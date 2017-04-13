@@ -8,11 +8,14 @@
 #define _GAME_APPLICATION_FRAMEWORK_H_
 
 #include "stdafx.h"
-
 #include "GameObject.h"
+#include "Player.h"
+#include "EnemyObject.h"
+
 
 #define CLIENT_WIDTH	640
 #define CLIENT_HEIGHT	480
+
 
 class CGameFramework
 {
@@ -20,10 +23,14 @@ public:
 	CGameFramework(void);
 	~CGameFramework(void);
 
+	//게임 생성
 	bool OnCreate(HINSTANCE hInstance, HWND hMainWnd);
+	//게임 종료(파괴)
 	void OnDestroy();
+	//디바이스 인풋, 오브젝트 애니메이트, 랜더, 더블버퍼링
 	void FrameAdvance();
 
+	//게임 상태
 	void SetActive(bool bActive) { m_bActive = bActive; }
 
 private:
@@ -37,10 +44,10 @@ private:
 
 	CPlayer						*m_pPlayer;
 
-	int							m_nObjects;
-	CGameObject					*m_pObjects;
-
-	CGameObject					*m_pWall;
+	int							m_nObjects;  //오브젝트 갯수
+	//CGameObject					*m_pObjects; //오브젝트 포인터(배열)
+	EnemyCube					*m_pObjects;
+	CGameObject					*m_pWall;    //벽
 	XMFLOAT4					m_pxmf4WallPlanes[6];
 
 public:

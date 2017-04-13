@@ -4,6 +4,8 @@
 
 #include "stdafx.h"
 #include "GameFramework.h"
+#include "Player.h"
+#include "EnemyObject.h"
 
 CGameFramework::CGameFramework()
 {
@@ -92,12 +94,21 @@ void CGameFramework::BuildObjects()
 	m_pPlayer->SetColor(RGB(0, 0, 255));
 	m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 5.0f, -15.0f));
 
-	CWallMesh *pWallCubeMesh = new CWallMesh(40.0f, 40.0f, 40.0f);
-	m_pWall = new CGameObject();
-	m_pWall->SetPosition(0.0f, 0.0f, 0.0f);
-	m_pWall->SetMesh(pWallCubeMesh);
-	m_pWall->SetColor(RGB(0, 0, 0));
-	m_pWall->SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(20.0f, 20.0f, 20.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
+	CWallMesh *pWallCubeMesh = new CWallMesh(40.0f, 40.0f, 100.0f);
+	m_pWall = new CGameObject[2];
+
+	for (int i = 0; i < 2; ++i) {
+		m_pWall[i].SetPosition(0, 0, i * 50);
+		m_pWall[i].SetColor(RGB(0, 0, 0));
+		m_pWall[i].SetMesh(pWallCubeMesh);
+		m_pWall[i].SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(40.0f, 40.0f, 100.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
+	}
+	//m_pWall->SetPosition(0.0f, 0.0f, 0.0f);
+	//m_pWall->SetMesh(pWallCubeMesh);
+	//m_pWall->SetColor(RGB(0, 0, 0));
+	//m_pWall->SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(20.0f, 20.0f, 20.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
+
+
 	m_pxmf4WallPlanes[0] = XMFLOAT4(+1.0f, 0.0f, 0.0f, 20.0f);
 	m_pxmf4WallPlanes[1] = XMFLOAT4(-1.0f, 0.0f, 0.0f, 20.0f);
 	m_pxmf4WallPlanes[2] = XMFLOAT4(0.0f, +1.0f, 0.0f, 20.0f);
@@ -105,81 +116,19 @@ void CGameFramework::BuildObjects()
 	m_pxmf4WallPlanes[4] = XMFLOAT4(0.0f, 0.0f, +1.0f, 20.0f);
 	m_pxmf4WallPlanes[5] = XMFLOAT4(0.0f, 0.0f, -1.0f, 20.0f);
 
-	CCubeMesh *pObjectCubeMesh = new CCubeMesh(4.0f, 4.0f, 4.0f);
 
-	m_nObjects = 8;
-	m_pObjects = new CGameObject[m_nObjects];
-    m_pObjects[0].SetMesh(pObjectCubeMesh);
-	m_pObjects[0].SetColor(RGB(255, 0, 0));
-	m_pObjects[0].SetPosition(-13.5f, 0.0f, -14.0f);
-	m_pObjects[0].SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 1.0f));
-	m_pObjects[0].SetRotationSpeed(0.05f);
-	m_pObjects[0].SetMovingDirection(XMFLOAT3(1.0f, 0.0f, 0.0f));
-	m_pObjects[0].SetMovingSpeed(0.001f);
-	m_pObjects[0].SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(2.0f, 2.0f, 2.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
+	m_nObjects = 20;
+	m_pObjects = new EnemyCube[m_nObjects];
+	XMFLOAT3 tmp[4] = { { -13.5f, 0.0f, -14.0f },{ 13.5f, 0.0f, -14.0f } ,{ -13.5f, 0.0f, 14.0f } ,
+	{ 13.5f, 0.0f, 14.0f } };
+	DWORD tmp2[4] = { RGB(255,0,0), RGB(0,255,0), RGB(0,0,255), RGB(255,255,0) };
 
-    m_pObjects[1].SetMesh(pObjectCubeMesh);
-	m_pObjects[1].SetColor(RGB(0, 0, 255));
-	m_pObjects[1].SetPosition(+13.5f, 0.0f, -14.0f);
-	m_pObjects[1].SetRotationAxis(XMFLOAT3(1.0f, 1.0f, 0.0f));
-	m_pObjects[1].SetRotationSpeed(0.07f);
-	m_pObjects[1].SetMovingDirection(XMFLOAT3(-1.0f, 0.0f, 0.0f));
-	m_pObjects[1].SetMovingSpeed(0.001f);
-	m_pObjects[1].SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(2.0f, 2.0f, 2.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
+	for (int i = 0; i < m_nObjects; ++i) {
+		m_pObjects[i].setCube(tmp[i], tmp2[i], XMFLOAT3(1.0f, 1.0f, 1.0f),
+			0.05f, XMFLOAT3(1.0f, 0.0f, 0.0f), 0.01f);
 
-	m_pObjects[2].SetMesh(pObjectCubeMesh);
-	m_pObjects[2].SetColor(RGB(0, 255, 0));
-	m_pObjects[2].SetPosition(0.0f, +5.0f, 20.0f);
-	m_pObjects[2].SetRotationAxis(XMFLOAT3(1.0f, 1.0f, 0.0f));
-	m_pObjects[2].SetRotationSpeed(0.15f);
-	m_pObjects[2].SetMovingDirection(XMFLOAT3(1.0f, -1.0f, 0.0f));
-	m_pObjects[2].SetMovingSpeed(0.02f);
-	m_pObjects[2].SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(2.0f, 2.0f, 2.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
-
-	m_pObjects[3].SetMesh(pObjectCubeMesh);
-	m_pObjects[3].SetColor(RGB(0, 255, 255));
-	m_pObjects[3].SetPosition(0.0f, 0.0f, 0.0f);
-	m_pObjects[3].SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 1.0f));
-	m_pObjects[3].SetRotationSpeed(0.06f);
-	m_pObjects[3].SetMovingDirection(XMFLOAT3(0.0f, 0.0f, 1.0f));
-	m_pObjects[3].SetMovingSpeed(0.004f);
-	m_pObjects[3].SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(2.0f, 2.0f, 2.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
-
-	m_pObjects[4].SetMesh(pObjectCubeMesh);
-	m_pObjects[4].SetColor(RGB(128, 0, 255));
-	m_pObjects[4].SetPosition(10.0f, 0.0f, 0.0f);
-	m_pObjects[4].SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-	m_pObjects[4].SetRotationSpeed(0.06f);
-	m_pObjects[4].SetMovingDirection(XMFLOAT3(0.0f, 1.0f, 1.0f));
-	m_pObjects[4].SetMovingSpeed(0.004f);
-	m_pObjects[4].SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(2.0f, 2.0f, 2.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
-
-	m_pObjects[5].SetMesh(pObjectCubeMesh);
-	m_pObjects[5].SetColor(RGB(255, 0, 255));
-	m_pObjects[5].SetPosition(-10.0f, 0.0f, -10.0f);
-	m_pObjects[5].SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-	m_pObjects[5].SetRotationSpeed(0.06f);
-	m_pObjects[5].SetMovingDirection(XMFLOAT3(1.0f, 0.0f, 1.0f));
-	m_pObjects[5].SetMovingSpeed(0.004f);
-	m_pObjects[5].SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(2.0f, 2.0f, 2.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
-
-	m_pObjects[6].SetMesh(pObjectCubeMesh);
-	m_pObjects[6].SetColor(RGB(255, 0, 255));
-	m_pObjects[6].SetPosition(-10.0f, 10.0f, -10.0f);
-	m_pObjects[6].SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-	m_pObjects[6].SetRotationSpeed(0.06f);
-	m_pObjects[6].SetMovingDirection(XMFLOAT3(1.0f, 1.0f, 1.0f));
-	m_pObjects[6].SetMovingSpeed(0.004f);
-	m_pObjects[6].SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(2.0f, 2.0f, 2.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
-
-	m_pObjects[7].SetMesh(pObjectCubeMesh);
-	m_pObjects[7].SetColor(RGB(255, 0, 128));
-	m_pObjects[7].SetPosition(-10.0f, 10.0f, -20.0f);
-	m_pObjects[7].SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-	m_pObjects[7].SetRotationSpeed(0.06f);
-	m_pObjects[7].SetMovingDirection(XMFLOAT3(-1.0f, 1.0f, 1.0f));
-	m_pObjects[7].SetMovingSpeed(0.004f);
-	m_pObjects[7].SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(2.0f, 2.0f, 2.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
+		m_pObjects[i].m_pCollider = NULL;
+	}
 }
 
 void CGameFramework::ReleaseObjects()
@@ -210,15 +159,20 @@ void CGameFramework::ProcessInput()
 		if (pKeyBuffer[VK_RIGHT] & 0xF0) dwDirection |= DIR_RIGHT;
 		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeyBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
+		if (pKeyBuffer[0x51] & 0xF0) {
+			for(int i=0; i<m_nObjects; ++i)
+				m_pObjects[i].DestroyObject();
+		}
 	}
+	
 	float cxDelta = 0.0f, cyDelta = 0.0f;
 	POINT ptCursorPos;
 	if (GetCapture() == m_hWnd)
 	{
 		SetCursor(NULL);
 		GetCursorPos(&ptCursorPos);
-		cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 3.0f;
-		cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 3.0f;
+		cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 10.0f;
+		cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 10.0f;
 		SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
 	}
 	if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
@@ -237,10 +191,15 @@ void CGameFramework::ProcessInput()
 
 void CGameFramework::AnimateObjects()
 {
-	for (int i = 0; i < m_nObjects; i++) m_pObjects[i].Animate();
+	for (int i = 0; i < m_nObjects; i++) {
+		if(m_pObjects[i].getLive())
+			m_pObjects[i].Animate();
+	}
 
 	for (int i = 0; i < m_nObjects; i++)
 	{
+		if (!m_pObjects[i].getCubeLive())
+			continue;
 		ContainmentType containType = m_pWall->m_xmOOBB.Contains(m_pObjects[i].m_xmOOBB);
 		switch (containType)
 		{
@@ -288,9 +247,11 @@ void CGameFramework::AnimateObjects()
 				break;
 		}
 	}
-	for (int i = 0; i < m_nObjects; i++) m_pObjects[i].m_pCollider = NULL;
+	
 	for (int i = 0; i < m_nObjects; i++)
 	{
+		if (!m_pObjects[i].getLive())
+			continue;
 		for (int j = (i + 1); j < m_nObjects; j++)
 		{
 			if (m_pObjects[i].m_xmOOBB.Intersects(m_pObjects[j].m_xmOOBB))
@@ -302,6 +263,8 @@ void CGameFramework::AnimateObjects()
 	}
 	for (int i = 0; i < m_nObjects; i++)
 	{
+		if (!m_pObjects[i].getLive())
+			continue;
 		if (m_pObjects[i].m_pCollider && m_pObjects[i].m_pCollider->m_pCollider)
 		{
 			XMFLOAT3 xmf3MovingDirection = m_pObjects[i].m_xmf3MovingDirection;
@@ -326,9 +289,16 @@ void CGameFramework::FrameAdvance()
 
     ClearFrameBuffer(RGB(255, 255, 255));
 
-	m_pWall->Render(m_hDCFrameBuffer, m_pPlayer->m_pCamera);
+	//m_pWall->Render(m_hDCFrameBuffer, m_pPlayer->m_pCamera);
+	for (int i = 0; i < 2; ++i) {
+		if(m_pPlayer->GetPosition().z > m_pWall[i].GetPosition().z)
+			m_pWall[i].Render(m_hDCFrameBuffer, m_pPlayer->m_pCamera);
+	}
 
-	for (int i = 0; i < m_nObjects; i++) m_pObjects[i].Render(m_hDCFrameBuffer, m_pPlayer->m_pCamera);
+	for (int i = 0; i < m_nObjects; i++) {
+		if(m_pObjects[i].getLive())
+			m_pObjects[i].Render(m_hDCFrameBuffer, m_pPlayer->m_pCamera);
+	}
 
 	m_pPlayer->Render(m_hDCFrameBuffer, m_pPlayer->m_pCamera);
 

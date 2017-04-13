@@ -16,6 +16,18 @@
     <Filter Include="GameObject">
       <UniqueIdentifier>{b1558cd7-9fdf-4dfc-9b09-aa7db437afee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameObject\Enemy">
+      <UniqueIdentifier>{6eac1282-6193-4e96-8f67-1a6a8b7e6d5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject\Player">
+      <UniqueIdentifier>{14627d08-e221-4974-9c78-91a870df83a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject\BaseObject">
+      <UniqueIdentifier>{67eb5810-0ccf-485b-b66a-feb7b15c6d55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject\Map">
+      <UniqueIdentifier>{156153e6-b68b-44d9-a7b2-6dd6a37d6117}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="LabProject.ico">
@@ -32,9 +44,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\GameObject.cpp">
-      <Filter>GameObject</Filter>
-    </ClCompile>
     <ClCompile Include="src\GameFramework.cpp">
       <Filter>GameFrameWork</Filter>
     </ClCompile>
@@ -44,11 +53,20 @@
     <ClCompile Include="src\stdafx.cpp">
       <Filter>winMain</Filter>
     </ClCompile>
+    <ClCompile Include="src\GameObject.cpp">
+      <Filter>GameObject\BaseObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EnemyObject.cpp">
+      <Filter>GameObject\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Player.cpp">
+      <Filter>GameObject\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Map.cpp">
+      <Filter>GameObject\Map</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\GameObject.h">
-      <Filter>GameObject</Filter>
-    </ClInclude>
     <ClInclude Include="src\GameFramework.h">
       <Filter>GameFrameWork</Filter>
     </ClInclude>
@@ -60,6 +78,18 @@
     </ClInclude>
     <ClInclude Include="src\stdafx.h">
       <Filter>winMain</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GameObject.h">
+      <Filter>GameObject\BaseObject</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EnemyObject.h">
+      <Filter>GameObject\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Player.h">
+      <Filter>GameObject\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Map.h">
+      <Filter>GameObject\Map</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
