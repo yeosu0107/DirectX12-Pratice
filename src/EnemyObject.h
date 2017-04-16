@@ -1,13 +1,7 @@
 #pragma once
 #include "GameObject.h"
 
-class Paticle : public CGameObject {
-private:
-public:
-	Paticle() { }
-	~Paticle() {}
-	virtual void Animate();
-};
+
 
 class EnemyCube : public CGameObject {
 private:

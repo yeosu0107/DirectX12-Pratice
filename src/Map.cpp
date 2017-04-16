@@ -17,6 +17,9 @@ Tile::~Tile() {
 //void Tile::Render(HDC hDCFrameBuffer, CCamera *pCamera) {
 //
 //}
+const float mapHalfWidth = 20.0f;
+const float mapHalfHeight = 20.0f;
+const float mapHalfDepth = 60.0f;
 
 Wall::Wall() : size{ 300 }, Live{ false }, n_tile{ 48 } {
 	tile = new Tile[n_tile];
@@ -26,9 +29,9 @@ Wall::Wall() : size{ 300 }, Live{ false }, n_tile{ 48 } {
 	//float halfTileDepth = tileDepth / 2;
 
 	CWallTileMesh *tileMesh = new CWallTileMesh(tileWidth, 0, tileDepth);
-	width = 20.0f;
-	height = 20.0f;
-	depth = 60.0f;
+	width = mapHalfWidth;
+	height = mapHalfHeight;
+	depth = mapHalfDepth;
 
 	for (int index = 0; index < n_tile; ++index) {
 		tile[index].SetMesh(tileMesh);

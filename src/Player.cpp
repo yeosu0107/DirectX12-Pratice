@@ -2,9 +2,12 @@
 #include "Player.h"
 #include "GameObject.h"
 #include "Bullet.h"
+#include <random>
+
 
 using namespace Vector3;
-CPlayer::CPlayer() : maxBulletCount{ 100 }, bulletDelay{ 100 }, maxBulletDelay{ 100 }
+CPlayer::CPlayer() : maxBulletCount{ 100 }, bulletDelay{ 10 }, maxBulletDelay{ 10 },
+numOfPaticle{ 100 }, paticleLiveTime{ 0 }, maxpaicleLiveTime{ 50 }, Live{ true }, speed{ 0.5f }
 {
 	m_pCamera = new CCamera();
 	m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, 60.0f);
@@ -25,11 +28,27 @@ CPlayer::CPlayer() : maxBulletCount{ 100 }, bulletDelay{ 100 }, maxBulletDelay{ 
 
 	m_pBullet = new Bullet[maxBulletCount];
 	bulletIndex = 0;
+
+	paticle = new Paticle[numOfPaticle];
+	CCubeMesh *paticleMesh = new CCubeMesh(0.5f, 0.5f, 0.5f);
+	std::default_random_engine dre;
+	std::uniform_int_distribution<> ui(-10, 10);
+
+	for (int i = 0; i < numOfPaticle; ++i) {
+		paticle[i].SetMesh(paticleMesh);
+		paticle[i].SetColor(getColor());
+		paticle[i].SetRotationAxis(XMFLOAT3(1.0f, 1.0f, 1.0f));
+		paticle[i].SetRotationSpeed(0.05f);
+		paticle[i].SetMovingDirection(XMFLOAT3(ui(dre), ui(dre), ui(dre)));
+		paticle[i].SetMovingSpeed(1.0f);
+	}
 }
 
 CPlayer::~CPlayer()
 {
 	delete[] m_pBullet;
+	delete[] paticle;
+	CGameObject::~CGameObject();
 }
 
 void CPlayer::SetPosition(float x, float y, float z)
@@ -46,17 +65,17 @@ void CPlayer::SetCameraOffset(XMFLOAT3& xmf3CameraOffset)
 	m_pCamera->GenerateViewMatrix();
 }
 
-void CPlayer::Move(DWORD dwDirection, float fDistance)
+void CPlayer::Move(DWORD dwDirection)
 {
 	if (dwDirection)
 	{
 		XMFLOAT3 xmf3Shift = XMFLOAT3(0, 0, 0);
-		if (dwDirection & DIR_FORWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
-		if (dwDirection & DIR_BACKWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, -fDistance);
-		if (dwDirection & DIR_RIGHT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, fDistance);
-		if (dwDirection & DIR_LEFT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, -fDistance);
-		if (dwDirection & DIR_UP) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, fDistance);
-		if (dwDirection & DIR_DOWN) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, -fDistance);
+		if (dwDirection & DIR_FORWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, speed);
+		if (dwDirection & DIR_BACKWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, -speed);
+		if (dwDirection & DIR_RIGHT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, speed);
+		if (dwDirection & DIR_LEFT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, -speed);
+		if (dwDirection & DIR_UP) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, speed);
+		if (dwDirection & DIR_DOWN) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, -speed);
 
 		Move(xmf3Shift, true);
 	}
@@ -82,6 +101,17 @@ void CPlayer::Move(float x, float y, float z)
 
 void CPlayer::Rotate(float fPitch, float fYaw, float fRoll)
 {
+	//XMFLOAT3 rightvector = XMFLOAT3(1.0f, 0.0f, 0.0f);
+	//XMFLOAT3 upvector = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	XMFLOAT3 baseLookv = XMFLOAT3(0.0f, 0.0f, 1.0f);
+	XMFLOAT3 nowLookv = m_xmf3Up; //0,0,1
+	float angle = Vector3::Angle(baseLookv, nowLookv);
+
+	/*printf("%f, %f, %f\t%f, %f, %f\t%f\n", baseLookv.x, baseLookv.y, baseLookv.z,
+		nowLookv.x, nowLookv.y, nowLookv.z, angle);*/
+	
+	/*if (_isnan(angle))
+		return;*/
 	m_pCamera->Rotate(fPitch, fYaw, fRoll);
 	if (fPitch != 0.0f)
 	{
@@ -140,6 +170,17 @@ void CPlayer::Shoot()
 	bulletDelay = 0;
 }
 
+void CPlayer::OnDestroy()
+{
+	if (Live) {
+		Live = false;
+		for (int i = 0; i < maxBulletCount; ++i)
+			m_pBullet[i].setLive(false);
+		for (int i = 0; i < numOfPaticle; ++i)
+			paticle[i].SetPosition(GetPosition());
+	}
+}
+
 void CPlayer::Render(HDC hDCFrameBuffer, CCamera *pCamera)
 {
 	m_xmf4x4World._11 = m_xmf3Right.x; m_xmf4x4World._12 = m_xmf3Right.y; m_xmf4x4World._13 = m_xmf3Right.z;
@@ -148,22 +189,38 @@ void CPlayer::Render(HDC hDCFrameBuffer, CCamera *pCamera)
 	m_xmf4x4World._41 = m_xmf3Position.x; m_xmf4x4World._42 = m_xmf3Position.y; m_xmf4x4World._43 = m_xmf3Position.z;
 
 	m_xmf4x4World = Matrix4x4::Multiply(XMMatrixRotationRollPitchYaw(XMConvertToRadians(90.0f), 0.0f, 0.0f), m_xmf4x4World);
-
-	CGameObject::Render(hDCFrameBuffer, pCamera);
-
-	for (int i = 0; i < maxBulletCount; ++i) {
-		if (m_pBullet[i].GetLive())
-			m_pBullet[i].Render(hDCFrameBuffer, pCamera);
+	if (Live) {
+		CGameObject::Render(hDCFrameBuffer, pCamera);
+		for (int i = 0; i < maxBulletCount; ++i) {
+			if (m_pBullet[i].GetLive())
+				m_pBullet[i].Render(hDCFrameBuffer, pCamera);
+		}
 	}
+	else {
+		for(int i=0; i<numOfPaticle; ++i)
+			paticle[i].Render(hDCFrameBuffer, pCamera);
+	}
+	
 }
 
 void CPlayer::Animate()
 {
-	//CGameObject::Animate();
-	for (int i = 0; i < maxBulletCount; ++i) {
-		if (m_pBullet[i].GetLive())
-			m_pBullet[i].Animate();
+	if (Live) {
+		CGameObject::Animate();
+
+		for (int i = 0; i < maxBulletCount; ++i) {
+			if (m_pBullet[i].GetLive())
+				m_pBullet[i].Animate();
+		}
 	}
+	else {
+		if (paticleLiveTime < maxpaicleLiveTime) {
+			for (int i = 0; i < numOfPaticle; ++i)
+				paticle[i].Animate();
+			paticleLiveTime++;
+		}
+	}
+
 }
 
 
@@ -291,3 +348,4 @@ void CCamera::Update(CPlayer *pPlayer, XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 		SetLookAt(pPlayer->m_xmf3Position, pPlayer->m_xmf3Up);
 	}
 }
+

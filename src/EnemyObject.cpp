@@ -5,8 +5,8 @@
 #include <random>
 
 
-CCubeMesh *baseCubeMesh = new CCubeMesh(4.0, 4.0, 4.0);
-CCubeMesh *paticleMesh = new CCubeMesh(1.0, 1.0, 1.0);
+CCubeMesh *baseCubeMesh = new CCubeMesh(4.0f, 4.0f, 4.0f);
+CCubeMesh *paticleMesh = new CCubeMesh(0.5f, 0.5f, 0.5f);
 
 
 std::default_random_engine dre;
@@ -18,7 +18,7 @@ std::uniform_int_distribution<> z(0.0f, 100.0f);
 std::uniform_int_distribution<> color(0,255);
 std::uniform_int_distribution<> select(0, 3);
 
-EnemyCube::EnemyCube() : LiveCube{ true }, LivePaticle{ false }, Live{ true }, paticleLiveTime{ 0 }, numOfPaticle{ 40 } {
+EnemyCube::EnemyCube() : LiveCube{ true }, LivePaticle{ false }, Live{ true }, paticleLiveTime{ 0 }, numOfPaticle{ 50 } {
 	paticle = new Paticle[numOfPaticle];
 	m_pMesh = baseCubeMesh;
 }
@@ -69,9 +69,9 @@ void EnemyCube::setCube(float posz, float rotSpeed, float movSpeed) {
 		paticle[i].SetMesh(paticleMesh);
 		paticle[i].SetColor(color);
 		paticle[i].SetRotationAxis(XMFLOAT3(1.0f, 1.0f, 1.0f));
-		paticle[i].SetRotationSpeed(0.05f);
+		paticle[i].SetRotationSpeed(1.0f);
 		paticle[i].SetMovingDirection(XMFLOAT3(ui(dre), ui(dre), ui(dre)));
-		paticle[i].SetMovingSpeed(0.1f);
+		paticle[i].SetMovingSpeed(1.0f);
 		//paticle[i].SetPosition(pos);
 	}
 }
@@ -90,10 +90,10 @@ void EnemyCube::DestroyObject() {
 void EnemyCube::Animate(XMFLOAT3 pos) {
 	if (!Live) {
   	    //this->MoveForward(pos.z + 100.0f);
-		this->setCube(pos.z+100, 0.1f, 0.1f);
+		this->setCube(pos.z+100, 1.0f, 0.1f);
 		Live = true;
 		LiveCube = true;
-		return;
+		//return;
 	}
 	if (LiveCube) {
 		if (this->GetPosition().z < pos.z-50) {
@@ -105,7 +105,7 @@ void EnemyCube::Animate(XMFLOAT3 pos) {
 		return;
 	}
 	if(LivePaticle){
-		if (paticleLiveTime > 500) {
+		if (paticleLiveTime > 50) {
 			LivePaticle = false;
 			paticleLiveTime = 0;
 			Live = false;
@@ -132,9 +132,5 @@ void EnemyCube::Render(HDC hDCFrameBuffer, CCamera *pCamera) {
 	}
 }
 
-void Paticle::Animate() {
-	if (m_fRotationSpeed != 0.0f)
-		Rotate(m_xmf3RotationAxis, m_fRotationSpeed);
-	if (m_fMovingSpeed != 0.0f)
-		Move(m_xmf3MovingDirection, m_fMovingSpeed);
-}
+
+

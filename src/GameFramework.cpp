@@ -24,11 +24,16 @@ CGameFramework::CGameFramework()
 
 	m_nObjects = 0;
 
+	score = new Score();
 	_tcscpy_s(m_pszFrameRate, _T("LapProject ("));
 }
 
 CGameFramework::~CGameFramework()
 {
+	delete m_pPlayer;
+	delete m_pObjects;
+	delete m_pWall;
+	delete score;
 }
 
 bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
@@ -100,6 +105,7 @@ void CGameFramework::BuildObjects()
 	m_pPlayer->SetMesh(pAirplaneMesh);
 	m_pPlayer->SetColor(RGB(0, 0, 255));
 	m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 5.0f, -15.0f));
+	m_pPlayer->SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(3.0f, 6.0f, 0.5f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 
 	m_nWall = 5;
 	m_pWall = new Wall[m_nWall];
@@ -130,7 +136,7 @@ void CGameFramework::BuildObjects()
 	
 
 	for (int i = 0; i < m_nObjects; ++i) {
-		m_pObjects[i].setCube(m_pPlayer->GetPosition().z, 0.1f, 0.1f);
+		m_pObjects[i].setCube(m_pPlayer->GetPosition().z+20.0f, 1.0f, 0.1f);
 		
 		m_pObjects[i].m_pCollider = NULL;
 	}
@@ -178,8 +184,8 @@ void CGameFramework::ProcessInput()
 	{
 		SetCursor(NULL);
 		GetCursorPos(&ptCursorPos);
-		cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 10.0f;
-		cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 10.0f;
+		cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 5.0f;
+		cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 5.0f;
 		SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
 	}
 	if(pKeyBuffer[VK_LBUTTON] & 0xF0)
@@ -197,9 +203,12 @@ void CGameFramework::ProcessInput()
 				
 			}
 		}
-		if (dwDirection) m_pPlayer->Move(dwDirection, 0.05f);
+		if (m_pPlayer->getLive() && dwDirection) {
+			score->moveForward(m_pPlayer->getSpeed());
+			m_pPlayer->Move(dwDirection);
+		}
 	}
-	m_pPlayer->Update(0.00516f);
+	m_pPlayer->Update(0.516f);
 }
 
 void CGameFramework::AnimateObjects()
@@ -290,14 +299,16 @@ void CGameFramework::AnimateObjects()
 	}
 
 	
-
+	//오브젝트 충돌 정의
 	for (int i = 0; i < m_nObjects; i++)
 	{
 		if (!m_pObjects[i].getLive())
 			continue;
-		for (int j = (i + 1); j < m_nObjects; j++)
+		//오브젝트끼리 충돌
+		for (int j = ( i + 1 ); j < m_nObjects; j++)
 		{
-			//오브젝트끼리 충돌
+			/*if (i == j)
+				continue;*/
 			if (m_pObjects[i].m_xmOOBB.Intersects(m_pObjects[j].m_xmOOBB))
 			{
 				m_pObjects[i].m_pCollider = &m_pObjects[j];
@@ -307,13 +318,21 @@ void CGameFramework::AnimateObjects()
 
 		//총알과 충돌
 		for (int k = 0; k < 100; ++k) {
-			if (!m_pPlayer->GetBullet()[k].GetLive())
+			if (!m_pPlayer->GetBullet()[k].GetLive() || !m_pPlayer->getLive())
 				continue;
-			if (m_pObjects[i].m_xmOOBB.Intersects(m_pPlayer->GetBullet()[k].m_xmOOBB)) {
+			if (m_pObjects[i].getCubeLive() &&  m_pObjects[i].m_xmOOBB.Intersects(m_pPlayer->GetBullet()[k].m_xmOOBB)) {
 				m_pObjects[i].DestroyObject();
 				m_pPlayer->GetBullet()[k].setLive(false);
+				score->killEnemy();
 				break;
 			}
+		}
+
+		//플레이어와 충돌
+
+		if(m_pPlayer->getLive() && m_pObjects[i].m_xmOOBB.Intersects(m_pPlayer->m_xmOOBB)) {
+			printf("Crash!\n");
+			m_pPlayer->OnDestroy();
 		}
 	}
 	for (int i = 0; i < m_nObjects; i++)
@@ -334,10 +353,15 @@ void CGameFramework::AnimateObjects()
 	}
 }
 
+void DrawScore(int score) {
+	
+
+}
+
 void CGameFramework::FrameAdvance()
 {    
     if (!m_bActive) return;
-	m_GameTimer.Tick(0.0f);
+	m_GameTimer.Tick(60.0f);
 	ProcessInput();
 
 	AnimateObjects();
@@ -352,15 +376,20 @@ void CGameFramework::FrameAdvance()
 	for (int i = 0; i < m_nObjects; i++) {
 		if(m_pObjects[i].getLive())
 			m_pObjects[i].Render(m_hDCFrameBuffer, m_pPlayer->m_pCamera);
-		/*XMFLOAT3 tmp = m_pObjects[i].GetPosition();
-		printf("%d오브젝트\t%f\t,%f\t,%f\n", i, tmp.x, tmp.y, tmp.z);*/
 		
 	}
-	//system("cls");
+
 	m_pPlayer->Render(m_hDCFrameBuffer, m_pPlayer->m_pCamera);
 
-	PresentFrameBuffer();
 
+	wchar_t str[100];
+	wsprintf(str, L"Score : %d", score->setScore());
+	TextOut(m_hDCFrameBuffer, 10, 10, str, lstrlen(str));
+
+
+
+	PresentFrameBuffer();
+	
 	//프레임레이트 표현
 	_itow_s(m_GameTimer.GetFrameRate(), (m_pszFrameRate + 12), 37, 10);    
 	wcscat_s((m_pszFrameRate + 12), 37, _T(" FPS)"));

@@ -3,12 +3,12 @@
 #include "Bullet.h"
 
 
-CCubeMesh *bulletMesh = new CCubeMesh(1.0, 1.0, 1.0);
+CCubeMesh *bulletMesh = new CCubeMesh(0.5, 0.5, 0.5);
 
 Bullet::Bullet() : Live{ false }, damage{ 0 }, LimitTime{ 0 }, maxLimitTime{ 1000 } {
 	m_pMesh = bulletMesh;
 	SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
-	SetMovingSpeed(0.4);
+	SetMovingSpeed(3.0f);
 	SetRotationAxis(XMFLOAT3(0.0f, 0.0f, 0.0f));
 	SetRotationSpeed(0.0f);
 }
@@ -40,6 +40,8 @@ void Bullet::Shoot(XMFLOAT3 pos, XMFLOAT3 dir, XMFLOAT3 up, XMFLOAT3 right)
 	Live = true;
 }
 
+
+
 void Bullet::Animate()
 {
 	if (Live && LimitTime >= maxLimitTime) {
@@ -47,6 +49,13 @@ void Bullet::Animate()
 		LimitTime = 0;
 		return;
 	}
+	XMFLOAT3 tmpPos = this->GetPosition();
+	if (Live && ((tmpPos.x > mapHalfWidth + 10) || (tmpPos.x < -mapHalfWidth - 10) || (tmpPos.y > mapHalfHeight + 10) || (tmpPos.y < -mapHalfHeight - 10))) {
+		Live = false;
+		LimitTime = 0;
+		return;
+	}
+
 	LimitTime++;
 	CGameObject::Animate();
 }

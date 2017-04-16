@@ -2,6 +2,8 @@
 #include "GameObject.h"
 #include "Bullet.h"
 
+
+
 class CPlayer : public CGameObject
 {
 private:
@@ -10,6 +12,15 @@ private:
 	int bulletIndex;
 	int bulletDelay;
 	int maxBulletDelay;
+
+	Paticle* paticle;
+	int HP;
+	int numOfPaticle;
+	bool Live;
+	int paticleLiveTime;
+	int maxpaicleLiveTime;
+
+	float speed;
 public:
 	CPlayer();
 	virtual ~CPlayer();
@@ -29,15 +40,22 @@ public:
 
 	CCamera						*m_pCamera;
 
+
 	void SetPosition(float x, float y, float z);
-	void Move(DWORD dwDirection, float fDistance);
+	void Move(DWORD dwDirection);
 	void Move(XMFLOAT3& xmf3Shift, bool bUpdateVelocity);
 	void Move(float x, float y, float z);
 	void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f);
 	void SetCameraOffset(XMFLOAT3& xmf3CameraOffset);
 	void Update(float fTimeElapsed = 0.016f);
 
+	
 	void Shoot();
+	void OnDestroy();
+
+	bool getLive() const { return Live; }
+	void setSpeed(float tmp) { speed = tmp; }
+	float getSpeed() const { return speed; }
 
 	virtual void Render(HDC hDCFrameBuffer, CCamera *pCamera);
 	virtual void Animate();
@@ -75,8 +93,5 @@ public:
 	void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f);
 	void Update(CPlayer *pPlayer, XMFLOAT3& xmf3LookAt, float fTimeElapsed = 0.016f);
 };
-
-
-
 
 

@@ -91,6 +91,22 @@ void CMesh::Render(HDC hDCFrameBuffer, XMFLOAT4X4& xm4x4Transform, CCamera *pCam
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+CLine::CLine() : CMesh(1){
+
+}
+
+CLine::~CLine() {
+
+}
+
+void CLine::setLength(XMFLOAT3 pos1, XMFLOAT3 pos2) {
+	CPolygon *line = new CPolygon(2);
+	line->SetVertex(0, CVertex(pos1.x, pos1.y, pos1.z));
+	line->SetVertex(1, CVertex(pos2.x, pos2.y, pos2.z));
+	SetPolygon(0, line);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 CCubeMesh::CCubeMesh(float fWidth, float fHeight, float fDepth) : CMesh(6)
 {
 	float fHalfWidth = fWidth * 0.5f;
@@ -605,3 +621,10 @@ void CGameObject::Render(HDC hDCFrameBuffer, CCamera *pCamera)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+
+void Paticle::Animate() {
+	if (m_fRotationSpeed != 0.0f)
+		Rotate(m_xmf3RotationAxis, m_fRotationSpeed);
+	if (m_fMovingSpeed != 0.0f)
+		Move(m_xmf3MovingDirection, m_fMovingSpeed);
+}

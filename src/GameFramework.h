@@ -18,6 +18,21 @@
 #define CLIENT_WIDTH	640
 #define CLIENT_HEIGHT	480
 
+class Score {
+private:
+	float distance;
+	float killCount;
+	float score;
+public:
+	Score() : distance{ 0 }, killCount{ 0 }, score{ 0 } {}
+	~Score() {}
+	void killEnemy() { killCount++; }
+	void moveForward(float dist) { distance+=dist; }
+	int setScore() { 
+		score = killCount*100 + distance/10;
+		return (int)score;
+	}
+};
 
 class CGameFramework
 {
@@ -55,6 +70,8 @@ private:
 
 	CGameTimer					m_GameTimer;
 	_TCHAR						m_pszFrameRate[50];
+
+	Score*						score;
 
 public:
 	void BuildFrameBuffer();

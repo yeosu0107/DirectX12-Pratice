@@ -72,6 +72,15 @@ public:
 	virtual void Render(HDC hDCFrameBuffer, XMFLOAT4X4& xm4x4Transform, CCamera *pCamera);
 };
 
+class CLine : public CMesh
+{
+public:
+	CLine();
+	virtual ~CLine();
+
+	void setLength(XMFLOAT3 pos1, XMFLOAT3 pos2);
+};
+
 class CCubeMesh : public CMesh
 {
 public:
@@ -179,9 +188,15 @@ public:
 	virtual void Animate();
 	//그리기(버퍼, 카메라 포인터)
 	virtual void Render(HDC hDCFrameBuffer, CCamera *pCamera);
-	//피격당했을 시 파괴
+
 };
 
 
-
+class Paticle : public CGameObject {
+private:
+public:
+	Paticle() {}
+	~Paticle() {}
+	virtual void Animate();
+};
 

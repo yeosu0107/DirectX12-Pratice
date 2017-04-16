@@ -26,5 +26,5 @@ public:
 	float GetTimeElapsed() { return m_fTimeElapsed; } 
 	//프레임 평균 경과시간 반환
 	long getCurretFrame() {	return m_nCurrentFrameRate;	}
-	
+	void WaitClock();
 };
