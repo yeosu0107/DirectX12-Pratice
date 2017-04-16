@@ -26,11 +26,11 @@ public:
 	bool getPaticleLive() { return LivePaticle; }
 	bool getLive() { return Live; }
 
-	void setCube(XMFLOAT3 Pos, DWORD dwColor,
-		XMFLOAT3 Axis, float rotSpeed, XMFLOAT3 dir, float movSpeed);
+	void setCube(float posz, float rotSpeed, float movSpeed);
+	//void setCube(XMFLOAT3 Pos);
 	void DestroyObject();
 	void setNumOfPaticle(int num) { numOfPaticle = num; }
-	virtual void Animate();
+	virtual void Animate(XMFLOAT3 pos);
 	virtual void Render(HDC hDCFrameBuffer, CCamera *pCamera);
 };
 

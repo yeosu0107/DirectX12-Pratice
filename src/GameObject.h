@@ -140,7 +140,7 @@ public:
 
 
 	//충돌영역 설정(XMFLOAT3&, XMFLOAT3&, XMFLOAT4&)
-	//중심좌표, 중심에서 끝점까지의 거리, 
+	//중심좌표, 중심에서 끝점까지의 거리, 회전
 	void SetOOBB(XMFLOAT3& xmCenter, XMFLOAT3& xmExtents, XMFLOAT4& xmOrientation) { m_xmOOBBTransformed = m_xmOOBB = BoundingOrientedBox(xmCenter, xmExtents, xmOrientation); }
 
 	//이동 반경 설정(XMFLOAT3&)
@@ -155,11 +155,11 @@ public:
 	//회전 속도 설정(float)
 	void SetRotationSpeed(float fSpeed) { m_fRotationSpeed = fSpeed; }
 
-	//z축 이동(float)
+	//x축 이동(float)
 	void MoveStrafe(float fDistance=1.0f);
 	//y축 이동(float)
 	void MoveUp(float fDistance=1.0f);
-	//x축 이동(float)
+	//z축 이동(float)
 	void MoveForward(float fDistance=1.0f);
 	//임의의 방향으로 임의의 속도로 이동 (XMFLOAT3&, float)
 	void Move(XMFLOAT3& vDirection, float fSpeed);
@@ -173,6 +173,7 @@ public:
 	XMFLOAT3 GetLook();     //룩벡터 반환
 	XMFLOAT3 GetUp();       //업벡터 반환
 	XMFLOAT3 GetRight();    //오른쪽 벡터 반환
+	DWORD getColor() { return m_dwColor; }
 
 	//애니메이션 (이동, 회전, 충돌 등...)
 	virtual void Animate();

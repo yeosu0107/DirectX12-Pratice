@@ -1,11 +1,16 @@
-//-----------------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------------
 // File: CGameFramework.cpp
 //-----------------------------------------------------------------------------
 
 #include "stdafx.h"
 #include "GameFramework.h"
+#include "Map.h"
 #include "Player.h"
+
 #include "EnemyObject.h"
+#include <stdio.h>
+#include <random>
+
 
 CGameFramework::CGameFramework()
 {
@@ -18,6 +23,8 @@ CGameFramework::CGameFramework()
 	m_bActive = true;    
 
 	m_nObjects = 0;
+
+	_tcscpy_s(m_pszFrameRate, _T("LapProject ("));
 }
 
 CGameFramework::~CGameFramework()
@@ -89,24 +96,20 @@ void CGameFramework::BuildObjects()
 {
 	CAirplaneMesh *pAirplaneMesh = new CAirplaneMesh(6.0f, 6.0f, 1.0f);
 	m_pPlayer = new CPlayer();
-	m_pPlayer->SetPosition(0.0f, 0.0f, -30.0f);
+	m_pPlayer->SetPosition(0.0f, 0.0f, 0.0f);
 	m_pPlayer->SetMesh(pAirplaneMesh);
 	m_pPlayer->SetColor(RGB(0, 0, 255));
 	m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 5.0f, -15.0f));
 
-	CWallMesh *pWallCubeMesh = new CWallMesh(40.0f, 40.0f, 100.0f);
-	m_pWall = new CGameObject[2];
+	m_nWall = 5;
+	m_pWall = new Wall[m_nWall];
 
-	for (int i = 0; i < 2; ++i) {
-		m_pWall[i].SetPosition(0, 0, i * 50);
-		m_pWall[i].SetColor(RGB(0, 0, 0));
-		m_pWall[i].SetMesh(pWallCubeMesh);
-		m_pWall[i].SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(40.0f, 40.0f, 100.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
+	for (int i = 0; i < m_nWall; ++i) {
+		m_pWall[i].SetIndex(i);
+		m_pWall[i].SetPosition(0, 0, i * 60);
+		m_pWall[i].SetTile(i * 60);
+		m_pWall[i].SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(25.0f, 15.0f, 100.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 	}
-	//m_pWall->SetPosition(0.0f, 0.0f, 0.0f);
-	//m_pWall->SetMesh(pWallCubeMesh);
-	//m_pWall->SetColor(RGB(0, 0, 0));
-	//m_pWall->SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(20.0f, 20.0f, 20.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 
 
 	m_pxmf4WallPlanes[0] = XMFLOAT4(+1.0f, 0.0f, 0.0f, 20.0f);
@@ -117,16 +120,18 @@ void CGameFramework::BuildObjects()
 	m_pxmf4WallPlanes[5] = XMFLOAT4(0.0f, 0.0f, -1.0f, 20.0f);
 
 
-	m_nObjects = 20;
+	m_nObjects = 10;
 	m_pObjects = new EnemyCube[m_nObjects];
-	XMFLOAT3 tmp[4] = { { -13.5f, 0.0f, -14.0f },{ 13.5f, 0.0f, -14.0f } ,{ -13.5f, 0.0f, 14.0f } ,
-	{ 13.5f, 0.0f, 14.0f } };
-	DWORD tmp2[4] = { RGB(255,0,0), RGB(0,255,0), RGB(0,0,255), RGB(255,255,0) };
+
+	DWORD tmp2[4] = { RGB(255,255,0), RGB(0,255, 255), RGB(255,0,255), RGB(100,200,30) };
+
+	//(-25 ~ 25) (-15 ~ 15), (-100, 100)
+	
+	
 
 	for (int i = 0; i < m_nObjects; ++i) {
-		m_pObjects[i].setCube(tmp[i], tmp2[i], XMFLOAT3(1.0f, 1.0f, 1.0f),
-			0.05f, XMFLOAT3(1.0f, 0.0f, 0.0f), 0.01f);
-
+		m_pObjects[i].setCube(m_pPlayer->GetPosition().z, 0.1f, 0.1f);
+		
 		m_pObjects[i].m_pCollider = NULL;
 	}
 }
@@ -134,7 +139,11 @@ void CGameFramework::BuildObjects()
 void CGameFramework::ReleaseObjects()
 {
 	if (m_pObjects) delete [] m_pObjects;
+	if (m_pWall) delete[] m_pWall;
+	if (m_pPlayer) delete m_pPlayer;
 	m_pObjects = NULL;
+	m_pWall = NULL;
+	m_pPlayer = NULL;
 }
 
 void CGameFramework::OnDestroy()
@@ -153,16 +162,14 @@ void CGameFramework::ProcessInput()
 	DWORD dwDirection = 0;
 	if (GetKeyboardState(pKeyBuffer))
 	{
-		if (pKeyBuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;
-		if (pKeyBuffer[VK_DOWN] & 0xF0) dwDirection |= DIR_BACKWARD;
-		if (pKeyBuffer[VK_LEFT] & 0xF0) dwDirection |= DIR_LEFT;
-		if (pKeyBuffer[VK_RIGHT] & 0xF0) dwDirection |= DIR_RIGHT;
+		if (pKeyBuffer[VK_W] & 0xF0) dwDirection |= DIR_FORWARD;
+		if (pKeyBuffer[VK_S] & 0xF0) dwDirection |= DIR_BACKWARD;
+		if (pKeyBuffer[VK_A] & 0xF0) dwDirection |= DIR_LEFT;
+		if (pKeyBuffer[VK_D] & 0xF0) dwDirection |= DIR_RIGHT;
 		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeyBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
-		if (pKeyBuffer[0x51] & 0xF0) {
-			for(int i=0; i<m_nObjects; ++i)
-				m_pObjects[i].DestroyObject();
-		}
+		if (pKeyBuffer[VK_Q] & 0xF0) 	m_pPlayer->Shoot();
+		
 	}
 	
 	float cxDelta = 0.0f, cyDelta = 0.0f;
@@ -175,34 +182,67 @@ void CGameFramework::ProcessInput()
 		cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 10.0f;
 		SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
 	}
+	if(pKeyBuffer[VK_LBUTTON] & 0xF0)
+		m_pPlayer->Shoot();
 	if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
 	{
 		if (cxDelta || cyDelta)
 		{
-			if (pKeyBuffer[VK_RBUTTON] & 0xF0)
+			if (pKeyBuffer[VK_RBUTTON] & 0xF0) {
 				m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
-			else
+				//m_pPlayer->Shoot();
+			}
+			else {
 				m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
+				
+			}
 		}
-		if (dwDirection) m_pPlayer->Move(dwDirection, 0.025f);
+		if (dwDirection) m_pPlayer->Move(dwDirection, 0.05f);
 	}
 	m_pPlayer->Update(0.00516f);
 }
 
 void CGameFramework::AnimateObjects()
 {
+	// ------------- 애니메이션 부분 ----------------------
+	m_pPlayer->Animate();
 	for (int i = 0; i < m_nObjects; i++) {
-		if(m_pObjects[i].getLive())
-			m_pObjects[i].Animate();
+		/*if(m_pObjects[i].getLive())*/
+			m_pObjects[i].Animate(m_pPlayer->GetPosition());
 	}
+	for (int i = 0; i < m_nWall; ++i)
+		m_pWall[i].Animate(m_pPlayer->GetPosition());
+	////////////////////////////////////////////////////////
 
-	for (int i = 0; i < m_nObjects; i++)
-	{
-		if (!m_pObjects[i].getCubeLive())
+	// ------------- 충돌체크 부분 ------------------------
+
+	/*for (int wallIndex = 0; wallIndex < m_nWall; ++wallIndex) {
+		if (!m_pWall[wallIndex].getLive())
 			continue;
-		ContainmentType containType = m_pWall->m_xmOOBB.Contains(m_pObjects[i].m_xmOOBB);
-		switch (containType)
+		for (int enemyIndex = 0; enemyIndex < m_nObjects; ++enemyIndex) {
+			if (!m_pObjects[enemyIndex].getLive())
+				continue;
+			ContainmentType containType = m_pWall[wallIndex].m_xmOOBB.Contains(m_pObjects[enemyIndex].m_xmOOBB);
+			if (containType == INTERSECTS) {
+				Tile* tmpTile = m_pWall[wallIndex].GetTile();
+				for (int tile = 0; tile < 48; ++tile) {
+					ContainmentType tileType = tmpTile[tile].m_xmOOBB.Contains(m_pObjects[enemyIndex].m_xmOOBB);
+					if (tileType == INTERSECTS) {
+						printf("%d  %d\n", enemyIndex, tile);
+						tmpTile[tile].SetColor(m_pObjects[enemyIndex].getColor());
+						break;
+					}
+				}
+			}
+		}
+	}*/
+
+	for (int index = 0; index < m_nWall; ++index) {
+		for (int i = 0; i < m_nObjects; i++)
 		{
+			ContainmentType containType = m_pWall[index].m_xmOOBB.Contains(m_pObjects[i].m_xmOOBB);
+			switch (containType)
+			{
 			case DISJOINT:
 			{
 				int nPlaneIndex = -1;
@@ -245,19 +285,34 @@ void CGameFramework::AnimateObjects()
 			}
 			case CONTAINS:
 				break;
+			}
 		}
 	}
+
 	
+
 	for (int i = 0; i < m_nObjects; i++)
 	{
 		if (!m_pObjects[i].getLive())
 			continue;
 		for (int j = (i + 1); j < m_nObjects; j++)
 		{
+			//오브젝트끼리 충돌
 			if (m_pObjects[i].m_xmOOBB.Intersects(m_pObjects[j].m_xmOOBB))
 			{
 				m_pObjects[i].m_pCollider = &m_pObjects[j];
 				m_pObjects[j].m_pCollider = &m_pObjects[i];
+			}
+		}
+
+		//총알과 충돌
+		for (int k = 0; k < 100; ++k) {
+			if (!m_pPlayer->GetBullet()[k].GetLive())
+				continue;
+			if (m_pObjects[i].m_xmOOBB.Intersects(m_pPlayer->GetBullet()[k].m_xmOOBB)) {
+				m_pObjects[i].DestroyObject();
+				m_pPlayer->GetBullet()[k].setLive(false);
+				break;
 			}
 		}
 	}
@@ -282,27 +337,34 @@ void CGameFramework::AnimateObjects()
 void CGameFramework::FrameAdvance()
 {    
     if (!m_bActive) return;
-
+	m_GameTimer.Tick(0.0f);
 	ProcessInput();
 
 	AnimateObjects();
 
     ClearFrameBuffer(RGB(255, 255, 255));
 
-	//m_pWall->Render(m_hDCFrameBuffer, m_pPlayer->m_pCamera);
-	for (int i = 0; i < 2; ++i) {
-		if(m_pPlayer->GetPosition().z > m_pWall[i].GetPosition().z)
+	for (int i = 0; i < m_nWall; ++i) {
+		if(m_pWall[i].getLive())
 			m_pWall[i].Render(m_hDCFrameBuffer, m_pPlayer->m_pCamera);
 	}
 
 	for (int i = 0; i < m_nObjects; i++) {
 		if(m_pObjects[i].getLive())
 			m_pObjects[i].Render(m_hDCFrameBuffer, m_pPlayer->m_pCamera);
+		/*XMFLOAT3 tmp = m_pObjects[i].GetPosition();
+		printf("%d오브젝트\t%f\t,%f\t,%f\n", i, tmp.x, tmp.y, tmp.z);*/
+		
 	}
-
+	//system("cls");
 	m_pPlayer->Render(m_hDCFrameBuffer, m_pPlayer->m_pCamera);
 
 	PresentFrameBuffer();
+
+	//프레임레이트 표현
+	_itow_s(m_GameTimer.GetFrameRate(), (m_pszFrameRate + 12), 37, 10);    
+	wcscat_s((m_pszFrameRate + 12), 37, _T(" FPS)"));
+	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37); ::SetWindowText(m_hWnd, m_pszFrameRate);
 }
 
 

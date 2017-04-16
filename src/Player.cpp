@@ -1,9 +1,10 @@
 #include "stdafx.h"
 #include "Player.h"
 #include "GameObject.h"
+#include "Bullet.h"
 
-
-CPlayer::CPlayer()
+using namespace Vector3;
+CPlayer::CPlayer() : maxBulletCount{ 100 }, bulletDelay{ 100 }, maxBulletDelay{ 100 }
 {
 	m_pCamera = new CCamera();
 	m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, 60.0f);
@@ -21,10 +22,14 @@ CPlayer::CPlayer()
 	m_fPitch = 0.0f;
 	m_fRoll = 0.0f;
 	m_fYaw = 0.0f;
+
+	m_pBullet = new Bullet[maxBulletCount];
+	bulletIndex = 0;
 }
 
 CPlayer::~CPlayer()
 {
+	delete[] m_pBullet;
 }
 
 void CPlayer::SetPosition(float x, float y, float z)
@@ -116,6 +121,25 @@ void CPlayer::Update(float fTimeElapsed)
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, xmf3Deceleration, fDeceleration);
 }
 
+void CPlayer::Shoot()
+{
+	if (bulletDelay < maxBulletDelay) {
+		bulletDelay += 1;
+		return;
+	}
+
+	XMFLOAT3 upV = this->GetUp();
+	XMFLOAT3 lookV = this->GetLook();
+	XMFLOAT3 rightV = this->GetRight();
+
+
+	m_pBullet[bulletIndex].Shoot(this->GetPosition(), upV, lookV, rightV);
+	bulletIndex += 1;
+	if (bulletIndex > maxBulletCount)
+		bulletIndex = 0;
+	bulletDelay = 0;
+}
+
 void CPlayer::Render(HDC hDCFrameBuffer, CCamera *pCamera)
 {
 	m_xmf4x4World._11 = m_xmf3Right.x; m_xmf4x4World._12 = m_xmf3Right.y; m_xmf4x4World._13 = m_xmf3Right.z;
@@ -126,6 +150,20 @@ void CPlayer::Render(HDC hDCFrameBuffer, CCamera *pCamera)
 	m_xmf4x4World = Matrix4x4::Multiply(XMMatrixRotationRollPitchYaw(XMConvertToRadians(90.0f), 0.0f, 0.0f), m_xmf4x4World);
 
 	CGameObject::Render(hDCFrameBuffer, pCamera);
+
+	for (int i = 0; i < maxBulletCount; ++i) {
+		if (m_pBullet[i].GetLive())
+			m_pBullet[i].Render(hDCFrameBuffer, pCamera);
+	}
+}
+
+void CPlayer::Animate()
+{
+	//CGameObject::Animate();
+	for (int i = 0; i < maxBulletCount; ++i) {
+		if (m_pBullet[i].GetLive())
+			m_pBullet[i].Animate();
+	}
 }
 
 

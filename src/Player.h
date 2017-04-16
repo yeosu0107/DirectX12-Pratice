@@ -1,9 +1,15 @@
 #pragma once
 #include "GameObject.h"
-
+#include "Bullet.h"
 
 class CPlayer : public CGameObject
 {
+private:
+	Bullet* m_pBullet;
+	int maxBulletCount;
+	int bulletIndex;
+	int bulletDelay;
+	int maxBulletDelay;
 public:
 	CPlayer();
 	virtual ~CPlayer();
@@ -31,7 +37,12 @@ public:
 	void SetCameraOffset(XMFLOAT3& xmf3CameraOffset);
 	void Update(float fTimeElapsed = 0.016f);
 
+	void Shoot();
+
 	virtual void Render(HDC hDCFrameBuffer, CCamera *pCamera);
+	virtual void Animate();
+
+	Bullet* GetBullet() const{ return m_pBullet; }
 };
 
 

@@ -12,6 +12,12 @@ CCubeMesh *paticleMesh = new CCubeMesh(1.0, 1.0, 1.0);
 std::default_random_engine dre;
 std::uniform_int_distribution<> ui(-10, 10);
 
+std::uniform_int_distribution<> x(-20.0f, 20.0f);
+std::uniform_int_distribution<> y(-13.0f, 13.0f);
+std::uniform_int_distribution<> z(0.0f, 100.0f);
+std::uniform_int_distribution<> color(0,255);
+std::uniform_int_distribution<> select(0, 3);
+
 EnemyCube::EnemyCube() : LiveCube{ true }, LivePaticle{ false }, Live{ true }, paticleLiveTime{ 0 }, numOfPaticle{ 40 } {
 	paticle = new Paticle[numOfPaticle];
 	m_pMesh = baseCubeMesh;
@@ -24,21 +30,44 @@ EnemyCube::~EnemyCube() {
 
 }
 
-void EnemyCube::setCube(XMFLOAT3 pos, DWORD dwColor,
-	XMFLOAT3 Axis, float rotSpeed, XMFLOAT3 dir, float movSpeed) {
+void EnemyCube::setCube(float posz, float rotSpeed, float movSpeed) {
 
-	SetPosition(pos);
-	SetColor(dwColor);
-	SetRotationAxis(Axis);
+	XMFLOAT3 Pos(x(dre), y(dre), z(dre)+posz);
+	DWORD color(RGB(color(dre), color(dre), color(dre)));
+
+	switch (select(dre)) {
+	case 0:
+		SetRotationAxis(XMFLOAT3(1.0f, 0.0f, 0.0f));
+		SetMovingDirection(XMFLOAT3(1.0f, 0.0f, 0.0f));
+		break;
+	case 1:
+		SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
+		SetMovingDirection(XMFLOAT3(0.0f, 1.0f, 0.0f));
+		break;
+	case 2:
+		SetRotationAxis(XMFLOAT3(0.0f, 0.0f, 1.0f));
+		SetMovingDirection(XMFLOAT3(0.0f, 0.0f, 1.0f));
+		break;
+	case 3:
+		SetRotationAxis(XMFLOAT3(1.0f, 1.0f, 1.0f));
+		SetMovingDirection(XMFLOAT3(1.0f, 1.0f, 1.0f));
+		break;
+	default:
+		SetRotationAxis(XMFLOAT3(1.0f, 1.0f, 1.0f));
+		SetMovingDirection(XMFLOAT3(1.0f, 1.0f, 1.0f));
+		break;
+	}
+	SetPosition(Pos);
+	SetColor(color);
 	SetRotationSpeed(rotSpeed);
-	SetMovingDirection(dir);
 	SetMovingSpeed(movSpeed);
+
 	SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(2.0f, 2.0f, 2.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 
 	
 	for (int i = 0; i < numOfPaticle; ++i) {
 		paticle[i].SetMesh(paticleMesh);
-		paticle[i].SetColor(dwColor);
+		paticle[i].SetColor(color);
 		paticle[i].SetRotationAxis(XMFLOAT3(1.0f, 1.0f, 1.0f));
 		paticle[i].SetRotationSpeed(0.05f);
 		paticle[i].SetMovingDirection(XMFLOAT3(ui(dre), ui(dre), ui(dre)));
@@ -48,20 +77,31 @@ void EnemyCube::setCube(XMFLOAT3 pos, DWORD dwColor,
 }
 
 void EnemyCube::DestroyObject() {
+	if (!LiveCube)
+		return;
 	LiveCube = false;
 	LivePaticle = true;
 	for (int i = 0; i < numOfPaticle; ++i) {
 		paticle[i].SetPosition(GetPosition());
 	}
+	
 }
 
-void EnemyCube::Animate() {
+void EnemyCube::Animate(XMFLOAT3 pos) {
+	if (!Live) {
+  	    //this->MoveForward(pos.z + 100.0f);
+		this->setCube(pos.z+100, 0.1f, 0.1f);
+		Live = true;
+		LiveCube = true;
+		return;
+	}
 	if (LiveCube) {
-		if (m_fRotationSpeed != 0.0f) Rotate(m_xmf3RotationAxis, m_fRotationSpeed);
-		if (m_fMovingSpeed != 0.0f) Move(m_xmf3MovingDirection, m_fMovingSpeed);
-
-		m_xmOOBBTransformed.Transform(m_xmOOBB, XMLoadFloat4x4(&m_xmf4x4World));
-		XMStoreFloat4(&m_xmOOBBTransformed.Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmOOBBTransformed.Orientation)));
+		if (this->GetPosition().z < pos.z-50) {
+			LiveCube = false;
+			LivePaticle = false;
+			Live = false;
+		}
+		CGameObject::Animate();
 		return;
 	}
 	if(LivePaticle){
@@ -76,16 +116,14 @@ void EnemyCube::Animate() {
 		}
 		paticleLiveTime += 1;
 	}
+	
 }
+
+
 
 void EnemyCube::Render(HDC hDCFrameBuffer, CCamera *pCamera) {
 	if (LiveCube) {
-		XMFLOAT4X4 xm4x4Transform = Matrix4x4::Multiply(m_xmf4x4World, pCamera->m_xmf4x4ViewProject);
-		HPEN hPen = ::CreatePen(PS_SOLID, 0, m_dwColor);
-		HPEN hOldPen = (HPEN)::SelectObject(hDCFrameBuffer, hPen);
-		if (m_pMesh) m_pMesh->Render(hDCFrameBuffer, xm4x4Transform, pCamera);
-		::SelectObject(hDCFrameBuffer, hOldPen);
-		::DeleteObject(hPen);
+		CGameObject::Render(hDCFrameBuffer, pCamera);
 	}
 	if(LivePaticle){
 		for (int i = 0; i < numOfPaticle; ++i) {

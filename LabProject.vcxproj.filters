@@ -28,6 +28,15 @@
     <Filter Include="GameObject\Map">
       <UniqueIdentifier>{156153e6-b68b-44d9-a7b2-6dd6a37d6117}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameObject\Bullet">
+      <UniqueIdentifier>{df2b537d-fd13-4b4b-b3f6-0dba3f51f1f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameFrameWork\GameTimer">
+      <UniqueIdentifier>{8d5786d4-07bb-4ff6-a896-392ed0650173}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameFrameWork\GameFrameWork">
+      <UniqueIdentifier>{3453e0ac-2965-4bcb-8636-a0f7f78c0c05}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="LabProject.ico">
@@ -44,9 +53,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\GameFramework.cpp">
-      <Filter>GameFrameWork</Filter>
-    </ClCompile>
     <ClCompile Include="src\LabProject.cpp">
       <Filter>winMain</Filter>
     </ClCompile>
@@ -65,11 +71,17 @@
     <ClCompile Include="src\Map.cpp">
       <Filter>GameObject\Map</Filter>
     </ClCompile>
+    <ClCompile Include="src\Bullet.cpp">
+      <Filter>GameObject\Bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameFramework.cpp">
+      <Filter>GameFrameWork\GameFrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Timer.cpp">
+      <Filter>GameFrameWork\GameTimer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\GameFramework.h">
-      <Filter>GameFrameWork</Filter>
-    </ClInclude>
     <ClInclude Include="src\LabProject.h">
       <Filter>winMain</Filter>
     </ClInclude>
@@ -90,6 +102,15 @@
     </ClInclude>
     <ClInclude Include="src\Map.h">
       <Filter>GameObject\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bullet.h">
+      <Filter>GameObject\Bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GameFramework.h">
+      <Filter>GameFrameWork\GameFrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Timer.h">
+      <Filter>GameFrameWork\GameTimer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

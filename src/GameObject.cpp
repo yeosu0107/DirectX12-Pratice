@@ -45,6 +45,7 @@ void CPolygon::Draw(HDC hDCFrameBuffer, XMFLOAT4X4& xm4x4Transform, CCamera *pCa
 			{
 				::MoveToEx(hDCFrameBuffer, (long)xmf3Previous.x, (long)xmf3Previous.y, NULL);
 				::LineTo(hDCFrameBuffer, (long)xmf3Current.x, (long)xmf3Current.y);
+				//::Rectangle(hDCFrameBuffer, (long)xmf3Previous.x, (long)xmf3Previous.y, (long)xmf3Current.x, (long)xmf3Current.y);
 			}
 		}
 		xmf3Previous = xmf3Current;
@@ -145,14 +146,14 @@ CCubeMesh::~CCubeMesh(void)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-CWallMesh::CWallMesh(float fWidth, float fHeight, float fDepth) : CMesh(672)
+CWallMesh::CWallMesh(float fWidth, float fHeight, float fDepth) : CMesh(32)
 {
 	float fHalfWidth = fWidth;
 	float fHalfHeight = fHeight * 0.5f;
-	float fHalfDepth = fDepth-30;
+	float fHalfDepth = fDepth;
 
-	float numOfSide = 5;
-	float numOfBotton = 7;
+	float numOfSide = 1;
+	float numOfBotton = 2;
 	float difference = -3;
 
 	int index = 0;
@@ -168,10 +169,10 @@ CWallMesh::CWallMesh(float fWidth, float fHeight, float fDepth) : CMesh(672)
 			SetPolygon(index++, pLeftFace);
 
 			pLeftFace = new CPolygon(4);
-			pLeftFace->SetVertex(0, CVertex(-fHalfWidth, +fHalfHeight * (i / numOfBotton), -fHalfDepth * (j / numOfSide) + i * difference));
-			pLeftFace->SetVertex(1, CVertex(-fHalfWidth, +fHalfHeight * (i / numOfBotton), -fHalfDepth * ((j - 1) / numOfSide) + i * difference));
-			pLeftFace->SetVertex(2, CVertex(-fHalfWidth, +fHalfHeight * ((i - 1) / numOfBotton), -fHalfDepth * ((j - 1) / numOfSide) + i * difference));
-			pLeftFace->SetVertex(3, CVertex(-fHalfWidth, +fHalfHeight * ((i - 1) / numOfBotton), -fHalfDepth * (j / numOfSide) + i * difference));
+			pLeftFace->SetVertex(0, CVertex(-fHalfWidth, +fHalfHeight * (i / numOfBotton), 0 * (j / numOfSide) + i * difference));
+			pLeftFace->SetVertex(1, CVertex(-fHalfWidth, +fHalfHeight * (i / numOfBotton), 0 * ((j - 1) / numOfSide) + i * difference));
+			pLeftFace->SetVertex(2, CVertex(-fHalfWidth, +fHalfHeight * ((i - 1) / numOfBotton), 0 * ((j - 1) / numOfSide) + i * difference));
+			pLeftFace->SetVertex(3, CVertex(-fHalfWidth, +fHalfHeight * ((i - 1) / numOfBotton), 0 * (j / numOfSide) + i * difference));
 			SetPolygon(index++, pLeftFace);
 
 			pLeftFace = new CPolygon(4);
@@ -182,10 +183,10 @@ CWallMesh::CWallMesh(float fWidth, float fHeight, float fDepth) : CMesh(672)
 			SetPolygon(index++, pLeftFace);
 
 			pLeftFace = new CPolygon(4);
-			pLeftFace->SetVertex(0, CVertex(-fHalfWidth, -fHalfHeight * (i / numOfBotton),       -fHalfDepth * (j / numOfSide) + i * difference));
-			pLeftFace->SetVertex(1, CVertex(-fHalfWidth, -fHalfHeight * (i / numOfBotton),       -fHalfDepth * ((j - 1) / numOfSide) + i * difference));
-			pLeftFace->SetVertex(2, CVertex(-fHalfWidth, -fHalfHeight * ((i - 1) / numOfBotton), -fHalfDepth * ((j - 1) / numOfSide) + i * difference));
-			pLeftFace->SetVertex(3, CVertex(-fHalfWidth, -fHalfHeight * ((i - 1) / numOfBotton), -fHalfDepth * (j / numOfSide) + i * difference));
+			pLeftFace->SetVertex(0, CVertex(-fHalfWidth, -fHalfHeight * (i / numOfBotton),       0 * (j / numOfSide) + i * difference));
+			pLeftFace->SetVertex(1, CVertex(-fHalfWidth, -fHalfHeight * (i / numOfBotton),       0 * ((j - 1) / numOfSide) + i * difference));
+			pLeftFace->SetVertex(2, CVertex(-fHalfWidth, -fHalfHeight * ((i - 1) / numOfBotton), 0 * ((j - 1) / numOfSide) + i * difference));
+			pLeftFace->SetVertex(3, CVertex(-fHalfWidth, -fHalfHeight * ((i - 1) / numOfBotton), 0 * (j / numOfSide) + i * difference));
 			SetPolygon(index++, pLeftFace);
 		}
 	}
@@ -208,24 +209,24 @@ CWallMesh::CWallMesh(float fWidth, float fHeight, float fDepth) : CMesh(672)
 			SetPolygon(index++, pRightFace);
 
 			pRightFace = new CPolygon(4);
-			pRightFace->SetVertex(0, CVertex(+fHalfWidth, +fHalfHeight * (i / numOfBotton), -fHalfDepth * (j / numOfSide) + i * difference));
-			pRightFace->SetVertex(1, CVertex(+fHalfWidth, +fHalfHeight * (i / numOfBotton), -fHalfDepth * ((j - 1) / numOfSide) + i * difference));
-			pRightFace->SetVertex(2, CVertex(+fHalfWidth, +fHalfHeight * ((i - 1) / numOfBotton), -fHalfDepth * ((j - 1) / numOfSide) + i * difference));
-			pRightFace->SetVertex(3, CVertex(+fHalfWidth, +fHalfHeight * ((i - 1) / numOfBotton), -fHalfDepth * (j / numOfSide) + i * difference));
+			pRightFace->SetVertex(0, CVertex(+fHalfWidth, +fHalfHeight * (i / numOfBotton), 0 * (j / numOfSide) + i * difference));
+			pRightFace->SetVertex(1, CVertex(+fHalfWidth, +fHalfHeight * (i / numOfBotton), 0 * ((j - 1) / numOfSide) + i * difference));
+			pRightFace->SetVertex(2, CVertex(+fHalfWidth, +fHalfHeight * ((i - 1) / numOfBotton), 0 * ((j - 1) / numOfSide) + i * difference));
+			pRightFace->SetVertex(3, CVertex(+fHalfWidth, +fHalfHeight * ((i - 1) / numOfBotton), 0 * (j / numOfSide) + i * difference));
 			SetPolygon(index++, pRightFace);
 
 			pRightFace = new CPolygon(4);
-			pRightFace->SetVertex(0, CVertex(+fHalfWidth, -fHalfHeight * (i / numOfBotton), -fHalfDepth * (j / numOfSide) + i * difference));
-			pRightFace->SetVertex(1, CVertex(+fHalfWidth, -fHalfHeight * (i / numOfBotton), -fHalfDepth * ((j - 1) / numOfSide) + i * difference));
-			pRightFace->SetVertex(2, CVertex(+fHalfWidth, -fHalfHeight * ((i - 1) / numOfBotton), -fHalfDepth * ((j - 1) / numOfSide) + i * difference));
-			pRightFace->SetVertex(3, CVertex(+fHalfWidth, -fHalfHeight * ((i - 1) / numOfBotton), -fHalfDepth * (j / numOfSide) + i * difference));
+			pRightFace->SetVertex(0, CVertex(+fHalfWidth, -fHalfHeight * (i / numOfBotton), 0 * (j / numOfSide) + i * difference));
+			pRightFace->SetVertex(1, CVertex(+fHalfWidth, -fHalfHeight * (i / numOfBotton), 0 * ((j - 1) / numOfSide) + i * difference));
+			pRightFace->SetVertex(2, CVertex(+fHalfWidth, -fHalfHeight * ((i - 1) / numOfBotton), 0 * ((j - 1) / numOfSide) + i * difference));
+			pRightFace->SetVertex(3, CVertex(+fHalfWidth, -fHalfHeight * ((i - 1) / numOfBotton), 0 * (j / numOfSide) + i * difference));
 			SetPolygon(index++, pRightFace);
 		}
 	}
 	
 	CPolygon *pUpFace;
-	for (float i = numOfSide+2; i>0; --i) {
-		for (float j = numOfBotton; j>0; --j) {
+	for (float i = numOfBotton; i>0; --i) {
+		for (float j = numOfSide; j>0; --j) {
 			pUpFace = new CPolygon(4);
 			pUpFace->SetVertex(0, CVertex(+fHalfWidth * (i / numOfBotton), +fHalfHeight , +fHalfDepth * (j / numOfSide) + i * difference));
 			pUpFace->SetVertex(1, CVertex(+fHalfWidth * (i / numOfBotton), +fHalfHeight , +fHalfDepth * ((j - 1) / numOfSide) + i * difference));
@@ -234,10 +235,10 @@ CWallMesh::CWallMesh(float fWidth, float fHeight, float fDepth) : CMesh(672)
 			SetPolygon(index++, pUpFace);
 
 			pUpFace = new CPolygon(4);
-			pUpFace->SetVertex(0, CVertex(+fHalfWidth * (i / numOfBotton), +fHalfHeight , -fHalfDepth * (j / numOfSide) + i * difference));
-			pUpFace->SetVertex(1, CVertex(+fHalfWidth * (i / numOfBotton), +fHalfHeight , -fHalfDepth * ((j - 1) / numOfSide) + i * difference));
-			pUpFace->SetVertex(2, CVertex(+fHalfWidth * ((i - 1) / numOfBotton), +fHalfHeight , -fHalfDepth * ((j - 1) / numOfSide) + i * difference));
-			pUpFace->SetVertex(3, CVertex(+fHalfWidth * ((i - 1) / numOfBotton), +fHalfHeight , -fHalfDepth * (j / numOfSide) + i * difference));
+			pUpFace->SetVertex(0, CVertex(+fHalfWidth * (i / numOfBotton), +fHalfHeight , 0 * (j / numOfSide) + i * difference));
+			pUpFace->SetVertex(1, CVertex(+fHalfWidth * (i / numOfBotton), +fHalfHeight , 0 * ((j - 1) / numOfSide) + i * difference));
+			pUpFace->SetVertex(2, CVertex(+fHalfWidth * ((i - 1) / numOfBotton), +fHalfHeight , 0 * ((j - 1) / numOfSide) + i * difference));
+			pUpFace->SetVertex(3, CVertex(+fHalfWidth * ((i - 1) / numOfBotton), +fHalfHeight , 0 * (j / numOfSide) + i * difference));
 			SetPolygon(index++, pUpFace);
 
 			pUpFace = new CPolygon(4);
@@ -248,17 +249,17 @@ CWallMesh::CWallMesh(float fWidth, float fHeight, float fDepth) : CMesh(672)
 			SetPolygon(index++, pUpFace);
 
 			pUpFace = new CPolygon(4);
-			pUpFace->SetVertex(0, CVertex(-fHalfWidth * (i / numOfBotton), +fHalfHeight, -fHalfDepth * (j / numOfSide) + i * difference));
-			pUpFace->SetVertex(1, CVertex(-fHalfWidth * (i / numOfBotton), +fHalfHeight, -fHalfDepth * ((j - 1) / numOfSide) + i * difference));
-			pUpFace->SetVertex(2, CVertex(-fHalfWidth * ((i - 1) / numOfBotton), +fHalfHeight, -fHalfDepth * ((j - 1) / numOfSide) + i * difference));
-			pUpFace->SetVertex(3, CVertex(-fHalfWidth * ((i - 1) / numOfBotton), +fHalfHeight, -fHalfDepth * (j / numOfSide) + i * difference));
+			pUpFace->SetVertex(0, CVertex(-fHalfWidth * (i / numOfBotton), +fHalfHeight, 0 * (j / numOfSide) + i * difference));
+			pUpFace->SetVertex(1, CVertex(-fHalfWidth * (i / numOfBotton), +fHalfHeight, 0 * ((j - 1) / numOfSide) + i * difference));
+			pUpFace->SetVertex(2, CVertex(-fHalfWidth * ((i - 1) / numOfBotton), +fHalfHeight, 0 * ((j - 1) / numOfSide) + i * difference));
+			pUpFace->SetVertex(3, CVertex(-fHalfWidth * ((i - 1) / numOfBotton), +fHalfHeight, 0 * (j / numOfSide) + i * difference));
 			SetPolygon(index++, pUpFace);
 		}
 	}
 
 	CPolygon *pBottonFace;
-	for (float i = numOfSide+2; i>0; --i) {
-		for (float j = numOfBotton; j>0; --j) {
+	for (float i = numOfBotton; i>0; --i) {
+		for (float j = numOfSide; j>0; --j) {
 			pBottonFace = new CPolygon(4);
 			pBottonFace->SetVertex(0, CVertex(+fHalfWidth * (i / numOfBotton), -fHalfHeight, +fHalfDepth * (j / numOfSide) + i * difference));
 			pBottonFace->SetVertex(1, CVertex(+fHalfWidth * (i / numOfBotton), -fHalfHeight, +fHalfDepth * ((j - 1) / numOfSide) + i * difference));
@@ -267,10 +268,10 @@ CWallMesh::CWallMesh(float fWidth, float fHeight, float fDepth) : CMesh(672)
 			SetPolygon(index++, pBottonFace);
 
 			pBottonFace = new CPolygon(4);
-			pBottonFace->SetVertex(0, CVertex(+fHalfWidth * (i / numOfBotton), -fHalfHeight, -fHalfDepth * (j / numOfSide) + i * difference));
-			pBottonFace->SetVertex(1, CVertex(+fHalfWidth * (i / numOfBotton), -fHalfHeight, -fHalfDepth * ((j - 1) / numOfSide) + i * difference));
-			pBottonFace->SetVertex(2, CVertex(+fHalfWidth * ((i - 1) / numOfBotton), -fHalfHeight, -fHalfDepth * ((j - 1) / numOfSide) + i * difference));
-			pBottonFace->SetVertex(3, CVertex(+fHalfWidth * ((i - 1) / numOfBotton), -fHalfHeight, -fHalfDepth * (j / numOfSide) + i * difference));
+			pBottonFace->SetVertex(0, CVertex(+fHalfWidth * (i / numOfBotton), -fHalfHeight, 0 * (j / numOfSide) + i * difference));
+			pBottonFace->SetVertex(1, CVertex(+fHalfWidth * (i / numOfBotton), -fHalfHeight, 0 * ((j - 1) / numOfSide) + i * difference));
+			pBottonFace->SetVertex(2, CVertex(+fHalfWidth * ((i - 1) / numOfBotton), -fHalfHeight, 0 * ((j - 1) / numOfSide) + i * difference));
+			pBottonFace->SetVertex(3, CVertex(+fHalfWidth * ((i - 1) / numOfBotton), -fHalfHeight, 0 * (j / numOfSide) + i * difference));
 			SetPolygon(index++, pBottonFace);
 
 			pBottonFace = new CPolygon(4);
@@ -281,10 +282,10 @@ CWallMesh::CWallMesh(float fWidth, float fHeight, float fDepth) : CMesh(672)
 			SetPolygon(index++, pBottonFace);
 
 			pBottonFace = new CPolygon(4);
-			pBottonFace->SetVertex(0, CVertex(-fHalfWidth * (i / numOfBotton), -fHalfHeight, -fHalfDepth * (j / numOfSide) + i * difference));
-			pBottonFace->SetVertex(1, CVertex(-fHalfWidth * (i / numOfBotton), -fHalfHeight, -fHalfDepth * ((j - 1) / numOfSide) + i * difference));
-			pBottonFace->SetVertex(2, CVertex(-fHalfWidth * ((i - 1) / numOfBotton), -fHalfHeight, -fHalfDepth * ((j - 1) / numOfSide) + i * difference));
-			pBottonFace->SetVertex(3, CVertex(-fHalfWidth * ((i - 1) / numOfBotton), -fHalfHeight, -fHalfDepth * (j / numOfSide) + i * difference));
+			pBottonFace->SetVertex(0, CVertex(-fHalfWidth * (i / numOfBotton), -fHalfHeight, 0 * (j / numOfSide) + i * difference));
+			pBottonFace->SetVertex(1, CVertex(-fHalfWidth * (i / numOfBotton), -fHalfHeight, 0 * ((j - 1) / numOfSide) + i * difference));
+			pBottonFace->SetVertex(2, CVertex(-fHalfWidth * ((i - 1) / numOfBotton), -fHalfHeight, 0 * ((j - 1) / numOfSide) + i * difference));
+			pBottonFace->SetVertex(3, CVertex(-fHalfWidth * ((i - 1) / numOfBotton), -fHalfHeight, 0 * (j / numOfSide) + i * difference));
 			SetPolygon(index++, pBottonFace);
 		}
 	}

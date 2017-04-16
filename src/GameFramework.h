@@ -11,6 +11,8 @@
 #include "GameObject.h"
 #include "Player.h"
 #include "EnemyObject.h"
+#include "Map.h"
+#include "Timer.h"
 
 
 #define CLIENT_WIDTH	640
@@ -45,10 +47,14 @@ private:
 	CPlayer						*m_pPlayer;
 
 	int							m_nObjects;  //오브젝트 갯수
-	//CGameObject					*m_pObjects; //오브젝트 포인터(배열)
 	EnemyCube					*m_pObjects;
-	CGameObject					*m_pWall;    //벽
+
+	int							m_nWall;
+	Wall						*m_pWall;
 	XMFLOAT4					m_pxmf4WallPlanes[6];
+
+	CGameTimer					m_GameTimer;
+	_TCHAR						m_pszFrameRate[50];
 
 public:
 	void BuildFrameBuffer();

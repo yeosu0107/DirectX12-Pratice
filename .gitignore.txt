@@ -1,0 +1,3 @@
+Degug/
+x64/
+ReadMe/

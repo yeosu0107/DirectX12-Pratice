@@ -24,6 +24,12 @@
 #endif
 
 #define WIN32_LEAN_AND_MEAN		// 거의 사용되지 않는 내용은 Windows 헤더에서 제외합니다.
+
+#ifdef _DEBUG
+#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
+#endif
+
+
 // Windows 헤더 파일:
 #include <windows.h>
 
@@ -51,6 +57,14 @@ using namespace DirectX::PackedVector;
 #define RANDOM_COLOR	(0xFF000000 | ((rand() * 0xFFFFFF) / RAND_MAX))
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
+
+const int VK_Q = 0x51;
+const int VK_W = 0x57;
+const int VK_E = 0x45;
+const int VK_A = 0x41;
+const int VK_S = 0x53;
+const int VK_D = 0x44;
+
 
 namespace Vector3
 {
