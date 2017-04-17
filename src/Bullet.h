@@ -3,7 +3,6 @@
 
 extern const float mapHalfWidth;
 extern const float mapHalfHeight;
-//extern const float mapHalfDepth;
 
 class Bullet : public CGameObject {
 private:

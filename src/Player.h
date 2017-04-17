@@ -21,6 +21,9 @@ private:
 	int maxpaicleLiveTime;
 
 	float speed;
+	float backupSpeed;
+	float boostSpeed;
+	int boostGauge;
 public:
 	CPlayer();
 	virtual ~CPlayer();
@@ -56,6 +59,8 @@ public:
 	bool getLive() const { return Live; }
 	void setSpeed(float tmp) { speed = tmp; }
 	float getSpeed() const { return speed; }
+	void Boost();
+	void endBoost();
 
 	virtual void Render(HDC hDCFrameBuffer, CCamera *pCamera);
 	virtual void Animate();

@@ -112,8 +112,8 @@ void CGameFramework::BuildObjects()
 
 	for (int i = 0; i < m_nWall; ++i) {
 		m_pWall[i].SetIndex(i);
-		m_pWall[i].SetPosition(0, 0, i * 60);
-		m_pWall[i].SetTile(i * 60);
+		m_pWall[i].SetPosition(0, 0, (float)i * 60);
+		m_pWall[i].SetTile((float)i * 60);
 		m_pWall[i].SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(25.0f, 15.0f, 100.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 	}
 
@@ -174,10 +174,14 @@ void CGameFramework::ProcessInput()
 		if (pKeyBuffer[VK_D] & 0xF0) dwDirection |= DIR_RIGHT;
 		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeyBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
-		if (pKeyBuffer[VK_Q] & 0xF0) 	m_pPlayer->Shoot();
+		if (pKeyBuffer[VK_SPACE] & 0xF0)
+			m_pPlayer->Boost();
+		else
+			m_pPlayer->endBoost();
 		
 	}
-	
+	if (!m_pPlayer->getLive())
+		return;
 	float cxDelta = 0.0f, cyDelta = 0.0f;
 	POINT ptCursorPos;
 	if (GetCapture() == m_hWnd)
@@ -195,12 +199,10 @@ void CGameFramework::ProcessInput()
 		if (cxDelta || cyDelta)
 		{
 			if (pKeyBuffer[VK_RBUTTON] & 0xF0) {
-				m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
-				//m_pPlayer->Shoot();
+					m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
 			}
 			else {
 				m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
-				
 			}
 		}
 		if (m_pPlayer->getLive() && dwDirection) {
@@ -249,7 +251,7 @@ void CGameFramework::AnimateObjects()
 	for (int index = 0; index < m_nWall; ++index) {
 		for (int i = 0; i < m_nObjects; i++)
 		{
-			ContainmentType containType = m_pWall[index].m_xmOOBB.Contains(m_pObjects[i].m_xmOOBB);
+			ContainmentType containType = m_pWall[index].getOOBB()->Contains(*m_pObjects[i].getOOBB());
 			switch (containType)
 			{
 			case DISJOINT:
@@ -257,7 +259,7 @@ void CGameFramework::AnimateObjects()
 				int nPlaneIndex = -1;
 				for (int j = 0; j < 6; j++)
 				{
-					PlaneIntersectionType intersectType = m_pObjects[i].m_xmOOBB.Intersects(XMLoadFloat4(&m_pxmf4WallPlanes[j]));
+					PlaneIntersectionType intersectType = m_pObjects[i].getOOBB()->Intersects(XMLoadFloat4(&m_pxmf4WallPlanes[j]));
 					if (intersectType == BACK)
 					{
 						nPlaneIndex = j;
@@ -277,7 +279,7 @@ void CGameFramework::AnimateObjects()
 				int nPlaneIndex = -1;
 				for (int j = 0; j < 6; j++)
 				{
-					PlaneIntersectionType intersectType = m_pObjects[i].m_xmOOBB.Intersects(XMLoadFloat4(&m_pxmf4WallPlanes[j]));
+					PlaneIntersectionType intersectType = m_pObjects[i].getOOBB()->Intersects(XMLoadFloat4(&m_pxmf4WallPlanes[j]));
 					if (intersectType == INTERSECTING)
 					{
 						nPlaneIndex = j;
@@ -309,7 +311,8 @@ void CGameFramework::AnimateObjects()
 		{
 			/*if (i == j)
 				continue;*/
-			if (m_pObjects[i].m_xmOOBB.Intersects(m_pObjects[j].m_xmOOBB))
+
+			if (m_pObjects[i].getOOBB()->Intersects(*m_pObjects[j].getOOBB()))
 			{
 				m_pObjects[i].m_pCollider = &m_pObjects[j];
 				m_pObjects[j].m_pCollider = &m_pObjects[i];
@@ -320,17 +323,18 @@ void CGameFramework::AnimateObjects()
 		for (int k = 0; k < 100; ++k) {
 			if (!m_pPlayer->GetBullet()[k].GetLive() || !m_pPlayer->getLive())
 				continue;
-			if (m_pObjects[i].getCubeLive() &&  m_pObjects[i].m_xmOOBB.Intersects(m_pPlayer->GetBullet()[k].m_xmOOBB)) {
+			if (m_pObjects[i].getCubeLive() &&  m_pObjects[i].getOOBB()->Intersects(*m_pPlayer->GetBullet()[k].getOOBB())) {
 				m_pObjects[i].DestroyObject();
 				m_pPlayer->GetBullet()[k].setLive(false);
+				printf("%d\n", i);
 				score->killEnemy();
 				break;
 			}
 		}
 
 		//플레이어와 충돌
-
-		if(m_pPlayer->getLive() && m_pObjects[i].m_xmOOBB.Intersects(m_pPlayer->m_xmOOBB)) {
+		if(m_pObjects[i].getCubeLive() &&  m_pPlayer->getLive() && 
+			m_pObjects[i].getOOBB()->Intersects(*m_pPlayer->getOOBB())) {
 			printf("Crash!\n");
 			m_pPlayer->OnDestroy();
 		}

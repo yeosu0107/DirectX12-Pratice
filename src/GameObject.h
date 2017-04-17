@@ -184,6 +184,8 @@ public:
 	XMFLOAT3 GetRight();    //오른쪽 벡터 반환
 	DWORD getColor() { return m_dwColor; }
 
+	BoundingOrientedBox* getOOBB() { return &m_xmOOBBTransformed; } //트랜스폼 oobb주소 반환
+
 	//애니메이션 (이동, 회전, 충돌 등...)
 	virtual void Animate();
 	//그리기(버퍼, 카메라 포인터)

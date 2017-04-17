@@ -7,7 +7,8 @@
 
 using namespace Vector3;
 CPlayer::CPlayer() : maxBulletCount{ 100 }, bulletDelay{ 10 }, maxBulletDelay{ 10 },
-numOfPaticle{ 100 }, paticleLiveTime{ 0 }, maxpaicleLiveTime{ 50 }, Live{ true }, speed{ 0.5f }
+numOfPaticle{ 100 }, paticleLiveTime{ 0 }, maxpaicleLiveTime{ 50 }, Live{ true }, 
+speed{ 0.5f }, backupSpeed{ speed }, boostSpeed{ speed * 3 }, boostGauge{ 100 }
 {
 	m_pCamera = new CCamera();
 	m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, 60.0f);
@@ -101,18 +102,11 @@ void CPlayer::Move(float x, float y, float z)
 
 void CPlayer::Rotate(float fPitch, float fYaw, float fRoll)
 {
-	//XMFLOAT3 rightvector = XMFLOAT3(1.0f, 0.0f, 0.0f);
-	//XMFLOAT3 upvector = XMFLOAT3(0.0f, 1.0f, 0.0f);
-	XMFLOAT3 baseLookv = XMFLOAT3(0.0f, 0.0f, 1.0f);
-	XMFLOAT3 nowLookv = m_xmf3Up; //0,0,1
-	float angle = Vector3::Angle(baseLookv, nowLookv);
+	XMFLOAT3 saveLook = m_xmf3Look;
+	XMFLOAT3 saveUp = m_xmf3Up;
+	XMFLOAT3 saveRight = m_xmf3Right;
 
-	/*printf("%f, %f, %f\t%f, %f, %f\t%f\n", baseLookv.x, baseLookv.y, baseLookv.z,
-		nowLookv.x, nowLookv.y, nowLookv.z, angle);*/
 	
-	/*if (_isnan(angle))
-		return;*/
-	m_pCamera->Rotate(fPitch, fYaw, fRoll);
 	if (fPitch != 0.0f)
 	{
 		XMMATRIX mtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right), XMConvertToRadians(fPitch));
@@ -132,9 +126,26 @@ void CPlayer::Rotate(float fPitch, float fYaw, float fRoll)
 		m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, mtxRotate);
 	}
 
-	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
-	m_xmf3Right = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Up, m_xmf3Look));
-	m_xmf3Up = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Look, m_xmf3Right));
+	XMFLOAT3 baseLookv = XMFLOAT3(0.0f, 0.0f, 1.0f);
+	XMFLOAT3 nowLookv = m_xmf3Look; 
+	float angle = Vector3::Angle(baseLookv, nowLookv);
+
+//#ifdef _DEBUG
+//	printf("%f, %f, %f\t%f, %f, %f\t%f\n", baseLookv.x, baseLookv.y, baseLookv.z,
+//		nowLookv.x, nowLookv.y, nowLookv.z, angle);
+//#endif
+
+	if (angle > 60.0f) {
+		m_xmf3Look = saveLook;
+		m_xmf3Right = saveRight;
+		m_xmf3Up = saveUp;
+	}
+	else {
+		m_pCamera->Rotate(fPitch, fYaw, fRoll);
+		m_xmf3Look = Vector3::Normalize(m_xmf3Look);
+		m_xmf3Right = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Up, m_xmf3Look));
+		m_xmf3Up = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Look, m_xmf3Right));
+	}
 }
 
 void CPlayer::Update(float fTimeElapsed)
@@ -179,6 +190,24 @@ void CPlayer::OnDestroy()
 		for (int i = 0; i < numOfPaticle; ++i)
 			paticle[i].SetPosition(GetPosition());
 	}
+}
+
+void CPlayer::Boost()
+{
+	if (boostGauge > 0) {
+		speed = boostSpeed;
+		boostGauge--;
+	}
+	else {
+		speed = backupSpeed;
+	}
+}
+
+void CPlayer::endBoost()
+{
+	if(boostGauge<100)
+		boostGauge++;
+	speed = backupSpeed;
 }
 
 void CPlayer::Render(HDC hDCFrameBuffer, CCamera *pCamera)
