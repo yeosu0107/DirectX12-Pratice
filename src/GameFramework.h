@@ -32,6 +32,7 @@ public:
 		score = killCount*100 + distance/10;
 		return (int)score;
 	}
+	void ResetScore() { distance = 0; killCount = 0; score = 0; }
 };
 
 class CGameFramework
@@ -72,6 +73,8 @@ private:
 	_TCHAR						m_pszFrameRate[50];
 
 	Score*						score;
+
+	bool						m_start = false;
 
 public:
 	void BuildFrameBuffer();

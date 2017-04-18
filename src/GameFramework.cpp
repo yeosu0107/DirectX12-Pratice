@@ -14,6 +14,8 @@
 
 CGameFramework::CGameFramework()
 {
+	m_start = false;
+
 	m_hInstance = NULL;
 	m_hWnd = NULL;     
 
@@ -99,6 +101,8 @@ void CGameFramework::SetupRenderStates()
 
 void CGameFramework::BuildObjects()
 {
+	score->ResetScore();
+
 	CAirplaneMesh *pAirplaneMesh = new CAirplaneMesh(6.0f, 6.0f, 1.0f);
 	m_pPlayer = new CPlayer();
 	m_pPlayer->SetPosition(0.0f, 0.0f, 0.0f);
@@ -179,9 +183,20 @@ void CGameFramework::ProcessInput()
 		else
 			m_pPlayer->endBoost();
 		
+		if (pKeyBuffer[VK_RETURN] & 0xF0) {
+			if (!m_pPlayer->getLive()) {
+				BuildObjects();
+				m_start = false;
+			}
+			else if (!m_start)
+				m_start = true;
+		}
+
+
 	}
-	if (!m_pPlayer->getLive())
+	if (!m_pPlayer->getLive() || !m_start)
 		return;
+
 	float cxDelta = 0.0f, cyDelta = 0.0f;
 	POINT ptCursorPos;
 	if (GetCapture() == m_hWnd)
@@ -219,7 +234,7 @@ void CGameFramework::AnimateObjects()
 	m_pPlayer->Animate();
 	for (int i = 0; i < m_nObjects; i++) {
 		/*if(m_pObjects[i].getLive())*/
-			m_pObjects[i].Animate(m_pPlayer->GetPosition());
+		m_pObjects[i].Animate(m_pPlayer->GetPosition());
 	}
 	for (int i = 0; i < m_nWall; ++i)
 		m_pWall[i].Animate(m_pPlayer->GetPosition());
@@ -299,15 +314,16 @@ void CGameFramework::AnimateObjects()
 			}
 		}
 	}
+	if (!m_start)
+		return;
 
-	
 	//오브젝트 충돌 정의
 	for (int i = 0; i < m_nObjects; i++)
 	{
 		if (!m_pObjects[i].getLive())
 			continue;
 		//오브젝트끼리 충돌
-		for (int j = ( i + 1 ); j < m_nObjects; j++)
+		for (int j = (i + 1); j < m_nObjects; j++)
 		{
 			/*if (i == j)
 				continue;*/
@@ -323,7 +339,7 @@ void CGameFramework::AnimateObjects()
 		for (int k = 0; k < 100; ++k) {
 			if (!m_pPlayer->GetBullet()[k].GetLive() || !m_pPlayer->getLive())
 				continue;
-			if (m_pObjects[i].getCubeLive() &&  m_pObjects[i].getOOBB()->Intersects(*m_pPlayer->GetBullet()[k].getOOBB())) {
+			if (m_pObjects[i].getCubeLive() && m_pObjects[i].getOOBB()->Intersects(*m_pPlayer->GetBullet()[k].getOOBB())) {
 				m_pObjects[i].DestroyObject();
 				m_pPlayer->GetBullet()[k].setLive(false);
 				printf("%d\n", i);
@@ -333,9 +349,10 @@ void CGameFramework::AnimateObjects()
 		}
 
 		//플레이어와 충돌
-		if(m_pObjects[i].getCubeLive() &&  m_pPlayer->getLive() && 
+		if (m_pObjects[i].getCubeLive() && m_pPlayer->getLive() &&
 			m_pObjects[i].getOOBB()->Intersects(*m_pPlayer->getOOBB())) {
-			printf("Crash!\n");
+			//printf("Crash!\n");
+			//m_start = false;
 			m_pPlayer->OnDestroy();
 		}
 	}
@@ -355,6 +372,7 @@ void CGameFramework::AnimateObjects()
 			m_pObjects[i].m_pCollider = NULL;
 		}
 	}
+
 }
 
 void DrawScore(int score) {
@@ -367,6 +385,7 @@ void CGameFramework::FrameAdvance()
     if (!m_bActive) return;
 	m_GameTimer.Tick(60.0f);
 	ProcessInput();
+
 
 	AnimateObjects();
 
@@ -385,11 +404,24 @@ void CGameFramework::FrameAdvance()
 
 	m_pPlayer->Render(m_hDCFrameBuffer, m_pPlayer->m_pCamera);
 
-
-	wchar_t str[100];
-	wsprintf(str, L"Score : %d", score->setScore());
-	TextOut(m_hDCFrameBuffer, 10, 10, str, lstrlen(str));
-
+	if (m_start) {
+		wchar_t str[100];
+		wsprintf(str, L"Score : %d", score->setScore());
+		TextOut(m_hDCFrameBuffer, 10, 10, str, lstrlen(str));
+		if (!m_pPlayer->getLive()) {
+			wchar_t exit[15];
+			wchar_t exit2[20];
+			wsprintf(exit, L"Game Over");
+			wsprintf(exit2, L"Press Enter to Restart");
+			TextOut(m_hDCFrameBuffer, CLIENT_WIDTH / 2 - 30, CLIENT_HEIGHT / 2 - 20, exit, lstrlen(exit));
+			TextOut(m_hDCFrameBuffer, CLIENT_WIDTH / 2 - 30, CLIENT_HEIGHT / 2, exit2, lstrlen(exit2));
+		}
+	}
+	else {
+		wchar_t str[20];
+		wsprintf(str, L"Press Enter to Start");
+		TextOut(m_hDCFrameBuffer, CLIENT_WIDTH / 2 - 60, CLIENT_HEIGHT / 2 - 20, str, lstrlen(str));
+	}
 
 
 	PresentFrameBuffer();
@@ -399,5 +431,3 @@ void CGameFramework::FrameAdvance()
 	wcscat_s((m_pszFrameRate + 12), 37, _T(" FPS)"));
 	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37); ::SetWindowText(m_hWnd, m_pszFrameRate);
 }
-
-
