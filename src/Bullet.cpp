@@ -14,7 +14,7 @@ Bullet::Bullet() : Live{ false }, damage{ 0 }, LimitTime{ 0 }, maxLimitTime{ 100
 }
 
 Bullet::~Bullet() {
-
+	CGameObject::~CGameObject();
 }
 
 void Bullet::SetBullet(DWORD dwColor, float movSpeed)

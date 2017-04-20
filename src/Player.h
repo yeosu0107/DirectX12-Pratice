@@ -24,6 +24,7 @@ private:
 	float backupSpeed;
 	float boostSpeed;
 	int boostGauge;
+	int maxboostGauge;
 public:
 	CPlayer();
 	virtual ~CPlayer();
@@ -55,12 +56,15 @@ public:
 	
 	void Shoot();
 	void OnDestroy();
+	void ItemChecker(int item);
 
 	bool getLive() const { return Live; }
 	void setSpeed(float tmp) { speed = tmp; }
 	float getSpeed() const { return speed; }
 	void Boost();
 	void endBoost();
+	int getBulletSpeed() const { return maxBulletDelay; }
+
 	float getBoost() const{ return boostGauge; }
 
 	void MoveBack(DWORD dwDirection);

@@ -26,7 +26,7 @@ EnemyCube::EnemyCube() : LiveCube{ true }, LivePaticle{ false }, Live{ true }, p
 
 EnemyCube::~EnemyCube() {
 	delete[] paticle;
-
+	CGameObject::~CGameObject();
 
 }
 
@@ -48,7 +48,7 @@ void EnemyCube::setCube(float posz, float rotSpeed, float movSpeed) {
 		break;
 	case 2:
 		SetRotationAxis(XMFLOAT3(0.0f, 0.0f, 1.0f));
-		SetMovingDirection(XMFLOAT3(0.0f, 0.0f, 1.0f));
+		SetMovingDirection(XMFLOAT3(0.0f, 0.0f, -1.0f));
 		SetColor(color[2]);
 		break;
 	case 3:
@@ -66,6 +66,7 @@ void EnemyCube::setCube(float posz, float rotSpeed, float movSpeed) {
 	//SetColor(color);
 	SetRotationSpeed(rotSpeed);
 	SetMovingSpeed(movSpeed);
+	SetMovingRange(30.0f);
 
 	SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(2.0f, 2.0f, 2.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 
@@ -92,7 +93,7 @@ void EnemyCube::DestroyObject() {
 	
 }
 
-void EnemyCube::Animate(XMFLOAT3 pos, float movSpeed, float rotSpeed) {
+void EnemyCube::Animate(XMFLOAT3& pos, float movSpeed, float rotSpeed) {
 	if (!Live) {
   	    //this->MoveForward(pos.z + 100.0f);
 		this->setCube(pos.z+100, rotSpeed, movSpeed);

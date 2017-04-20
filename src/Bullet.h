@@ -12,7 +12,7 @@ private:
 	int maxLimitTime;
 public:
 	Bullet();
-	~Bullet();
+	virtual ~Bullet();
 
 	void SetBullet(DWORD dwColor, float movSpeed);
 	void Shoot(XMFLOAT3 pos, XMFLOAT3 dir, XMFLOAT3 up, XMFLOAT3 right);

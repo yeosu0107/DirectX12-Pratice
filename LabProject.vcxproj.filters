@@ -37,6 +37,9 @@
     <Filter Include="GameFrameWork\GameFrameWork">
       <UniqueIdentifier>{3453e0ac-2965-4bcb-8636-a0f7f78c0c05}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameObject\Itme">
+      <UniqueIdentifier>{6fe487b8-e8b9-4823-a049-6696222ecc7c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="LabProject.ico">
@@ -80,6 +83,9 @@
     <ClCompile Include="src\Timer.cpp">
       <Filter>GameFrameWork\GameTimer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Item.cpp">
+      <Filter>GameObject\Itme</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\LabProject.h">
@@ -111,6 +117,9 @@
     </ClInclude>
     <ClInclude Include="src\Timer.h">
       <Filter>GameFrameWork\GameTimer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Item.h">
+      <Filter>GameObject\Itme</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

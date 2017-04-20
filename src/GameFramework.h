@@ -13,10 +13,13 @@
 #include "EnemyObject.h"
 #include "Map.h"
 #include "Timer.h"
+#include "Item.h"
 
 
 #define CLIENT_WIDTH	640
 #define CLIENT_HEIGHT	480
+
+
 
 class Score {
 private:
@@ -44,10 +47,12 @@ private:
 	wchar_t m_gameover[30];
 	wchar_t m_restart[40];
 	wchar_t m_boostGauag[30];
+	//wchar_t m_speed[30];
+	wchar_t m_bulletspeed[30];
 public:
 	UI();
 	~UI();
-	void DrawUI(HDC m_hDCFrameBuffer, int status, int score, int boost);
+	void DrawUI(HDC m_hDCFrameBuffer, int status, int score, int boost, int bullet);
 };
 class CGameFramework
 {
@@ -78,6 +83,7 @@ private:
 
 	int							m_nObjects;  //오브젝트 갯수
 	EnemyCube					*m_pObjects;
+	Item						*m_pItem;
 
 	int							m_nWall;
 	Wall						*m_pWall;
@@ -91,6 +97,7 @@ private:
 
 	int							m_gameStatus;
 
+	
 
 public:
 	void BuildFrameBuffer();

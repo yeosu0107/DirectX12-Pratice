@@ -7,7 +7,7 @@ private:
 
 public:
 	Tile();
-	~Tile();
+	virtual ~Tile();
 
 	//virtual void Animate() {}
 	//virtual void Render(HDC hDCFrameBuffer, CCamera *pCamera);
@@ -28,7 +28,7 @@ private:
 	int n_tile;
 public:
 	Wall();
-	~Wall();
+	virtual ~Wall();
 
 	const bool getLive() { return Live; }
 	void SetIndex(int tmp) { index = tmp; }

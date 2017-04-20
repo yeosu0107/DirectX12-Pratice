@@ -6,9 +6,9 @@
 
 
 using namespace Vector3;
-CPlayer::CPlayer() : maxBulletCount{ 100 }, bulletDelay{ 10 }, maxBulletDelay{ 10 },
+CPlayer::CPlayer() : maxBulletCount{ 1000 }, bulletDelay{ 10 }, maxBulletDelay{ 10 },
 numOfPaticle{ 100 }, paticleLiveTime{ 0 }, maxpaicleLiveTime{ 50 }, Live{ true }, 
-speed{ 0.5f }, backupSpeed{ speed }, boostSpeed{ speed * 3 }, boostGauge{ 100 }
+speed{ 0.5f }, backupSpeed{ speed }, boostSpeed{ speed * 3 }, boostGauge{ 100 }, maxboostGauge{ 100 }
 {
 	m_pCamera = new CCamera();
 	m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, 60.0f);
@@ -192,6 +192,27 @@ void CPlayer::OnDestroy()
 	}
 }
 
+void CPlayer::ItemChecker(int item)
+{
+	//enum	   itemType { bulletDeley = 0, boostGauge, speed };
+	switch (item) {
+	case 0:
+		if(maxBulletDelay>5)
+			maxBulletDelay -= 1;
+		break;
+	case 1:
+		maxboostGauge += 10;
+		break;
+	//case 2:
+	//	if (speed < 1.5f)
+	//		speed += 0.1f;
+	//	break;
+	default:
+		break;
+	}
+	//printf("ItemGet!\n");
+}
+
 void CPlayer::Boost()
 {
 	if (boostGauge > 0) {
@@ -205,7 +226,7 @@ void CPlayer::Boost()
 
 void CPlayer::endBoost()
 {
-	if(boostGauge<100)
+	if(boostGauge<maxboostGauge)
 		boostGauge++;
 	speed = backupSpeed;
 }

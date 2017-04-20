@@ -11,7 +11,7 @@ Tile::Tile() {
 }
 
 Tile::~Tile() {
-
+	CGameObject::~CGameObject();
 }
 
 //void Tile::Render(HDC hDCFrameBuffer, CCamera *pCamera) {
@@ -117,6 +117,7 @@ Wall::Wall() : size{ 300 }, Live{ false }, n_tile{ 48 } {
 
 Wall::~Wall() {
 	delete[] tile;
+	CGameObject::~CGameObject();
 }
 
 void Wall::SetTile(float zPos) {

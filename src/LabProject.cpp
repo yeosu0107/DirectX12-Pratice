@@ -139,12 +139,13 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY	- 종료 메시지를 게시하고 반환합니다.
 //
 //
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int wmId, wmEvent;
 	PAINTSTRUCT ps;
 	HDC hdc;
-
+	bool mouseHandle = false;
 	switch (message)
 	{
         case WM_SIZE:
@@ -159,13 +160,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
         case WM_LBUTTONDOWN:
         case WM_RBUTTONDOWN:
-            SetCapture(hWnd);
+			SetCapture(hWnd);
 			GetCursorPos(&gGameFramework.m_ptOldCursorPos);
+			//mouseHandle = true;
             break;
         case WM_LBUTTONUP:
         case WM_RBUTTONUP:
             ReleaseCapture();
+			//mouseHandle = false;
             break;
+		case WM_MOUSEMOVE:
+			/*if (mouseHandle) {
+				SetCapture(hWnd);
+				GetCursorPos(&gGameFramework.m_ptOldCursorPos);
+			}*/
+			break;
         case WM_KEYDOWN:
 			switch (wParam) 
             {
@@ -196,7 +205,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			EndPaint(hWnd, &ps);
 			break;
 		case WM_DESTROY:
-			PostQuitMessage(0);
+			//PostQuitMessage(0);
 			break;
 		default:
 			return DefWindowProc(hWnd, message, wParam, lParam);
