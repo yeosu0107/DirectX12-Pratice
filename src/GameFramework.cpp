@@ -12,9 +12,11 @@
 #include <random>
 
 
+enum gameStatus {main=0, Gameloop, die};
+
 CGameFramework::CGameFramework()
 {
-	m_start = false;
+	m_gameStatus = gameStatus::main;
 
 	m_hInstance = NULL;
 	m_hWnd = NULL;     
@@ -27,15 +29,15 @@ CGameFramework::CGameFramework()
 	m_nObjects = 0;
 
 	score = new Score();
+	ui = new UI();
+
 	_tcscpy_s(m_pszFrameRate, _T("LapProject ("));
 }
 
 CGameFramework::~CGameFramework()
 {
-	delete m_pPlayer;
-	delete m_pObjects;
-	delete m_pWall;
 	delete score;
+	delete ui;
 }
 
 bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
@@ -122,12 +124,12 @@ void CGameFramework::BuildObjects()
 	}
 
 
-	m_pxmf4WallPlanes[0] = XMFLOAT4(+1.0f, 0.0f, 0.0f, 20.0f);
-	m_pxmf4WallPlanes[1] = XMFLOAT4(-1.0f, 0.0f, 0.0f, 20.0f);
-	m_pxmf4WallPlanes[2] = XMFLOAT4(0.0f, +1.0f, 0.0f, 20.0f);
-	m_pxmf4WallPlanes[3] = XMFLOAT4(0.0f, -1.0f, 0.0f, 20.0f);
-	m_pxmf4WallPlanes[4] = XMFLOAT4(0.0f, 0.0f, +1.0f, 20.0f);
-	m_pxmf4WallPlanes[5] = XMFLOAT4(0.0f, 0.0f, -1.0f, 20.0f);
+	m_pxmf4WallPlanes[0] = XMFLOAT4(+1.0f, 0.0f, 0.0f, 25.0f);
+	m_pxmf4WallPlanes[1] = XMFLOAT4(-1.0f, 0.0f, 0.0f, 25.0f);
+	m_pxmf4WallPlanes[2] = XMFLOAT4(0.0f, +1.0f, 0.0f, 10.0f);
+	m_pxmf4WallPlanes[3] = XMFLOAT4(0.0f, -1.0f, 0.0f, 10.0f);
+	//m_pxmf4WallPlanes[4] = XMFLOAT4(0.0f, 0.0f, +1.0f, 100.0f);
+	//m_pxmf4WallPlanes[5] = XMFLOAT4(0.0f, 0.0f, -1.0f, 100.0f);
 
 
 	m_nObjects = 10;
@@ -135,13 +137,10 @@ void CGameFramework::BuildObjects()
 
 	DWORD tmp2[4] = { RGB(255,255,0), RGB(0,255, 255), RGB(255,0,255), RGB(100,200,30) };
 
-	//(-25 ~ 25) (-15 ~ 15), (-100, 100)
 	
 	
-
 	for (int i = 0; i < m_nObjects; ++i) {
 		m_pObjects[i].setCube(m_pPlayer->GetPosition().z+20.0f, 1.0f, 0.1f);
-		
 		m_pObjects[i].m_pCollider = NULL;
 	}
 }
@@ -184,17 +183,19 @@ void CGameFramework::ProcessInput()
 			m_pPlayer->endBoost();
 		
 		if (pKeyBuffer[VK_RETURN] & 0xF0) {
-			if (!m_pPlayer->getLive()) {
+			if (m_gameStatus == gameStatus::main)
+				m_gameStatus = gameStatus::Gameloop;
+		}
+		if (pKeyBuffer[VK_BACK] & 0xF0) {
+			if (m_gameStatus == gameStatus::die) {
 				BuildObjects();
-				m_start = false;
+				m_gameStatus = gameStatus::main;
 			}
-			else if (!m_start)
-				m_start = true;
 		}
 
 
 	}
-	if (!m_pPlayer->getLive() || !m_start)
+	if (!m_pPlayer->getLive() || m_gameStatus!=gameStatus::Gameloop)
 		return;
 
 	float cxDelta = 0.0f, cyDelta = 0.0f;
@@ -234,7 +235,7 @@ void CGameFramework::AnimateObjects()
 	m_pPlayer->Animate();
 	for (int i = 0; i < m_nObjects; i++) {
 		/*if(m_pObjects[i].getLive())*/
-		m_pObjects[i].Animate(m_pPlayer->GetPosition());
+		m_pObjects[i].Animate(m_pPlayer->GetPosition(), (score->getDist()/1000.0f), (score->getDist() / 1000.0f));
 	}
 	for (int i = 0; i < m_nWall; ++i)
 		m_pWall[i].Animate(m_pPlayer->GetPosition());
@@ -272,7 +273,7 @@ void CGameFramework::AnimateObjects()
 			case DISJOINT:
 			{
 				int nPlaneIndex = -1;
-				for (int j = 0; j < 6; j++)
+				for (int j = 0; j < 4; j++)
 				{
 					PlaneIntersectionType intersectType = m_pObjects[i].getOOBB()->Intersects(XMLoadFloat4(&m_pxmf4WallPlanes[j]));
 					if (intersectType == BACK)
@@ -292,7 +293,7 @@ void CGameFramework::AnimateObjects()
 			case INTERSECTS:
 			{
 				int nPlaneIndex = -1;
-				for (int j = 0; j < 6; j++)
+				for (int j = 0; j < 4; j++)
 				{
 					PlaneIntersectionType intersectType = m_pObjects[i].getOOBB()->Intersects(XMLoadFloat4(&m_pxmf4WallPlanes[j]));
 					if (intersectType == INTERSECTING)
@@ -313,8 +314,58 @@ void CGameFramework::AnimateObjects()
 				break;
 			}
 		}
+
+		ContainmentType containType = m_pWall[index].getOOBB()->Contains(*m_pPlayer->getOOBB());
+		switch (containType)
+		{
+		case DISJOINT:
+		{
+			printf("Crash!\n");
+			int nPlaneIndex = -1;
+			for (int j = 0; j < 4; j++)
+			{
+				PlaneIntersectionType intersectType = m_pPlayer->getOOBB()->Intersects(XMLoadFloat4(&m_pxmf4WallPlanes[j]));
+				if (intersectType == BACK)
+				{
+					nPlaneIndex = j;
+					break;
+				}
+			}
+			if (nPlaneIndex != -1)
+			{
+				//m_pPlayer->SetPosition()
+				//m_pPlayer->MoveBack(DIR_FORWARD);
+				m_pPlayer->OnDestroy();
+				m_gameStatus = gameStatus::die;
+			}
+			break;
+		}
+		case INTERSECTS:
+		{
+			int nPlaneIndex = -1;
+			for (int j = 0; j < 4; j++)
+			{
+				PlaneIntersectionType intersectType = m_pPlayer->getOOBB()->Intersects(XMLoadFloat4(&m_pxmf4WallPlanes[j]));
+				if (intersectType == INTERSECTING)
+				{
+					nPlaneIndex = j;
+					break;
+				}
+			}
+			if (nPlaneIndex != -1)
+			{
+				//m_pPlayer->MoveBack(DIR_FORWARD);
+				m_pPlayer->OnDestroy();
+				m_gameStatus = gameStatus::die;
+			}
+			break;
+		}
+		case CONTAINS:
+			break;
+		}
 	}
-	if (!m_start)
+
+	if (m_gameStatus!=gameStatus::Gameloop)
 		return;
 
 	//오브젝트 충돌 정의
@@ -354,6 +405,7 @@ void CGameFramework::AnimateObjects()
 			//printf("Crash!\n");
 			//m_start = false;
 			m_pPlayer->OnDestroy();
+			m_gameStatus = gameStatus::die;
 		}
 	}
 	for (int i = 0; i < m_nObjects; i++)
@@ -372,11 +424,6 @@ void CGameFramework::AnimateObjects()
 			m_pObjects[i].m_pCollider = NULL;
 		}
 	}
-
-}
-
-void DrawScore(int score) {
-	
 
 }
 
@@ -404,24 +451,7 @@ void CGameFramework::FrameAdvance()
 
 	m_pPlayer->Render(m_hDCFrameBuffer, m_pPlayer->m_pCamera);
 
-	if (m_start) {
-		wchar_t str[100];
-		wsprintf(str, L"Score : %d", score->setScore());
-		TextOut(m_hDCFrameBuffer, 10, 10, str, lstrlen(str));
-		if (!m_pPlayer->getLive()) {
-			wchar_t exit[15];
-			wchar_t exit2[20];
-			wsprintf(exit, L"Game Over");
-			wsprintf(exit2, L"Press Enter to Restart");
-			TextOut(m_hDCFrameBuffer, CLIENT_WIDTH / 2 - 30, CLIENT_HEIGHT / 2 - 20, exit, lstrlen(exit));
-			TextOut(m_hDCFrameBuffer, CLIENT_WIDTH / 2 - 30, CLIENT_HEIGHT / 2, exit2, lstrlen(exit2));
-		}
-	}
-	else {
-		wchar_t str[20];
-		wsprintf(str, L"Press Enter to Start");
-		TextOut(m_hDCFrameBuffer, CLIENT_WIDTH / 2 - 60, CLIENT_HEIGHT / 2 - 20, str, lstrlen(str));
-	}
+	ui->DrawUI(m_hDCFrameBuffer, m_gameStatus, score->setScore(), m_pPlayer->getBoost());
 
 
 	PresentFrameBuffer();
@@ -430,4 +460,37 @@ void CGameFramework::FrameAdvance()
 	_itow_s(m_GameTimer.GetFrameRate(), (m_pszFrameRate + 12), 37, 10);    
 	wcscat_s((m_pszFrameRate + 12), 37, _T(" FPS)"));
 	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37); ::SetWindowText(m_hWnd, m_pszFrameRate);
+}
+
+UI::UI() {
+	wsprintf(m_gameover, L"Game Over");
+	wsprintf(m_restart, L"Press BackSpace to Restart");
+	wsprintf(m_start, L"Press Enter to Start");
+}
+
+UI::~UI() {
+
+}
+
+RECT winRect = { 0,0,CLIENT_WIDTH, CLIENT_HEIGHT };
+
+void UI::DrawUI(HDC hdc, int status, int score, int boost) {
+	switch (status) {
+	case gameStatus::main:
+		SetBkColor(hdc, RGB(255, 255, 0));
+		TextOut(hdc, CLIENT_WIDTH / 2 - 60, CLIENT_HEIGHT / 2 - 20, m_start, lstrlen(m_start));
+		break;
+	case gameStatus::Gameloop:
+		wsprintf(m_boostGauag, L"BoostGauge : %d", boost);
+		wsprintf(m_score, L"Score : %d", score);
+		TextOut(hdc, 10, 10, m_score, lstrlen(m_score));
+		TextOut(hdc, 10, 30, m_boostGauag, lstrlen(m_boostGauag));
+		break;
+	case gameStatus::die:
+		wsprintf(m_score, L"Your Score : %d", score);
+		TextOut(hdc, CLIENT_WIDTH / 2 - 30, CLIENT_HEIGHT / 2 - 40, m_gameover, lstrlen(m_gameover));
+		TextOut(hdc, CLIENT_WIDTH / 2 - 35, CLIENT_HEIGHT / 2 - 20, m_score, lstrlen(m_score));
+		TextOut(hdc, CLIENT_WIDTH / 2 - 80, CLIENT_HEIGHT / 2, m_restart, lstrlen(m_restart));
+		break;
+	}
 }

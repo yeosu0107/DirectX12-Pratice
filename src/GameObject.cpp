@@ -91,19 +91,26 @@ void CMesh::Render(HDC hDCFrameBuffer, XMFLOAT4X4& xm4x4Transform, CCamera *pCam
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-CLine::CLine() : CMesh(1){
+CBox::CBox(float max) : CMesh(4){
+	CPolygon *pbox = new CPolygon(4);
+	pbox->SetVertex(0, CVertex(10, 0, 0));
+	pbox->SetVertex(1, CVertex(10, max, 0));
+	pbox->SetVertex(2, CVertex(0, max, 0));
+	pbox->SetVertex(3, CVertex(0, 0, 0));
+	SetPolygon(0, pbox);
+}
+
+CBox::~CBox() {
 
 }
 
-CLine::~CLine() {
-
-}
-
-void CLine::setLength(XMFLOAT3 pos1, XMFLOAT3 pos2) {
-	CPolygon *line = new CPolygon(2);
-	line->SetVertex(0, CVertex(pos1.x, pos1.y, pos1.z));
-	line->SetVertex(1, CVertex(pos2.x, pos2.y, pos2.z));
-	SetPolygon(0, line);
+void CBox::setBox(float end) {
+	CPolygon *pbox = new CPolygon(4);
+	pbox->SetVertex(0, CVertex(10, 0, 0));
+	pbox->SetVertex(1, CVertex(10, end, 0));
+	pbox->SetVertex(2, CVertex(0, end, 0));
+	pbox->SetVertex(3, CVertex(0, 0, 0));
+	SetPolygon(0, pbox);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //

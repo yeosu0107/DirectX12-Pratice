@@ -72,13 +72,13 @@ public:
 	virtual void Render(HDC hDCFrameBuffer, XMFLOAT4X4& xm4x4Transform, CCamera *pCamera);
 };
 
-class CLine : public CMesh
+class CBox : public CMesh
 {
 public:
-	CLine();
-	virtual ~CLine();
+	CBox(float max);
+	virtual ~CBox();
 
-	void setLength(XMFLOAT3 pos1, XMFLOAT3 pos2);
+	void setBox(float end);
 };
 
 class CCubeMesh : public CMesh

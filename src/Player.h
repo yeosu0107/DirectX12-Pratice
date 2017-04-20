@@ -61,6 +61,9 @@ public:
 	float getSpeed() const { return speed; }
 	void Boost();
 	void endBoost();
+	float getBoost() const{ return boostGauge; }
+
+	void MoveBack(DWORD dwDirection);
 
 	virtual void Render(HDC hDCFrameBuffer, CCamera *pCamera);
 	virtual void Animate();

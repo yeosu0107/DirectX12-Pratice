@@ -33,41 +33,46 @@ EnemyCube::~EnemyCube() {
 void EnemyCube::setCube(float posz, float rotSpeed, float movSpeed) {
 
 	XMFLOAT3 Pos(x(dre), y(dre), z(dre)+posz);
-	DWORD color(RGB(color(dre), color(dre), color(dre)));
-
+	//DWORD color(RGB(color(dre), color(dre), color(dre)));
+	DWORD color[4] = { RGB(255,0,0), RGB(0,255,0), RGB(0,0,255), RGB(0,255,255) };
 	switch (select(dre)) {
 	case 0:
 		SetRotationAxis(XMFLOAT3(1.0f, 0.0f, 0.0f));
 		SetMovingDirection(XMFLOAT3(1.0f, 0.0f, 0.0f));
+		SetColor(color[0]);
 		break;
 	case 1:
 		SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
 		SetMovingDirection(XMFLOAT3(0.0f, 1.0f, 0.0f));
+		SetColor(color[1]);
 		break;
 	case 2:
 		SetRotationAxis(XMFLOAT3(0.0f, 0.0f, 1.0f));
 		SetMovingDirection(XMFLOAT3(0.0f, 0.0f, 1.0f));
+		SetColor(color[2]);
 		break;
 	case 3:
 		SetRotationAxis(XMFLOAT3(1.0f, 1.0f, 1.0f));
 		SetMovingDirection(XMFLOAT3(1.0f, 1.0f, 1.0f));
+		SetColor(color[3]);
 		break;
 	default:
 		SetRotationAxis(XMFLOAT3(1.0f, 1.0f, 1.0f));
 		SetMovingDirection(XMFLOAT3(1.0f, 1.0f, 1.0f));
+		SetColor(color[3]);
 		break;
 	}
 	SetPosition(Pos);
-	SetColor(color);
+	//SetColor(color);
 	SetRotationSpeed(rotSpeed);
 	SetMovingSpeed(movSpeed);
 
 	SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(2.0f, 2.0f, 2.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 
-	
+	DWORD pColor = getColor();
 	for (int i = 0; i < numOfPaticle; ++i) {
 		paticle[i].SetMesh(paticleMesh);
-		paticle[i].SetColor(color);
+		paticle[i].SetColor(pColor);
 		paticle[i].SetRotationAxis(XMFLOAT3(1.0f, 1.0f, 1.0f));
 		paticle[i].SetRotationSpeed(1.0f);
 		paticle[i].SetMovingDirection(XMFLOAT3(ui(dre), ui(dre), ui(dre)));
@@ -87,10 +92,10 @@ void EnemyCube::DestroyObject() {
 	
 }
 
-void EnemyCube::Animate(XMFLOAT3 pos) {
+void EnemyCube::Animate(XMFLOAT3 pos, float movSpeed, float rotSpeed) {
 	if (!Live) {
   	    //this->MoveForward(pos.z + 100.0f);
-		this->setCube(pos.z+100, 1.0f, 0.1f);
+		this->setCube(pos.z+100, rotSpeed, movSpeed);
 		Live = true;
 		LiveCube = true;
 		//return;

@@ -24,7 +24,7 @@ public:
 	//void setCube(XMFLOAT3 Pos);
 	void DestroyObject();
 	void setNumOfPaticle(int num) { numOfPaticle = num; }
-	virtual void Animate(XMFLOAT3 pos);
+	virtual void Animate(XMFLOAT3 pos, float movSpeed, float rotSpeed);
 	virtual void Render(HDC hDCFrameBuffer, CCamera *pCamera);
 };
 

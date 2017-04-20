@@ -33,8 +33,22 @@ public:
 		return (int)score;
 	}
 	void ResetScore() { distance = 0; killCount = 0; score = 0; }
+	float getDist() const { return distance; }
 };
 
+
+class UI {
+private:
+	wchar_t m_score[50];
+	wchar_t m_start[30];
+	wchar_t m_gameover[30];
+	wchar_t m_restart[40];
+	wchar_t m_boostGauag[30];
+public:
+	UI();
+	~UI();
+	void DrawUI(HDC m_hDCFrameBuffer, int status, int score, int boost);
+};
 class CGameFramework
 {
 public:
@@ -67,14 +81,16 @@ private:
 
 	int							m_nWall;
 	Wall						*m_pWall;
-	XMFLOAT4					m_pxmf4WallPlanes[6];
+	XMFLOAT4					m_pxmf4WallPlanes[4];
 
 	CGameTimer					m_GameTimer;
 	_TCHAR						m_pszFrameRate[50];
 
 	Score*						score;
+	UI*							ui;
 
-	bool						m_start = false;
+	int							m_gameStatus;
+
 
 public:
 	void BuildFrameBuffer();
@@ -90,6 +106,7 @@ public:
 
 	void DrawObject(CGameObject *pObject, XMFLOAT4X4& mtxViewProject);
 	void DrawPrimitive(CPolygon *pPolygon, XMFLOAT4X4& xm4x4Transform);
+
 
 	POINT						m_ptOldCursorPos;    
 };
