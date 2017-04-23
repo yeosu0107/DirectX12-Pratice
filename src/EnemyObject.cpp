@@ -5,9 +5,8 @@
 #include <random>
 
 
-CCubeMesh *baseCubeMesh = new CCubeMesh(4.0f, 4.0f, 4.0f);
-CCubeMesh *paticleMesh = new CCubeMesh(0.5f, 0.5f, 0.5f);
 
+CCubeMesh *paticleMesh = new CCubeMesh(0.5f, 0.5f, 0.5f);
 
 std::default_random_engine dre;
 std::uniform_int_distribution<> ui(-10, 10);
@@ -19,14 +18,25 @@ std::uniform_int_distribution<> color(0,255);
 std::uniform_int_distribution<> select(0, 3);
 
 EnemyCube::EnemyCube() : LiveCube{ true }, LivePaticle{ false }, Live{ true }, paticleLiveTime{ 0 }, numOfPaticle{ 50 } {
+	
+
 	paticle = new Paticle[numOfPaticle];
-	m_pMesh = baseCubeMesh;
+	
+	for (int i = 0; i < numOfPaticle; ++i) {
+		paticle[i].SetMesh(paticleMesh);
+		paticle[i].SetRotationAxis(XMFLOAT3(1.0f, 1.0f, 1.0f));
+		paticle[i].SetRotationSpeed(1.0f);
+		paticle[i].SetMovingDirection(XMFLOAT3(ui(dre), ui(dre), ui(dre)));
+		paticle[i].SetMovingSpeed(1.0f);
+		//paticle[i].SetPosition(pos);
+	}
 }
 
 
 EnemyCube::~EnemyCube() {
 	delete[] paticle;
-	CGameObject::~CGameObject();
+	paticle = nullptr;
+	//CGameObject::~CGameObject();
 
 }
 
@@ -53,7 +63,7 @@ void EnemyCube::setCube(float posz, float rotSpeed, float movSpeed) {
 		break;
 	case 3:
 		SetRotationAxis(XMFLOAT3(1.0f, 1.0f, 1.0f));
-		SetMovingDirection(XMFLOAT3(1.0f, 1.0f, 1.0f));
+		SetMovingDirection(XMFLOAT3(1.0f, 1.0f, -1.0f));
 		SetColor(color[3]);
 		break;
 	default:
@@ -72,13 +82,7 @@ void EnemyCube::setCube(float posz, float rotSpeed, float movSpeed) {
 
 	DWORD pColor = getColor();
 	for (int i = 0; i < numOfPaticle; ++i) {
-		paticle[i].SetMesh(paticleMesh);
 		paticle[i].SetColor(pColor);
-		paticle[i].SetRotationAxis(XMFLOAT3(1.0f, 1.0f, 1.0f));
-		paticle[i].SetRotationSpeed(1.0f);
-		paticle[i].SetMovingDirection(XMFLOAT3(ui(dre), ui(dre), ui(dre)));
-		paticle[i].SetMovingSpeed(1.0f);
-		//paticle[i].SetPosition(pos);
 	}
 }
 

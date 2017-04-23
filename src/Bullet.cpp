@@ -3,10 +3,11 @@
 #include "Bullet.h"
 
 
-CCubeMesh *bulletMesh = new CCubeMesh(0.5, 0.5, 0.5);
+
 
 Bullet::Bullet() : Live{ false }, damage{ 0 }, LimitTime{ 0 }, maxLimitTime{ 1000 } {
-	m_pMesh = bulletMesh;
+	//CCubeMesh *bulletMesh = new CCubeMesh(0.5, 0.5, 0.5);
+	//m_pMesh = bulletMesh;
 	SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 	SetMovingSpeed(3.0f);
 	SetRotationAxis(XMFLOAT3(0.0f, 0.0f, 0.0f));
@@ -14,7 +15,7 @@ Bullet::Bullet() : Live{ false }, damage{ 0 }, LimitTime{ 0 }, maxLimitTime{ 100
 }
 
 Bullet::~Bullet() {
-	CGameObject::~CGameObject();
+	//CGameObject::~CGameObject();
 }
 
 void Bullet::SetBullet(DWORD dwColor, float movSpeed)

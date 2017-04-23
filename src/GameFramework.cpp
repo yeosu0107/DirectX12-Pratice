@@ -140,29 +140,35 @@ void CGameFramework::BuildObjects()
 	m_nObjects = 10;
 	m_pObjects = new EnemyCube[m_nObjects];
 	m_pItem = new Item[m_nObjects];
-
+	CCubeMesh *baseCubeMesh = new CCubeMesh(4.0f, 4.0f, 4.0f);
+	CCubeMesh* itemMesh = new CCubeMesh(3.0, 3.0, 3.0);
 	DWORD tmp2[4] = { RGB(255,255,0), RGB(0,255, 255), RGB(255,0,255), RGB(100,200,30) };
 
 	for (int i = 0; i < m_nObjects; ++i) {
 		m_pObjects[i].setCube(m_pPlayer->GetPosition().z+20.0f, 1.0f, 0.1f);
 		m_pObjects[i].m_pCollider = NULL;
+		m_pObjects[i].SetMesh(baseCubeMesh);
+		m_pItem[i].SetMesh(itemMesh);
 	}
 }
 
 void CGameFramework::ReleaseObjects()
 {
-	if (m_pObjects) delete [] m_pObjects;
-	if (m_pWall) delete[] m_pWall;
-	if (m_pPlayer) delete m_pPlayer;
+	if (m_pObjects) delete[] m_pObjects;
 	if (m_pItem) delete[] m_pItem;
-	if(score) delete score;
-	if(ui) delete ui;
-	m_pObjects = NULL;
-	m_pWall = NULL;
-	m_pPlayer = NULL;
-	m_pItem = NULL;
-	score = NULL;
-	ui = NULL;
+	if (score) delete score;
+	if (ui) delete ui;
+	if (m_pWall) delete[] m_pWall;
+
+	if (m_pPlayer) delete m_pPlayer;
+
+
+	m_pObjects = nullptr;
+	m_pWall = nullptr;
+	m_pPlayer = nullptr;
+	m_pItem = nullptr;
+	score = nullptr;
+	ui = nullptr;
 }
 
 void CGameFramework::OnDestroy()
@@ -206,7 +212,8 @@ void CGameFramework::ProcessInput()
 			}
 		}
 		if (pKeyBuffer[VK_ESCAPE] & 0xF0) {
-			PostQuitMessage(1);
+			PostQuitMessage(0);
+			//ExitProcess(0);
 		}
 
 	}
@@ -483,8 +490,8 @@ void CGameFramework::AnimateObjects()
 		if (!m_pItem[i].getLive())
 			continue;
 		if (m_pPlayer->getLive() && m_pItem[i].getOOBB()->Intersects(*m_pPlayer->getOOBB())) {
-			m_pPlayer->ItemChecker(m_pItem->getType());
-			m_pItem->setLive(false);
+			m_pPlayer->ItemChecker(m_pItem[i].getType());
+			m_pItem[i].setLive(false);
 		}
 	}
 }

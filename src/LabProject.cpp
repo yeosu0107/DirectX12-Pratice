@@ -1,9 +1,17 @@
 // LabProject.cpp : 응용 프로그램에 대한 진입점을 정의합니다.
 //
 
+
 #include "stdafx.h"
 #include "LabProject.h"
 #include "GameFramework.h"
+
+#ifdef _DEBUG
+#include <stdlib.h>
+#include <crtdbg.h>
+#include <string.h>
+#define new new(_CLIENT_BLOCK, __FILE__, __LINE__) //메모리 릭 체크
+#endif
 
 #define MAX_LOADSTRING 100
 
@@ -42,6 +50,12 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_LABPROJECT));
 
+
+#ifdef _DEBUG
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); //메모리 릭 체크
+#endif
+
+
 	// 기본 메시지 루프입니다.
 	while (1) 
 	{
@@ -60,7 +74,9 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		}
 	}
 	gGameFramework.OnDestroy();
-
+#ifdef _DEBUG
+	_CrtDumpMemoryLeaks(); //메모리 릭 체크
+#endif
 	return (int) msg.wParam;
 }
 
@@ -205,7 +221,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			EndPaint(hWnd, &ps);
 			break;
 		case WM_DESTROY:
-			//PostQuitMessage(0);
+			PostQuitMessage(0);
+			//ExitProcess(0);
 			break;
 		default:
 			return DefWindowProc(hWnd, message, wParam, lParam);

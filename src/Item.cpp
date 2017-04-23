@@ -3,13 +3,14 @@
 #include "Item.h"
 
 
-CCubeMesh* itemMesh  = new CCubeMesh(3.0, 3.0, 3.0);
+
 DWORD	   itemColor = RGB(255, 100, 255);
 
 enum	   itemType { bulletDeley = 0, boostGauge };
 
 Item::Item() : m_live { false } {
-	m_pMesh = itemMesh;
+	
+	//m_pMesh = itemMesh;
 	SetColor(itemColor);
 	SetRotationAxis(XMFLOAT3(1.0f, 1.0f, 1.0f)); 
 	SetRotationSpeed(10.0f);
@@ -17,7 +18,7 @@ Item::Item() : m_live { false } {
 }
 
 Item::~Item() {
-	CGameObject::~CGameObject();
+	//CGameObject::~CGameObject();
 }
 
 bool Item::setType(int type, XMFLOAT3& pos) {

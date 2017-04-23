@@ -1,5 +1,5 @@
 #pragma once
-
+#include <stdio.h>
 
 #define DIR_FORWARD			0x01
 #define DIR_BACKWARD		0x02
@@ -63,7 +63,12 @@ private:
 
 public:
 	void AddRef() { m_nReferences++; }
-	void Release() { m_nReferences--; if (m_nReferences <= 0) delete this; }
+	void Release() { 
+		m_nReferences--; 
+		printf("%d\n", m_nReferences);
+		if (m_nReferences <= 0) 
+			delete this; 
+	}
 
 public:
 	//¸Å½¬¿¡ Æú¸®°ï Ãß°¡(Æú¸®°ï ÀÎµ¦½º, Æú¸®°ï Æ÷ÀÎÅÍ)
@@ -198,7 +203,7 @@ class Paticle : public CGameObject {
 private:
 public:
 	Paticle() {}
-	~Paticle() {}
+	~Paticle() { /*CGameObject::~CGameObject(); */}
 	virtual void Animate();
 };
 

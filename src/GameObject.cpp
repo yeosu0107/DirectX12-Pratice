@@ -68,9 +68,16 @@ CMesh::~CMesh(void)
 {
 	if (m_ppPolygons)
 	{
-		for (int i = 0; i < m_nPolygons; i++) if (m_ppPolygons[i]) delete m_ppPolygons[i];
+		for (int i = 0; i < m_nPolygons; ++i) {
+			if (m_ppPolygons[i]) {
+				delete[] m_ppPolygons[i];
+				m_ppPolygons[i] = nullptr;
+			}
+		}
 		delete [] m_ppPolygons;
+		m_ppPolygons = nullptr;
 	}
+	
 }
 
 void CMesh::SetPolygon(int nIndex, CPolygon *pPolygon)
@@ -101,7 +108,7 @@ CBox::CBox(float max) : CMesh(4){
 }
 
 CBox::~CBox() {
-
+	
 }
 
 void CBox::setBox(float end) {
@@ -165,6 +172,7 @@ CCubeMesh::CCubeMesh(float fWidth, float fHeight, float fDepth) : CMesh(6)
 
 CCubeMesh::~CCubeMesh(void)
 {
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -316,6 +324,7 @@ CWallMesh::CWallMesh(float fWidth, float fHeight, float fDepth) : CMesh(32)
 
 CWallMesh::~CWallMesh(void)
 {
+
 }
 
 CWallTileMesh::CWallTileMesh(float fWidth, float fHeight, float fDepth) :CMesh(1) {
@@ -395,6 +404,7 @@ CAirplaneMesh::CAirplaneMesh(float fWidth, float fHeight, float fDepth) : CMesh(
 	SetPolygon(i++, pFace);
 
 	//Right Plane
+	pFace = new CPolygon(3);
 	pFace->SetVertex(0, CVertex(0.0f, +(fy + y3), -fz));
 	pFace->SetVertex(1, CVertex(0.0f, +(fy + y3), +fz));
 	pFace->SetVertex(2, CVertex(+x2, +y2, -fz));
@@ -419,6 +429,7 @@ CAirplaneMesh::CAirplaneMesh(float fWidth, float fHeight, float fDepth) : CMesh(
 	SetPolygon(i++, pFace);
 
 	//Back/Right Plane
+	pFace = new CPolygon(3);
 	pFace->SetVertex(0, CVertex(+x1, -y1, -fz));
 	pFace->SetVertex(1, CVertex(+fx, -y3, -fz));
 	pFace->SetVertex(2, CVertex(+fx, -y3, +fz));
@@ -436,6 +447,7 @@ CAirplaneMesh::CAirplaneMesh(float fWidth, float fHeight, float fDepth) : CMesh(
 	pFace->SetVertex(2, CVertex(+x1, -y1, +fz));
 	SetPolygon(i++, pFace);
 
+	pFace = new CPolygon(3);
 	pFace->SetVertex(0, CVertex(0.0f, 0.0f, -fz));
 	pFace->SetVertex(1, CVertex(+x1, -y1, +fz));
 	pFace->SetVertex(2, CVertex(0.0f, 0.0f, +fz));
@@ -521,7 +533,8 @@ CGameObject::CGameObject(CMesh *pMesh) : CGameObject()
 
 CGameObject::~CGameObject(void)
 {
-	if (m_pMesh) m_pMesh->Release();
+	if (m_pMesh!=nullptr)
+		m_pMesh->Release();
 }
 
 void CGameObject::SetPosition(float x, float y, float z) 

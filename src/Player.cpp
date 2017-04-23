@@ -28,6 +28,10 @@ speed{ 0.5f }, backupSpeed{ speed }, boostSpeed{ speed * 3 }, boostGauge{ 100 },
 	m_fYaw = 0.0f;
 
 	m_pBullet = new Bullet[maxBulletCount];
+	CCubeMesh *bulletMesh = new CCubeMesh(0.5, 0.5, 0.5);
+	for (int i = 0; i < maxBulletCount; ++i)
+		m_pBullet[i].SetMesh(bulletMesh);
+
 	bulletIndex = 0;
 
 	paticle = new Paticle[numOfPaticle];
@@ -49,7 +53,12 @@ CPlayer::~CPlayer()
 {
 	delete[] m_pBullet;
 	delete[] paticle;
-	CGameObject::~CGameObject();
+	delete m_pCamera;
+
+	m_pBullet = nullptr;
+	paticle = nullptr;
+	m_pCamera = nullptr;
+	//CGameObject::~CGameObject();
 }
 
 void CPlayer::SetPosition(float x, float y, float z)
