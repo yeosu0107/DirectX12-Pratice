@@ -290,7 +290,7 @@ void CGameFramework::AnimateObjects()
 			}
 		}
 	}*/
-
+	//벽과 오브젝트 충돌
 	for (int index = 0; index < m_nWall; ++index) {
 		for (int i = 0; i < m_nObjects; i++)
 		{
@@ -303,7 +303,7 @@ void CGameFramework::AnimateObjects()
 				for (int j = 0; j < 4; j++)
 				{
 					PlaneIntersectionType intersectType = m_pObjects[i].getOOBB()->Intersects(XMLoadFloat4(&m_pxmf4WallPlanes[j]));
-					if (intersectType == INTERSECTING ||intersectType == BACK)
+					if (intersectType == INTERSECTING || intersectType == BACK)
 					{
 						nPlaneIndex = j;
 						break;
@@ -341,79 +341,26 @@ void CGameFramework::AnimateObjects()
 				break;
 			}
 		}
-
-		ContainmentType containType = m_pWall[index].getOOBB()->Contains(*m_pPlayer->getOOBB());
-		/*if (containType == INTERSECTS || containType == DISJOINT) {
-			m_pPlayer->OnDestroy();
-			m_gameStatus = gameStatus::die;
-		}*/
-
-		switch (containType)
-		{
-		case DISJOINT:
-		{
-			int nPlaneIndex = -1;
-			for (int j = 0; j < 4; j++)
-			{
-				PlaneIntersectionType intersectType = m_pPlayer->getOOBB()->Intersects(XMLoadFloat4(&m_pxmf4WallPlanes[j]));
-				if (intersectType == BACK || intersectType == INTERSECTING)
-				{
-					nPlaneIndex = j;
-					break;
-				}
-			}
-			if (nPlaneIndex != -1)
-			{
-				//m_pPlayer->SetPosition()
-				//m_pPlayer->MoveBack(DIR_FORWARD);
-				m_pPlayer->OnDestroy();
-				m_gameStatus = gameStatus::die;
-			}
-			break;
-		}
-		case INTERSECTS:
-		{
-			int nPlaneIndex = -1;
-			for (int j = 0; j < 4; j++)
-			{
-				PlaneIntersectionType intersectType = m_pPlayer->getOOBB()->Intersects(XMLoadFloat4(&m_pxmf4WallPlanes[j]));
-				if (intersectType == INTERSECTING || intersectType == BACK)
-				{
-					nPlaneIndex = j;
-					break;
-				}
-			}
-			if (nPlaneIndex != -1)
-			{
-				//m_pPlayer->MoveBack(DIR_FORWARD);
-				m_pPlayer->OnDestroy();
-				m_gameStatus = gameStatus::die;
-			}
-			break;
-		}
-		case CONTAINS:
-			int nPlaneIndex = -1;
-			for (int j = 0; j < 4; j++)
-			{
-				PlaneIntersectionType intersectType = m_pPlayer->getOOBB()->Intersects(XMLoadFloat4(&m_pxmf4WallPlanes[j]));
-				if (intersectType == BACK || intersectType == INTERSECTING)
-				{
-					nPlaneIndex = j;
-					break;
-				}
-			}
-			if (nPlaneIndex != -1)
-			{
-				//m_pPlayer->SetPosition()
-				//m_pPlayer->MoveBack(DIR_FORWARD);
-				m_pPlayer->OnDestroy();
-				m_gameStatus = gameStatus::die;
-			}
-			break;
-			break;
-		}
 	}
 
+	//벽과 플레이어 충돌
+	{
+		int nPlaneIndex = -1;
+		for (int j = 0; j < 4; j++)
+		{
+			PlaneIntersectionType intersectType = m_pPlayer->getOOBB()->Intersects(XMLoadFloat4(&m_pxmf4WallPlanes[j]));
+			if (intersectType == BACK || intersectType == INTERSECTING)
+			{
+				nPlaneIndex = j;
+				break;
+			}
+		}
+		if (nPlaneIndex != -1)
+		{
+			m_pPlayer->OnDestroy();
+			m_gameStatus = gameStatus::die;
+		}
+	}
 	if (m_gameStatus!=gameStatus::Gameloop)
 		return;
 

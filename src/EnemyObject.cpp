@@ -68,7 +68,7 @@ void EnemyCube::setCube(float posz, float rotSpeed, float movSpeed) {
 		break;
 	default:
 		SetRotationAxis(XMFLOAT3(1.0f, 1.0f, 1.0f));
-		SetMovingDirection(XMFLOAT3(1.0f, 1.0f, 1.0f));
+		SetMovingDirection(XMFLOAT3(1.0f, 1.0f, -1.0f));
 		SetColor(color[3]);
 		break;
 	}
