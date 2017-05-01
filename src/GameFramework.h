@@ -109,8 +109,10 @@ public:
 	void SetupGameState();
 	void SetupRenderStates();
 	void AnimateObjects();
-	void CrashObjects();
 	void ProcessInput();
+
+	void DrawObject(CGameObject *pObject, XMFLOAT4X4& mtxViewProject);
+	void DrawPrimitive(CPolygon *pPolygon, XMFLOAT4X4& xm4x4Transform);
 
 
 	POINT						m_ptOldCursorPos;    

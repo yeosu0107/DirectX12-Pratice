@@ -3,12 +3,26 @@
 #include "Map.h"
 #include "Player.h"
 
+
+Tile::Tile() {
+	//SetRotationAxis(0.0f, 0.0f, 0.0f);
+
+	SetRotationSpeed(0.0f);
+}
+
+Tile::~Tile() {
+	//CGameObject::~CGameObject();
+}
+
+//void Tile::Render(HDC hDCFrameBuffer, CCamera *pCamera) {
+//
+//}
 const float mapHalfWidth = 20.0f;
 const float mapHalfHeight = 20.0f;
 const float mapHalfDepth = 60.0f;
 
 Wall::Wall() : size{ 300 }, Live{ false }, n_tile{ 48 } {
-	tile = new CGameObject[n_tile];
+	tile = new Tile[n_tile];
 	float tileWidth = 10.0f;
 	float tileDepth = 20.0f;
 	float halfTileWidth = tileWidth / 2;
@@ -21,8 +35,7 @@ Wall::Wall() : size{ 300 }, Live{ false }, n_tile{ 48 } {
 
 	for (int index = 0; index < n_tile; ++index) {
 		tile[index].SetMesh(tileMesh);
-		tile[index].SetRotationSpeed(0.0f);
-		tile[index].SetOOBB(XMFLOAT3(0, 0, 0), XMFLOAT3(tileWidth, 0, tileDepth), XMFLOAT4(0, 0, 0, 1));
+		//tile[index].SetOOBB(XMFLOAT3(0, 0, 0), XMFLOAT3(tileWidth, 0, tileDepth), XMFLOAT4(0, 0, 0, 1));
 
 	}
 	int index = 0;
@@ -32,11 +45,14 @@ Wall::Wall() : size{ 300 }, Live{ false }, n_tile{ 48 } {
 	for (float i = 0; i < 3; ++i) {
 		float j = 1;
 		tile[index].SetPosition(0, height - halfTileWidth, depth*(i / 3) + (j-1) * diff);
+		//tile[index].SetOOBB(XMFLOAT3(0, 0, 0), XMFLOAT3(tileWidth, 0, tileDepth), XMFLOAT4(0, 0, 0, 1));
 		index++;
 		for (; j < 3; ++j) {
 			tile[index].SetPosition(width* (j / 2), height - halfTileWidth, depth*(i / 3) + j * diff);
+			//tile[index].SetOOBB(XMFLOAT3(0, 0, 0), XMFLOAT3(tileWidth, 0, tileDepth), XMFLOAT4(0, 0, 0, 1));
 			index++;
 			tile[index].SetPosition(-width* (j / 2), height - halfTileWidth, depth*(i / 3) + j * diff);
+			//tile[index].SetOOBB(XMFLOAT3(0, 0, 0), XMFLOAT3(tileWidth, 0, tileDepth), XMFLOAT4(0, 0, 0, 1));
 			index++;
 		}
 	}
@@ -45,11 +61,14 @@ Wall::Wall() : size{ 300 }, Live{ false }, n_tile{ 48 } {
 	for (float i = 0; i < 3; ++i) {
 		float j = 1;
 		tile[index].SetPosition(0, -height + halfTileWidth, depth*(i / 3) + (j - 1) * diff);
+		//tile[index].SetOOBB(XMFLOAT3(0, 0, 0), XMFLOAT3(tileWidth, 0, tileDepth), XMFLOAT4(0, 0, 0, 1));
 		index++;
 		for (; j < 3; ++j) {
 			tile[index].SetPosition(width* (j / 2), -height + halfTileWidth, depth*(i / 3) + j * diff);
+			//tile[index].SetOOBB(XMFLOAT3(0, 0, 0), XMFLOAT3(tileWidth, 0, tileDepth), XMFLOAT4(0, 0, 0, 1));
 			index++;
 			tile[index].SetPosition(-width* (j / 2), -height + halfTileWidth, depth*(i / 3) + j * diff);
+			//tile[index].SetOOBB(XMFLOAT3(0, 0, 0), XMFLOAT3(tileWidth, 0, tileDepth), XMFLOAT4(0, 0, 0, 1));
 			index++;
 		}
 	}
@@ -59,13 +78,16 @@ Wall::Wall() : size{ 300 }, Live{ false }, n_tile{ 48 } {
 		float j = 1;
 		tile[index].SetPosition(width + halfTileWidth, 0, depth*(i / 3) + (j - 1) * diff);
 		tile[index].Rotate(0, 90, 0);
+		//tile[index].SetOOBB(XMFLOAT3(0, 0, 0), XMFLOAT3(tileWidth, 0, tileDepth), XMFLOAT4(0, 1, 0, 1));
 		index++;
 		for (; j < 2; ++j) {
 			tile[index].SetPosition(width + halfTileWidth, height* (j / 2), depth*(i / 3) + j * diff);
 			tile[index].Rotate(0, 90, 0);
+			//tile[index].SetOOBB(XMFLOAT3(0, 0, 0), XMFLOAT3(tileWidth, 0, tileDepth), XMFLOAT4(0, 1, 0, 1));
 			index++;
 			tile[index].SetPosition(width + halfTileWidth, -height* (j / 2), depth*(i / 3) + j * diff);
 			tile[index].Rotate(0, 90, 0);
+			//tile[index].SetOOBB(XMFLOAT3(0, 0, 0), XMFLOAT3(tileWidth, 0, tileDepth), XMFLOAT4(0, 1, 0, 1));
 			index++;
 		}
 	}
@@ -75,13 +97,16 @@ Wall::Wall() : size{ 300 }, Live{ false }, n_tile{ 48 } {
 		float j = 1;
 		tile[index].SetPosition(-width - halfTileWidth, 0, depth*(i / 3) + (j - 1) * diff);
 		tile[index].Rotate(0, 90, 0);
+		//tile[index].SetOOBB(XMFLOAT3(0, 0, 0), XMFLOAT3(tileWidth, 0, tileDepth), XMFLOAT4(0, 1, 0, 1));
 		index++;
 		for (; j < 2; ++j) {
 			tile[index].SetPosition(-width - halfTileWidth, height* (j / 2), depth*(i / 3) + j * diff);
 			tile[index].Rotate(0, 90, 0);
+			//tile[index].SetOOBB(XMFLOAT3(0, 0, 0), XMFLOAT3(tileWidth, 0, tileDepth), XMFLOAT4(0, 1, 0, 1));
 			index++;
 			tile[index].SetPosition(-width - halfTileWidth, -height* (j / 2), depth*(i / 3) + j * diff);
 			tile[index].Rotate(0, 90, 0);
+			//tile[index].SetOOBB(XMFLOAT3(0, 0, 0), XMFLOAT3(tileWidth, 0, tileDepth), XMFLOAT4(0, 1, 0, 1));
 			index++;
 		}
 	}

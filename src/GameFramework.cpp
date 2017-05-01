@@ -268,79 +268,100 @@ void CGameFramework::AnimateObjects()
 		m_pWall[i].Animate(m_pPlayer->GetPosition());
 	////////////////////////////////////////////////////////
 
-	
-}
-
-void CGameFramework::CrashObjects() {
 	// ------------- 충돌체크 부분 ------------------------
-	for (int index = 0; index < m_nWall; ++index) {
-		//벽과 플레이어 충돌 체크
-		ContainmentType containType = m_pWall[index].getOOBB()->Contains(*m_pPlayer->getOOBB());
-		switch (containType) {
-		case CONTAINS:
-			break;
-		case DISJOINT:
-		case INTERSECTING:
-			/*for (int i = 0; i < 48; ++i) {
-			ContainmentType tileCrash = m_pWall[index].GetTile()[i].getOOBB()->Contains(*m_pPlayer->getOOBB());
-			if (tileCrash == INTERSECTING) {
-			m_pPlayer->OnDestroy();
-			m_gameStatus = gameStatus::die;
-			break;
-			}
-			}*/
-			for (int j = 0; j < 4; j++)
-			{
-				PlaneIntersectionType intersectType = m_pPlayer->getOOBB()->Intersects(XMLoadFloat4(&m_pxmf4WallPlanes[j]));
-				if (intersectType == BACK || intersectType == INTERSECTING)
-				{
-					m_pPlayer->OnDestroy();
-					m_gameStatus = gameStatus::die;
-					break;
-				}
-			}
-			break;
-		}
 
-		//벽과 오브젝트 충돌 체크
-		for (int index = 0; index < m_nWall; ++index) {
-			for (int i = 0; i < m_nObjects; i++) {
-				ContainmentType containType = m_pWall[index].getOOBB()->Contains(*m_pObjects[i].getOOBB());
-				switch (containType) {
-				case CONTAINS:
-					break;
-				case DISJOINT:
-				case INTERSECTING:
-					/*for (int j = 0; j < 48; ++j) {
-					ContainmentType tileCrash = m_pWall[index].GetTile()[j].getOOBB()->Contains(*m_pObjects[i].getOOBB());
-					if (tileCrash == INTERSECTING) {
-					m_pObjects[i].DestroyObject();
-					break;
+	/*for (int wallIndex = 0; wallIndex < m_nWall; ++wallIndex) {
+		if (!m_pWall[wallIndex].getLive())
+			continue;
+		for (int enemyIndex = 0; enemyIndex < m_nObjects; ++enemyIndex) {
+			if (!m_pObjects[enemyIndex].getLive())
+				continue;
+			ContainmentType containType = m_pWall[wallIndex].m_xmOOBB.Contains(m_pObjects[enemyIndex].m_xmOOBB);
+			if (containType == INTERSECTS) {
+				Tile* tmpTile = m_pWall[wallIndex].GetTile();
+				for (int tile = 0; tile < 48; ++tile) {
+					ContainmentType tileType = tmpTile[tile].m_xmOOBB.Contains(m_pObjects[enemyIndex].m_xmOOBB);
+					if (tileType == INTERSECTS) {
+						printf("%d  %d\n", enemyIndex, tile);
+						tmpTile[tile].SetColor(m_pObjects[enemyIndex].getColor());
+						break;
 					}
-					}*/
-					int nPlaneIndex = -1;
-					for (int j = 0; j < 4; j++)
-					{
-						PlaneIntersectionType intersectType = m_pObjects[i].getOOBB()->Intersects(XMLoadFloat4(&m_pxmf4WallPlanes[j]));
-						if (intersectType == INTERSECTING)
-						{
-							nPlaneIndex = j;
-							break;
-						}
-					}
-					if (nPlaneIndex != -1)
-					{
-						XMVECTOR xmvNormal = XMVectorSet(m_pxmf4WallPlanes[nPlaneIndex].x, m_pxmf4WallPlanes[nPlaneIndex].y, m_pxmf4WallPlanes[nPlaneIndex].z, 0.0f);
-						XMVECTOR xmvReflect = XMVector3Reflect(XMLoadFloat3(&m_pObjects[i].m_xmf3MovingDirection), xmvNormal);
-						XMStoreFloat3(&m_pObjects[i].m_xmf3MovingDirection, xmvReflect);
-					}
-					break;
 				}
+			}
+		}
+	}*/
+	//벽과 오브젝트 충돌
+	for (int index = 0; index < m_nWall; ++index) {
+		for (int i = 0; i < m_nObjects; i++)
+		{
+			ContainmentType containType = m_pWall[index].getOOBB()->Contains(*m_pObjects[i].getOOBB());
+			switch (containType)
+			{
+			case DISJOINT:
+			{
+				int nPlaneIndex = -1;
+				for (int j = 0; j < 4; j++)
+				{
+					PlaneIntersectionType intersectType = m_pObjects[i].getOOBB()->Intersects(XMLoadFloat4(&m_pxmf4WallPlanes[j]));
+					if (intersectType == INTERSECTING || intersectType == BACK)
+					{
+						nPlaneIndex = j;
+						break;
+					}
+				}
+				if (nPlaneIndex != -1)
+				{
+					XMVECTOR xmvNormal = XMVectorSet(m_pxmf4WallPlanes[nPlaneIndex].x, m_pxmf4WallPlanes[nPlaneIndex].y, m_pxmf4WallPlanes[nPlaneIndex].z, 0.0f);
+					XMVECTOR xmvReflect = XMVector3Reflect(XMLoadFloat3(&m_pObjects[i].m_xmf3MovingDirection), xmvNormal);
+					XMStoreFloat3(&m_pObjects[i].m_xmf3MovingDirection, xmvReflect);
+				}
+				break;
+			}
+			case INTERSECTS:
+			{
+				int nPlaneIndex = -1;
+				for (int j = 0; j < 4; j++)
+				{
+					PlaneIntersectionType intersectType = m_pObjects[i].getOOBB()->Intersects(XMLoadFloat4(&m_pxmf4WallPlanes[j]));
+					if (intersectType == INTERSECTING)
+					{
+						nPlaneIndex = j;
+						break;
+					}
+				}
+				if (nPlaneIndex != -1)
+				{
+					XMVECTOR xmvNormal = XMVectorSet(m_pxmf4WallPlanes[nPlaneIndex].x, m_pxmf4WallPlanes[nPlaneIndex].y, m_pxmf4WallPlanes[nPlaneIndex].z, 0.0f);
+					XMVECTOR xmvReflect = XMVector3Reflect(XMLoadFloat3(&m_pObjects[i].m_xmf3MovingDirection), xmvNormal);
+					XMStoreFloat3(&m_pObjects[i].m_xmf3MovingDirection, xmvReflect);
+				}
+				break;
+			}
+			case CONTAINS:
+				break;
 			}
 		}
 	}
 
-	if (m_gameStatus != gameStatus::Gameloop)
+	//벽과 플레이어 충돌
+	{
+		int nPlaneIndex = -1;
+		for (int j = 0; j < 4; j++)
+		{
+			PlaneIntersectionType intersectType = m_pPlayer->getOOBB()->Intersects(XMLoadFloat4(&m_pxmf4WallPlanes[j]));
+			if (intersectType == BACK || intersectType == INTERSECTING)
+			{
+				nPlaneIndex = j;
+				break;
+			}
+		}
+		if (nPlaneIndex != -1)
+		{
+			m_pPlayer->OnDestroy();
+			m_gameStatus = gameStatus::die;
+		}
+	}
+	if (m_gameStatus!=gameStatus::Gameloop)
 		return;
 
 	//오브젝트 충돌 정의
@@ -352,7 +373,7 @@ void CGameFramework::CrashObjects() {
 		for (int j = (i + 1); j < m_nObjects; j++)
 		{
 			/*if (i == j)
-			continue;*/
+				continue;*/
 
 			if (m_pObjects[i].getOOBB()->Intersects(*m_pObjects[j].getOOBB()))
 			{
@@ -371,7 +392,7 @@ void CGameFramework::CrashObjects() {
 				m_pPlayer->GetBullet()[k].setLive(false);
 				score->killEnemy();
 
-				//아이템 생성 (2/11 확률)
+				//아이템 생성 (3/11 확률)
 				for (int itemIndex = 0; itemIndex < m_nObjects; ++itemIndex) {
 					if (m_pItem[itemIndex].getLive())
 						continue;
@@ -387,6 +408,8 @@ void CGameFramework::CrashObjects() {
 		//플레이어와 충돌
 		if (m_pObjects[i].getCubeLive() && m_pPlayer->getLive() &&
 			m_pObjects[i].getOOBB()->Intersects(*m_pPlayer->getOOBB())) {
+			//printf("Crash!\n");
+			//m_start = false;
 			m_pPlayer->OnDestroy();
 			m_gameStatus = gameStatus::die;
 			m_pObjects[i].DestroyObject();
@@ -426,9 +449,8 @@ void CGameFramework::FrameAdvance()
 	m_GameTimer.Tick(60.0f);
 	ProcessInput();
 
-	AnimateObjects();
 
-	CrashObjects();
+	AnimateObjects();
 
     ClearFrameBuffer(RGB(255, 255, 255));
 

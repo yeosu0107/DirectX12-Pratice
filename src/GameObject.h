@@ -65,7 +65,7 @@ public:
 	void AddRef() { m_nReferences++; }
 	void Release() { 
 		m_nReferences--; 
-		//printf("%d\n", m_nReferences);
+		printf("%d\n", m_nReferences);
 		if (m_nReferences <= 0) 
 			delete this; 
 	}
@@ -98,6 +98,13 @@ class CWallTileMesh : public CMesh {
 public:
 	CWallTileMesh(float fWidth, float fHeight, float fDepth);
 	virtual ~CWallTileMesh();
+};
+
+class CWallMesh : public CMesh
+{
+public:
+	CWallMesh(float fWidth = 4.0f, float fHeight = 4.0f, float fDepth = 4.0f);
+	virtual ~CWallMesh();
 };
 
 class CAirplaneMesh : public CMesh
