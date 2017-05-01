@@ -1,10 +1,10 @@
 Debug/
 x64/
 ReadMe/
-.aps/
-.ico/
-.rc/
-.vcproj/
-.vcxproj/
-.filters/
-.user/
+*.aps/
+*.ico
+*.rc
+*.vcproj
+*.vcxproj
+*.filters
+*.user
