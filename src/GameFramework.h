@@ -8,113 +8,108 @@
 #define _GAME_APPLICATION_FRAMEWORK_H_
 
 #include "stdafx.h"
-#include "GameObject.h"
-#include "Player.h"
-#include "EnemyObject.h"
-#include "Map.h"
 #include "Timer.h"
-#include "Item.h"
 
-
-#define CLIENT_WIDTH	640
-#define CLIENT_HEIGHT	480
-
-
-
-class Score {
-private:
-	float distance;
-	float killCount;
-	float score;
-public:
-	Score() : distance{ 0 }, killCount{ 0 }, score{ 0 } {}
-	~Score() {}
-	void killEnemy() { killCount++; }
-	void moveForward(float dist) { distance+=dist; }
-	int setScore() { 
-		score = killCount*100 + distance/10;
-		return (int)score;
-	}
-	void ResetScore() { distance = 0; killCount = 0; score = 0; }
-	float getDist() const { return distance; }
-};
-
-
-class UI {
-private:
-	wchar_t m_score[50];
-	wchar_t m_start[30];
-	wchar_t m_gameover[30];
-	wchar_t m_restart[40];
-	wchar_t m_boostGauag[30];
-	//wchar_t m_speed[30];
-	wchar_t m_bulletspeed[30];
-public:
-	UI();
-	~UI();
-	void DrawUI(HDC m_hDCFrameBuffer, int status, int score, int boost, int bullet);
-};
 class CGameFramework
 {
+private:
+	HINSTANCE					m_hInstance;
+	HWND						m_hWnd;
+	
+	int							client_width;
+	int							client_height;
+
+	//D3D 변수
+	//팩토리 인터페이스 포인터
+	IDXGIFactory4*				pdxgiFactory;
+	//스왑체인 인터페이스 포인터
+	IDXGISwapChain3*			pdxgiSwapChain;
+	//D3D12 디바이스 인터페이스 포인터
+	ID3D12Device*				pd3Device;
+
+	//다중샘플링 활성/비활성
+	bool						bMsaa4xEnable = false;
+	//다중샘플링 퀄리티 레벨 지정
+	UINT						nMsaa4xQualityLevels = 0;
+	//스왑 체인의 후면 버퍼의 갯수
+	static const UINT m_nSwapChainBuffers = 2;
+	//현재 스왑 체인의 후면 버퍼 인덱스
+	UINT m_nSwapChainBufferIndex;
+
+	//랜더타겟버퍼
+	ID3D12Resource *m_ppd3dRenderTargetBuffers[m_nSwapChainBuffers];
+	//서술자 십 인터페이스 포인터
+	ID3D12DescriptorHeap *m_pd3dRtvDescriptorHeap;
+	//랜더타겟 서술자의 버퍼 크기
+	UINT m_nRtvDescriptorIncrementSize;
+
+	//깊이-스텐실 버퍼
+	ID3D12Resource *m_pd3dDepthStencilBuffer;
+	//서술자 힙 인터페이스 포인터
+	ID3D12DescriptorHeap *m_pd3dDsvDescriptorHeap;
+	//깊이-스탠실 서술자 원소 크기
+	UINT m_nDsvDescriptorIncrementSize;
+
+	//명령 큐
+	ID3D12CommandQueue *m_pd3dCommandQueue;
+	//명령 어로케이터
+	ID3D12CommandAllocator *m_pd3dCommandAllocator;
+	//명령리스트
+	ID3D12GraphicsCommandList *m_pd3dCommandList;
+
+	//펜스 인터페이스 포인터
+	ID3D12Fence *m_pd3dFence;
+	//펜스 값
+	UINT64 m_nFenceValue;
+	//펜스 핸들
+	HANDLE m_hFenceEvent;
+
+#if defined(_DEBUG) 
+	ID3D12Debug *m_pd3dDebugController;
+#endif
+	D3D12_VIEWPORT m_d3dViewport;
+	D3D12_RECT m_d3dScissorRect; //뷰포트와 씨저 사각형이다.
+
+	//게임 프레임워크 변수
+	bool						m_bActive;
+	CGameTimer					m_GameTimer;
+	_TCHAR						m_pszFrameRate[50];
+
+	//게임 오브젝트 변수
 public:
 	CGameFramework(void);
 	~CGameFramework(void);
 
-	//게임 생성
+	//게임 프레임워크 제어
 	bool OnCreate(HINSTANCE hInstance, HWND hMainWnd);
-	//게임 종료(파괴)
 	void OnDestroy();
-	//디바이스 인풋, 오브젝트 애니메이트, 랜더, 더블버퍼링
 	void FrameAdvance();
-
-	//게임 상태
 	void SetActive(bool bActive) { m_bActive = bActive; }
 
-private:
-	HINSTANCE					m_hInstance;
-	HWND						m_hWnd; 
+	//D3D제어
+	void CreateSwapChain();
+	void CreateDirect3DDevice();
+	void CreateRtvAndDsvDescriptorHeaps();
+	void CreateCommandQueueAndList();
 
-    bool						m_bActive;          
+	void CreateRenderTargetView();
+	void CreateDepthStencilView();
 
-	HDC							m_hDCFrameBuffer;   
-    HBITMAP						m_hBitmapFrameBuffer;   
+	void WaitForGpuComplete();
 
-	CPlayer						*m_pPlayer;
-
-	int							m_nObjects;  //오브젝트 갯수
-	EnemyCube					*m_pObjects;
-	Item						*m_pItem;
-
-	int							m_nWall;
-	Wall						*m_pWall;
-	XMFLOAT4					m_pxmf4WallPlanes[4];
-
-	CGameTimer					m_GameTimer;
-	_TCHAR						m_pszFrameRate[50];
-
-	Score*						score;
-	UI*							ui;
-
-	int							m_gameStatus;
-
+	//마우스, 키보드 입출력
+	void OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
+	void OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK OnProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	
 
-public:
-	void BuildFrameBuffer();
-	void ClearFrameBuffer(DWORD dwColor);
-	void PresentFrameBuffer();
-
+	//오브젝트 제어
 	void BuildObjects();
 	void ReleaseObjects();
-	void SetupGameState();
-	void SetupRenderStates();
 	void AnimateObjects();
-	void CrashObjects();
 	void ProcessInput();
 
 
-	POINT						m_ptOldCursorPos;    
 };
 
 #endif 
-

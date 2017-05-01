@@ -26,6 +26,7 @@ CGameFramework		gGameFramework;
 ATOM				MyRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {
@@ -129,12 +130,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
-	RECT rc = { 0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT };
-	DWORD dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_BORDER; 
-	AdjustWindowRect(&rc, dwStyle, FALSE);
+	RECT rc = { 0, 0, CLIENT_WIDTH, CLIENT_HEIGHT };
+	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 	int nWidth = rc.right - rc.left;
 	int nHeight = rc.bottom - rc.top;
-	HWND hMainWnd = CreateWindow(szWindowClass, szTitle, dwStyle, 0, 0, nWidth, nHeight, NULL, NULL, hInstance, NULL);
+	HWND hMainWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, 0, 0, nWidth, nHeight, NULL, NULL, hInstance, NULL);
 	if (!hMainWnd) return(FALSE);
 
 	if (!gGameFramework.OnCreate(hInstance, hMainWnd)) return(FALSE);
@@ -158,6 +158,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	int wmId, wmEvent;
+	PAINTSTRUCT ps;
+	HDC hdc;
+	bool mouseHandle = false;
 	switch (message)
 	{
         case WM_SIZE:
@@ -172,15 +176,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
         case WM_LBUTTONDOWN:
         case WM_RBUTTONDOWN:
-		
+			SetCapture(hWnd);
+			GetCursorPos(&gGameFramework.m_ptOldCursorPos);
+			//mouseHandle = true;
             break;
         case WM_LBUTTONUP:
         case WM_RBUTTONUP:
-           
-			
+            ReleaseCapture();
+			//mouseHandle = false;
             break;
 		case WM_MOUSEMOVE:
-			
+			/*if (mouseHandle) {
+				SetCapture(hWnd);
+				GetCursorPos(&gGameFramework.m_ptOldCursorPos);
+			}*/
 			break;
         case WM_KEYDOWN:
 			switch (wParam) 
@@ -190,6 +199,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					return 0;
 			} 
 			break;
+		case WM_COMMAND:
+			wmId    = LOWORD(wParam);
+			wmEvent = HIWORD(wParam);
+			// 메뉴의 선택 영역을 구문 분석합니다.
+			switch (wmId)
+			{
+				case IDM_ABOUT:
+					DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+					break;
+				case IDM_EXIT:
+					DestroyWindow(hWnd);
+					break;
+				default:
+					return DefWindowProc(hWnd, message, wParam, lParam);
+			}
+			break;
+		case WM_PAINT:
+			hdc = BeginPaint(hWnd, &ps);
+			// TODO: 여기에 그리기 코드를 추가합니다.
+			EndPaint(hWnd, &ps);
+			break;
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			//ExitProcess(0);
@@ -198,4 +228,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 	return 0;
+}
+
+// 정보 대화 상자의 메시지 처리기입니다.
+INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		return (INT_PTR)TRUE;
+
+	case WM_COMMAND:
+		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+		{
+			EndDialog(hDlg, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+		break;
+	}
+	return (INT_PTR)FALSE;
 }

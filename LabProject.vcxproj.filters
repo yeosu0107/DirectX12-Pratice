@@ -13,32 +13,11 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="GameObject">
-      <UniqueIdentifier>{b1558cd7-9fdf-4dfc-9b09-aa7db437afee}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GameObject\Enemy">
-      <UniqueIdentifier>{6eac1282-6193-4e96-8f67-1a6a8b7e6d5a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GameObject\Player">
-      <UniqueIdentifier>{14627d08-e221-4974-9c78-91a870df83a5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GameObject\BaseObject">
-      <UniqueIdentifier>{67eb5810-0ccf-485b-b66a-feb7b15c6d55}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GameObject\Map">
-      <UniqueIdentifier>{156153e6-b68b-44d9-a7b2-6dd6a37d6117}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GameObject\Bullet">
-      <UniqueIdentifier>{df2b537d-fd13-4b4b-b3f6-0dba3f51f1f6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GameFrameWork\GameTimer">
       <UniqueIdentifier>{8d5786d4-07bb-4ff6-a896-392ed0650173}</UniqueIdentifier>
     </Filter>
     <Filter Include="GameFrameWork\GameFrameWork">
       <UniqueIdentifier>{3453e0ac-2965-4bcb-8636-a0f7f78c0c05}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GameObject\Itme">
-      <UniqueIdentifier>{6fe487b8-e8b9-4823-a049-6696222ecc7c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -62,29 +41,11 @@
     <ClCompile Include="src\stdafx.cpp">
       <Filter>winMain</Filter>
     </ClCompile>
-    <ClCompile Include="src\GameObject.cpp">
-      <Filter>GameObject\BaseObject</Filter>
-    </ClCompile>
-    <ClCompile Include="src\EnemyObject.cpp">
-      <Filter>GameObject\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Player.cpp">
-      <Filter>GameObject\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Map.cpp">
-      <Filter>GameObject\Map</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Bullet.cpp">
-      <Filter>GameObject\Bullet</Filter>
-    </ClCompile>
     <ClCompile Include="src\GameFramework.cpp">
       <Filter>GameFrameWork\GameFrameWork</Filter>
     </ClCompile>
     <ClCompile Include="src\Timer.cpp">
       <Filter>GameFrameWork\GameTimer</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Item.cpp">
-      <Filter>GameObject\Itme</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -97,29 +58,11 @@
     <ClInclude Include="src\stdafx.h">
       <Filter>winMain</Filter>
     </ClInclude>
-    <ClInclude Include="src\GameObject.h">
-      <Filter>GameObject\BaseObject</Filter>
-    </ClInclude>
-    <ClInclude Include="src\EnemyObject.h">
-      <Filter>GameObject\Enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Player.h">
-      <Filter>GameObject\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Map.h">
-      <Filter>GameObject\Map</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Bullet.h">
-      <Filter>GameObject\Bullet</Filter>
-    </ClInclude>
     <ClInclude Include="src\GameFramework.h">
       <Filter>GameFrameWork\GameFrameWork</Filter>
     </ClInclude>
     <ClInclude Include="src\Timer.h">
       <Filter>GameFrameWork\GameTimer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Item.h">
-      <Filter>GameObject\Itme</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

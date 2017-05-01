@@ -176,14 +176,8 @@
     <ResourceCompile Include="LabProject.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Bullet.cpp" />
-    <ClCompile Include="src\EnemyObject.cpp" />
     <ClCompile Include="src\GameFramework.cpp" />
-    <ClCompile Include="src\GameObject.cpp" />
-    <ClCompile Include="src\Item.cpp" />
     <ClCompile Include="src\LabProject.cpp" />
-    <ClCompile Include="src\Map.cpp" />
-    <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -192,14 +186,8 @@
     <ClCompile Include="src\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Bullet.h" />
-    <ClInclude Include="src\EnemyObject.h" />
     <ClInclude Include="src\GameFramework.h" />
-    <ClInclude Include="src\GameObject.h" />
-    <ClInclude Include="src\Item.h" />
     <ClInclude Include="src\LabProject.h" />
-    <ClInclude Include="src\Map.h" />
-    <ClInclude Include="src\Player.h" />
     <ClInclude Include="src\Resource.h" />
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\Timer.h" />

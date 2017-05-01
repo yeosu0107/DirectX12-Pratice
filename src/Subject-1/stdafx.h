@@ -1,29 +1,29 @@
-ï»¿// stdafx.h : ìì£¼ ì‚¬ìš©í•˜ì§€ë§Œ ìì£¼ ë³€ê²½ë˜ì§€ëŠ” ì•ŠëŠ”
-// í‘œì¤€ ì‹œìŠ¤í…œ í¬í•¨ íŒŒì¼ ë° í”„ë¡œì íŠ¸ ê´€ë ¨ í¬í•¨ íŒŒì¼ì´
-// ë“¤ì–´ ìˆëŠ” í¬í•¨ íŒŒì¼ì…ë‹ˆë‹¤.
+// stdafx.h : ÀÚÁÖ »ç¿ëÇÏÁö¸¸ ÀÚÁÖ º¯°æµÇÁö´Â ¾Ê´Â
+// Ç¥ÁØ ½Ã½ºÅÛ Æ÷ÇÔ ÆÄÀÏ ¹× ÇÁ·ÎÁ§Æ® °ü·Ã Æ÷ÇÔ ÆÄÀÏÀÌ
+// µé¾î ÀÖ´Â Æ÷ÇÔ ÆÄÀÏÀÔ´Ï´Ù.
 //
 
 #pragma once
 
-// ì•„ë˜ ì§€ì •ëœ í”Œë«í¼ì— ìš°ì„ í•˜ëŠ” í”Œë«í¼ì„ ëŒ€ìƒìœ¼ë¡œ í•˜ëŠ” ê²½ìš° ë‹¤ìŒ ì •ì˜ë¥¼ ìˆ˜ì •í•˜ì‹­ì‹œì˜¤.
-// ë‹¤ë¥¸ í”Œë«í¼ì— ì‚¬ìš©ë˜ëŠ” í•´ë‹¹ ê°’ì˜ ìµœì‹  ì •ë³´ëŠ” MSDNì„ ì°¸ì¡°í•˜ì‹­ì‹œì˜¤.
-#ifndef WINVER				// Windows XP ì´ìƒì—ì„œë§Œ ê¸°ëŠ¥ì„ ì‚¬ìš©í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.
-#define WINVER 0x0600		// ë‹¤ë¥¸ ë²„ì „ì˜ Windowsì— ë§ë„ë¡ ì í•©í•œ ê°’ìœ¼ë¡œ ë³€ê²½í•´ ì£¼ì‹­ì‹œì˜¤.
+// ¾Æ·¡ ÁöÁ¤µÈ ÇÃ·§Æû¿¡ ¿ì¼±ÇÏ´Â ÇÃ·§ÆûÀ» ´ë»óÀ¸·Î ÇÏ´Â °æ¿ì ´ÙÀ½ Á¤ÀÇ¸¦ ¼öÁ¤ÇÏ½Ê½Ã¿À.
+// ´Ù¸¥ ÇÃ·§Æû¿¡ »ç¿ëµÇ´Â ÇØ´ç °ªÀÇ ÃÖ½Å Á¤º¸´Â MSDNÀ» ÂüÁ¶ÇÏ½Ê½Ã¿À.
+#ifndef WINVER				// Windows XP ÀÌ»ó¿¡¼­¸¸ ±â´ÉÀ» »ç¿ëÇÒ ¼ö ÀÖ½À´Ï´Ù.
+#define WINVER 0x0501		// ´Ù¸¥ ¹öÀüÀÇ Windows¿¡ ¸Âµµ·Ï ÀûÇÕÇÑ °ªÀ¸·Î º¯°æÇØ ÁÖ½Ê½Ã¿À.
 #endif
 
-#ifndef _WIN32_WINNT		// Windows XP ì´ìƒì—ì„œë§Œ ê¸°ëŠ¥ì„ ì‚¬ìš©í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.                   
-#define _WIN32_WINNT 0x0600	// ë‹¤ë¥¸ ë²„ì „ì˜ Windowsì— ë§ë„ë¡ ì í•©í•œ ê°’ìœ¼ë¡œ ë³€ê²½í•´ ì£¼ì‹­ì‹œì˜¤.
+#ifndef _WIN32_WINNT		// Windows XP ÀÌ»ó¿¡¼­¸¸ ±â´ÉÀ» »ç¿ëÇÒ ¼ö ÀÖ½À´Ï´Ù.                   
+#define _WIN32_WINNT 0x0501	// ´Ù¸¥ ¹öÀüÀÇ Windows¿¡ ¸Âµµ·Ï ÀûÇÕÇÑ °ªÀ¸·Î º¯°æÇØ ÁÖ½Ê½Ã¿À.
 #endif						
 
-#ifndef _WIN32_WINDOWS		// Windows 98 ì´ìƒì—ì„œë§Œ ê¸°ëŠ¥ì„ ì‚¬ìš©í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.
-#define _WIN32_WINDOWS 0x0600 // Windows Me ì´ìƒì— ë§ë„ë¡ ì í•©í•œ ê°’ìœ¼ë¡œ ë³€ê²½í•´ ì£¼ì‹­ì‹œì˜¤.
+#ifndef _WIN32_WINDOWS		// Windows 98 ÀÌ»ó¿¡¼­¸¸ ±â´ÉÀ» »ç¿ëÇÒ ¼ö ÀÖ½À´Ï´Ù.
+#define _WIN32_WINDOWS 0x0410 // Windows Me ÀÌ»ó¿¡ ¸Âµµ·Ï ÀûÇÕÇÑ °ªÀ¸·Î º¯°æÇØ ÁÖ½Ê½Ã¿À.
 #endif
 
-#ifndef _WIN32_IE			// IE 6.0 ì´ìƒì—ì„œë§Œ ê¸°ëŠ¥ì„ ì‚¬ìš©í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.
-#define _WIN32_IE 0x0600	// ë‹¤ë¥¸ ë²„ì „ì˜ IEì— ë§ë„ë¡ ì í•©í•œ ê°’ìœ¼ë¡œ ë³€ê²½í•´ ì£¼ì‹­ì‹œì˜¤.
+#ifndef _WIN32_IE			// IE 6.0 ÀÌ»ó¿¡¼­¸¸ ±â´ÉÀ» »ç¿ëÇÒ ¼ö ÀÖ½À´Ï´Ù.
+#define _WIN32_IE 0x0600	// ´Ù¸¥ ¹öÀüÀÇ IE¿¡ ¸Âµµ·Ï ÀûÇÕÇÑ °ªÀ¸·Î º¯°æÇØ ÁÖ½Ê½Ã¿À.
 #endif
 
-#define WIN32_LEAN_AND_MEAN		// ê±°ì˜ ì‚¬ìš©ë˜ì§€ ì•ŠëŠ” ë‚´ìš©ì€ Windows í—¤ë”ì—ì„œ ì œì™¸í•©ë‹ˆë‹¤.
+#define WIN32_LEAN_AND_MEAN		// °ÅÀÇ »ç¿ëµÇÁö ¾Ê´Â ³»¿ëÀº Windows Çì´õ¿¡¼­ Á¦¿ÜÇÕ´Ï´Ù.
 
 #ifdef _DEBUG
 #pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
@@ -31,41 +31,40 @@
 #endif
 
 
-// Windows í—¤ë” íŒŒì¼:
+// Windows Çì´õ ÆÄÀÏ:
 #include <windows.h>
-// Cì˜ ëŸ°íƒ€ì„ í—¤ë” íŒŒì¼ì…ë‹ˆë‹¤.
-#include <string>
+
+// CÀÇ ·±Å¸ÀÓ Çì´õ ÆÄÀÏÀÔ´Ï´Ù.
+//#include <iostream>
+#include <stdlib.h>
+#include <malloc.h>
+#include <memory.h>
 #include <tchar.h>
-#include <wrl.h>
-#include <shellapi.h>
-#include <Mmsystem.h>
-//d3d í—¤ë”íŒŒì¼
+#include <math.h>
+
 #include <d3d12.h>
-#include <dxgi1_4.h>
-#include <d3dcompiler.h>
 #include <DirectXMath.h>
 #include <DirectXPackedVector.h>
 #include <DirectXColors.h>
 #include <DirectXCollision.h>
 
-
+#include <Mmsystem.h>
 
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
-using Microsoft::WRL::ComPtr;
-#pragma comment(lib, "d3dcompiler.lib") 
-#pragma comment(lib, "d3d12.lib") 
-#pragma comment(lib, "dxgi.lib")
-
+#pragma comment(lib, "d3d12.lib")
 
 #define RANDOM_COLOR	(0xFF000000 | ((rand() * 0xFFFFFF) / RAND_MAX))
 
-#define FRAME_BUFFER_WIDTH	640
-#define FRAME_BUFFER_HEIGHT	480
+// TODO: ÇÁ·Î±×·¥¿¡ ÇÊ¿äÇÑ Ãß°¡ Çì´õ´Â ¿©±â¿¡¼­ ÂüÁ¶ÇÕ´Ï´Ù.
 
-
-
+const int VK_Q = 0x51;
+const int VK_W = 0x57;
+const int VK_E = 0x45;
+const int VK_A = 0x41;
+const int VK_S = 0x53;
+const int VK_D = 0x44;
 
 
 namespace Vector3
