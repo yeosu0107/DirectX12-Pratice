@@ -206,7 +206,7 @@ void CPlayer::ItemChecker(int item)
 	//enum	   itemType { bulletDeley = 0, boostGauge, speed };
 	switch (item) {
 	case 0:
-		if(maxBulletDelay>5)
+		if(maxBulletDelay>6)
 			maxBulletDelay -= 1;
 		break;
 	case 1:
