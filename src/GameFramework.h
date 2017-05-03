@@ -95,6 +95,8 @@ public:
 	void CreateRenderTargetView();
 	void CreateDepthStencilView();
 
+	void OnResizeBackBuffers();
+
 	void WaitForGpuComplete();
 
 	//마우스, 키보드 입출력
