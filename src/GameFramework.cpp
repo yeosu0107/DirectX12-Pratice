@@ -122,7 +122,8 @@ void CGameFramework::CreateDirect3DDevice() {
 	IDXGIAdapter1 *pd3dAdapter = NULL;
 	for (UINT i = 0; DXGI_ERROR_NOT_FOUND != pdxgiFactory->EnumAdapters1(i, &pd3dAdapter); i++) {
 		//모든 하드웨어 어댑터 대하여 특성 레벨 12.0을 지원하는 하드웨어 디바이스를 생성한다.
-		DXGI_ADAPTER_DESC1 dxgiAdapterDesc; pd3dAdapter->GetDesc1(&dxgiAdapterDesc);
+		DXGI_ADAPTER_DESC1 dxgiAdapterDesc; 
+		pd3dAdapter->GetDesc1(&dxgiAdapterDesc);
 		if (dxgiAdapterDesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
 			continue;
 		if (SUCCEEDED(D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_12_0, _uuidof(ID3D12Device), (void **)&pd3Device)))
@@ -143,6 +144,7 @@ void CGameFramework::CreateDirect3DDevice() {
 	nMsaa4xQualityLevels = d3dMsaaQualityLevels.NumQualityLevels;
 	//다중 샘플의 품질 수준이 1보다 크면 다중 샘플링을 활성화한다. 
 	bMsaa4xEnable = (nMsaa4xQualityLevels > 1) ? true : false;
+
 	//펜스를 생성하고 펜스 값을 1로 설정한다.
 	pd3Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void **)&m_pd3dFence); m_nFenceValue = 1;
 	m_d3dViewport.TopLeftX = 0;
@@ -176,13 +178,15 @@ void CGameFramework::CreateCommandQueueAndList() {
 void CGameFramework::CreateRtvAndDsvDescriptorHeaps() {
 	D3D12_DESCRIPTOR_HEAP_DESC d3dDescriptorHeapDesc;
 	::ZeroMemory(&d3dDescriptorHeapDesc, sizeof(D3D12_DESCRIPTOR_HEAP_DESC));
-	d3dDescriptorHeapDesc.NumDescriptors = m_nSwapChainBuffers; d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+	d3dDescriptorHeapDesc.NumDescriptors = m_nSwapChainBuffers; 
+	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 	d3dDescriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	d3dDescriptorHeapDesc.NodeMask = 0;
 	//렌더 타겟 서술자 힙(서술자의 개수는 스왑체인 버퍼의 개수)을 생성한다. 
 	HRESULT hResult = pd3Device->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void **)&m_pd3dRtvDescriptorHeap);
 	//렌더 타겟 서술자 힙의 원소의 크기를 저장한다.
 	m_nRtvDescriptorIncrementSize = pd3Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
 	d3dDescriptorHeapDesc.NumDescriptors = 1;
 	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 	//깊이-스텐실 서술자 힙(서술자의 개수는 1)을 생성한다. 
@@ -260,7 +264,8 @@ void CGameFramework::OnResizeBackBuffers() {
 	CreateRenderTargetView(); 
 	CreateDepthStencilView();
 	m_pd3dCommandList->Close();
-	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList }; m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
+	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList }; 
+	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
 	WaitForGpuComplete();
 }
 
@@ -465,7 +470,7 @@ void CGameFramework::FrameAdvance()
 	pdxgiSwapChain->Present1(1, 0, &dxgiPresentParameters); 
 	/*스왑체인을 프리젠트한다. 
 	프리젠트를 하면 현재 렌더 타겟(후면버퍼)의 내용이 전면버퍼로 옮겨지고 
-	렌더 타겟 인 덱스가 바뀔 것이다.*/
+	렌더 타겟 인덱스가 바뀔 것이다.*/
 	m_nSwapChainBufferIndex = pdxgiSwapChain->GetCurrentBackBufferIndex();
 	
 	//프레임레이트 표현
