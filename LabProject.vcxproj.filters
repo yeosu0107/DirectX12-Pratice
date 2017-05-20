@@ -19,6 +19,12 @@
     <Filter Include="GameFrameWork\GameFrameWork">
       <UniqueIdentifier>{3453e0ac-2965-4bcb-8636-a0f7f78c0c05}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameFrameWork\Scene">
+      <UniqueIdentifier>{222751df-a7ea-4448-86cf-439cd7bca1ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="셰이더">
+      <UniqueIdentifier>{f2c016bf-6f67-40e3-bad1-4a0ef981d99e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="LabProject.ico">
@@ -47,6 +53,9 @@
     <ClCompile Include="src\Timer.cpp">
       <Filter>GameFrameWork\GameTimer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scene.cpp">
+      <Filter>GameFrameWork\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\LabProject.h">
@@ -64,5 +73,13 @@
     <ClInclude Include="src\Timer.h">
       <Filter>GameFrameWork\GameTimer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Scene.h">
+      <Filter>GameFrameWork\Scene</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders.hlsl">
+      <Filter>셰이더</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

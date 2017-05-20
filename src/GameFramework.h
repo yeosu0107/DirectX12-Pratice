@@ -9,10 +9,12 @@
 
 #include "stdafx.h"
 #include "Timer.h"
+#include "Scene.h"
 
 class CGameFramework
 {
 private:
+	CScene						*m_pScene;
 	HINSTANCE					m_hInstance;
 	HWND						m_hWnd;
 	
@@ -59,7 +61,7 @@ private:
 	//펜스 인터페이스 포인터
 	ID3D12Fence *m_pd3dFence;
 	//펜스 값
-	UINT64 m_nFenceValue;
+	UINT64 m_nFenceValue[m_nSwapChainBuffers];
 	//펜스 핸들
 	HANDLE m_hFenceEvent;
 
@@ -70,7 +72,7 @@ private:
 	D3D12_RECT m_d3dScissorRect; //뷰포트와 씨저 사각형이다.
 
 	//게임 프레임워크 변수
-	bool						m_bActive;
+	
 	CGameTimer					m_GameTimer;
 	_TCHAR						m_pszFrameRate[50];
 
@@ -83,7 +85,7 @@ public:
 	bool OnCreate(HINSTANCE hInstance, HWND hMainWnd);
 	void OnDestroy();
 	void FrameAdvance();
-	void SetActive(bool bActive) { m_bActive = bActive; }
+	
 
 	//D3D제어
 	void CreateSwapChain();
@@ -97,6 +99,9 @@ public:
 	void OnResizeBackBuffers();
 
 	void WaitForGpuComplete();
+
+	//따라하기 06
+	void MoveToNextFrame();
 
 	//마우스, 키보드 입출력
 	void OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);

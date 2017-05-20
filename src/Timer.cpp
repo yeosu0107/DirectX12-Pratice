@@ -78,3 +78,40 @@ unsigned long CGameTimer::GetFrameRate(LPTSTR lpszString, int nCharacters) {
 	} 
 	return(m_nCurrentFrameRate);
 }
+
+float CGameTimer::GetTimeElapsed() { 
+	return(m_fTimeElapsed);
+}
+
+void CGameTimer::Reset() {
+	__int64 nPerformanceCounter; 
+	::QueryPerformanceCounter((LARGE_INTEGER*)&nPerformanceCounter);
+	m_nBaseTime = nPerformanceCounter; 
+	m_nLastTime = nPerformanceCounter; 
+	m_nStopTime = 0; 
+	m_bStopped = false;
+}
+
+void CGameTimer::Start() { 
+	__int64 nPerformanceCounter; 
+	::QueryPerformanceCounter((LARGE_INTEGER *)&nPerformanceCounter); 
+	if (m_bStopped) { 
+		m_nPausedTime += (nPerformanceCounter - m_nStopTime); 
+		m_nLastTime = nPerformanceCounter; 
+		m_nStopTime = 0; 
+		m_bStopped = false; 
+	} 
+}
+
+void CGameTimer::Stop() { 
+	if (!m_bStopped) { 
+		::QueryPerformanceCounter((LARGE_INTEGER *)&m_nStopTime);
+		m_bStopped = true; 
+	} 
+}
+
+float CGameTimer::GetTotalTime() { 
+	if (m_bStopped) 
+		return(float(((m_nStopTime - m_nPausedTime) - m_nBaseTime) * m_fTimeScale)); 
+	return(float(((m_nCurrentTime - m_nPausedTime) - m_nBaseTime) * m_fTimeScale)); 
+}
