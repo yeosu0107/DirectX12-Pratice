@@ -20,9 +20,9 @@ CGameFramework::CGameFramework()
 	/////////////////////////////////////////////
 
 	//d3d 제어
-	pdxgiFactory = NULL;
+	//pdxgiFactory = NULL;
 	pdxgiSwapChain = NULL;
-	pd3Device = NULL;
+	//pd3Device = NULL;
 	m_pd3dCommandAllocator = NULL;
 	m_pd3dCommandQueue = NULL;
 	//pd3dPipelineState = NULL; 
@@ -59,12 +59,10 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	CreateCommandQueueAndList();
 	CreateRtvAndDsvDescriptorHeaps();
 	CreateSwapChain();
-	CreateRenderTargetView();
-	CreateDepthStencilView();
+
 	
+
 	m_hFenceEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-
-
 	//오브젝트 제어
 	BuildObjects();
 	
@@ -118,21 +116,26 @@ void CGameFramework::CreateDirect3DDevice() {
 	m_pd3dDebugController->EnableDebugLayer();
 #endif
 	//DXGI 팩토리를 생성한다.
-	::CreateDXGIFactory1(__uuidof(IDXGIFactory4), (void **)&pdxgiFactory);
+	//::CreateDXGIFactory1(__uuidof(IDXGIFactory4), (void **)&pdxgiFactory);
+	::CreateDXGIFactory1(IID_PPV_ARGS(&pdxgiFactory));
 	IDXGIAdapter1 *pd3dAdapter = NULL;
 	for (UINT i = 0; DXGI_ERROR_NOT_FOUND != pdxgiFactory->EnumAdapters1(i, &pd3dAdapter); i++) {
-		//모든 하드웨어 어댑터 대하여 특성 레벨 12.0을 지원하는 하드웨어 디바이스를 생성한다.
+		//어뎁터를 열거한다.
 		DXGI_ADAPTER_DESC1 dxgiAdapterDesc; 
 		pd3dAdapter->GetDesc1(&dxgiAdapterDesc);
+		//어뎁터의 속성을 읽어온다.
 		if (dxgiAdapterDesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
-			continue;
-		if (SUCCEEDED(D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_12_0, _uuidof(ID3D12Device), (void **)&pd3Device)))
-			break;
+			continue; //플래그를 확인, 소프트웨어적으로 작동하면 다음 어뎁터로 넘어간다.
+		if (SUCCEEDED(D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&pd3Device))))
+			break; //플래그가 소프트웨어적으로 작동하지 않을 때 
+				   //그 어뎁터를 이용 특성레벨 12.0을 지원하는 
+		           //하드웨어 디바이스를 생성하고 성공여부를 확인
 	}
 	if (!pd3dAdapter) {
-		//특성 레벨 12.0을 지원하는 하드웨어 디바이스를 생성할 수 없으면 WARP 디바이스를 생성한다.
+		//특성 레벨 12.0을 지원하는 하드웨어 디바이스를 
+		//생성할 수 없으면 WARP 디바이스를 생성한다.
 		pdxgiFactory->EnumWarpAdapter(_uuidof(IDXGIFactory4), (void **)&pd3dAdapter);
-		D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), (void **)&pd3Device);
+		D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_12_0, _uuidof(ID3D12Device), (void **)&pd3Device);
 	}
 	D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS d3dMsaaQualityLevels;
 	d3dMsaaQualityLevels.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -231,6 +234,7 @@ void CGameFramework::CreateDepthStencilView() {
 	d3dClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	d3dClearValue.DepthStencil.Depth = 1.0f;
 	d3dClearValue.DepthStencil.Stencil = 0;
+
 	//깊이-스텐실 버퍼를 생성한다.
 	pd3Device->CreateCommittedResource(&d3dHeapProperties, D3D12_HEAP_FLAG_NONE, &d3dResourceDesc,
 		D3D12_RESOURCE_STATE_DEPTH_WRITE, &d3dClearValue, __uuidof(ID3D12Resource), (void **)&m_pd3dDepthStencilBuffer);
@@ -301,8 +305,10 @@ void CGameFramework::OnDestroy()
 	if (m_pd3dFence) m_pd3dFence->Release();
 	pdxgiSwapChain->SetFullscreenState(FALSE, NULL);
 	if (pdxgiSwapChain) pdxgiSwapChain->Release();
-	if (pd3Device) pd3Device->Release();
-	if (pdxgiFactory) pdxgiFactory->Release();
+	
+	//comptr로 구현
+	//if (pd3Device) pd3Device->Release();
+	//if (pdxgiFactory) pdxgiFactory->Release();
 
 
 	if (m_hWnd) DestroyWindow(m_hWnd);
@@ -444,7 +450,7 @@ void CGameFramework::FrameAdvance()
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(); 
 	//원하는 값으로 깊이-스텐실(뷰)을 지운다.
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL); 
-	//렌더 타겟 뷰(서술자)와 깊이-스텐실 뷰(서술자)를 출력-병합 단계(OM)에 연결한다.
+	//렌더 타겟 뷰와 깊이-스텐실 뷰를 출력-병합 단계(OM)에 연결한다.
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle); 
 	////////////////////////////////////////////////
 	//렌더링 코드는 여기에 추가될 것이다.

@@ -21,12 +21,11 @@ private:
 
 	//D3D 변수
 	//팩토리 인터페이스 포인터
-	IDXGIFactory4*				pdxgiFactory;
+	ComPtr<IDXGIFactory4>		pdxgiFactory;
 	//스왑체인 인터페이스 포인터
 	IDXGISwapChain3*			pdxgiSwapChain;
 	//D3D12 디바이스 인터페이스 포인터
-	ID3D12Device*				pd3Device;
-
+	ComPtr<ID3D12Device>		pd3Device;
 	//다중샘플링 활성/비활성
 	bool						bMsaa4xEnable = false;
 	//다중샘플링 퀄리티 레벨 지정
