@@ -177,8 +177,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GameFramework.cpp" />
+    <ClCompile Include="src\GameObject.cpp" />
     <ClCompile Include="src\LabProject.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -188,9 +191,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GameFramework.h" />
+    <ClInclude Include="src\GameObject.h" />
     <ClInclude Include="src\LabProject.h" />
+    <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Resource.h" />
     <ClInclude Include="src\Scene.h" />
+    <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\Timer.h" />
   </ItemGroup>
