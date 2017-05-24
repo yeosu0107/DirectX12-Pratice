@@ -36,9 +36,9 @@ CTriangleMesh::CTriangleMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
 	m_nVertices = 3; m_nStride = sizeof(CDiffusedVertex); 
 	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	CDiffusedVertex pVertices[3]; 
-	pVertices[0] = CDiffusedVertex(XMFLOAT3(0.0f, 0.5f, 0.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-	pVertices[1] = CDiffusedVertex(XMFLOAT3(0.5f, -0.5f, 0.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)); 
-	pVertices[2] = CDiffusedVertex(XMFLOAT3(-0.5f, -0.5f, 0.0f), XMFLOAT4(Colors::Blue));
+	pVertices[0] = CDiffusedVertex(XMFLOAT3(0.0f, 0.1f, 0.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	pVertices[1] = CDiffusedVertex(XMFLOAT3(0.1f, -0.1f, 0.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)); 
+	pVertices[2] = CDiffusedVertex(XMFLOAT3(-0.1f, -0.1f, 0.0f), XMFLOAT4(Colors::Blue));
 	
 	//삼각형 메쉬를 리소스(정점 버퍼)로 생성한다. 
 	m_pd3dVertexBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, 

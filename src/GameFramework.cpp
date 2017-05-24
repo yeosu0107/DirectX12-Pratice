@@ -151,14 +151,9 @@ void CGameFramework::CreateDirect3DDevice() {
 	//펜스를 생성하고 펜스 값을 1로 설정한다.
 	pd3Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void **)&m_pd3dFence); 
 
-	m_d3dViewport.TopLeftX = 0;
-	m_d3dViewport.TopLeftY = 0;
-	m_d3dViewport.Width = static_cast<float>(client_width);
-	m_d3dViewport.Height = static_cast<float>(client_height);
-	m_d3dViewport.MinDepth = 0.0f;
-	m_d3dViewport.MaxDepth = 1.0f; //뷰포트를 주 윈도우의 클라이언트 영역 전체로 설정한다.
-	m_d3dScissorRect = { 0, 0, client_width, client_height }; //씨저 사각형을 주 윈도우의 클라이언트 영역 전체로 설정한다.
-	if (pd3dAdapter) pd3dAdapter->Release();
+	
+	if (pd3dAdapter) 
+		pd3dAdapter->Release();
 }
 
 //커맨드큐 생성
@@ -277,20 +272,35 @@ void CGameFramework::OnResizeBackBuffers() {
 void CGameFramework::BuildObjects()
 {
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
+
+	//카메라 객체를 생성하여 뷰포트, 씨저 사각형, 투영 변환 행렬, 카메라 변환 행렬을 생성하고 설정한다. 
+	m_pCamera = new CCamera(); 
+	m_pCamera->SetViewport(0, 0, client_width, client_height, 0.0f, 1.0f); 
+	m_pCamera->SetScissorRect(0, 0, client_width, client_height); 
+
+	m_pCamera->GenerateProjectionMatrix(1.0f, 500.0f, 
+		float(client_width) / float(client_height), 90.0f); 
+
+	m_pCamera->GenerateViewMatrix(XMFLOAT3(0.0f, 0.0f, -15.0f), 
+		XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
+
 	//씬 객체를 생성하고 씬에 포함될 게임 객체들을 생성한다. 
 	m_pScene = new CScene(); 
 	m_pScene->BuildObjects(pd3Device.Get(), m_pd3dCommandList);
+
 	//씬 객체를 생성하기 위하여 필요한 그래픽 명령 리스트들을 명령 큐에 추가한다. 
 	m_pd3dCommandList->Close(); 
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
+
 	//그래픽 명령 리스트들이 모두 실행될 때까지 기다린다. 
 	WaitForGpuComplete();
+
 	//그래픽 리소스들을 생성하는 과정에 생성된 업로드 버퍼들을 소멸시킨다. 
 	if (m_pScene)
 		m_pScene->ReleaseUploadBuffers();
-	m_GameTimer.Reset();
 
+	m_GameTimer.Reset();
 }
 
 void CGameFramework::ReleaseObjects()
@@ -438,9 +448,6 @@ void CGameFramework::FrameAdvance()
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL); 
 
-	//뷰포트와 씨저 사각형을 설정한다.
-	m_pd3dCommandList->RSSetViewports(1, &m_d3dViewport);
-	m_pd3dCommandList->RSSetScissorRects(1, &m_d3dScissorRect);
 
 	D3D12_RESOURCE_BARRIER d3dResourceBarrier;
 	::ZeroMemory(&d3dResourceBarrier, sizeof(D3D12_RESOURCE_BARRIER));
@@ -479,7 +486,7 @@ void CGameFramework::FrameAdvance()
 	////////////////////////////////////////////////
 	//랜더링
 	if (m_pScene)
-		m_pScene->Render(m_pd3dCommandList);
+		m_pScene->Render(m_pd3dCommandList, m_pCamera);
 	////////////////////////////////////////////////
 
 	//랜더타겟에 대한 랜더링 끝나기를 대기

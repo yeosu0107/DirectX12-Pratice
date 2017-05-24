@@ -68,6 +68,9 @@
     <ClCompile Include="src\Shader.cpp">
       <Filter>Draw</Filter>
     </ClCompile>
+    <ClCompile Include="src\Camera.cpp">
+      <Filter>Draw</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\LabProject.h">
@@ -95,6 +98,9 @@
       <Filter>Draw</Filter>
     </ClInclude>
     <ClInclude Include="src\Shader.h">
+      <Filter>Draw</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera.h">
       <Filter>Draw</Filter>
     </ClInclude>
   </ItemGroup>

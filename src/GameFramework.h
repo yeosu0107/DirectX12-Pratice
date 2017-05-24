@@ -10,6 +10,7 @@
 #include "stdafx.h"
 #include "Timer.h"
 #include "Scene.h"
+#include "Camera.h"
 
 class CGameFramework
 {
@@ -68,8 +69,6 @@ private:
 #if defined(_DEBUG) 
 	ID3D12Debug *m_pd3dDebugController;
 #endif
-	D3D12_VIEWPORT m_d3dViewport;
-	D3D12_RECT m_d3dScissorRect; //뷰포트와 씨저 사각형이다.
 
 	//게임 프레임워크 변수
 	
@@ -78,6 +77,8 @@ private:
 
 	//게임 오브젝트 변수
 public:
+	CCamera *m_pCamera = NULL;
+
 	CGameFramework(void);
 	~CGameFramework(void);
 
