@@ -58,8 +58,8 @@ using Microsoft::WRL::ComPtr;
 #pragma comment(lib, "d3d12.lib") 
 #pragma comment(lib, "dxgi.lib")
 
-
-#define RANDOM_COLOR	(0xFF000000 | ((rand() * 0xFFFFFF) / RAND_MAX))
+#define FRANDDOM		(rand() / float(RAND_MAX))
+#define RANDOM_COLOR	XMFLOAT4(FRANDDOM, FRANDDOM, FRANDDOM, FRANDDOM)
 
 #define FRAME_BUFFER_WIDTH	640
 #define FRAME_BUFFER_HEIGHT	480

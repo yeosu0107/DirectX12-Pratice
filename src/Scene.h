@@ -5,11 +5,13 @@
 class CScene
 {
 protected: 
-	//씬은 셰이더들의 집합이다. 셰이더들은 게임 객체들의 집합이다. 
-	//CShader **m_ppShaders = NULL; 
-	//int m_nShaders = 0;
+	//씬은 셰이더들의 집합이다. 셰이더들은 게임 객체들의 집합이다.
+	//랜더를 위해 사용
+	CShader **m_ppShaders = NULL; 
+	int m_nShaders = 0;
 
 	//씬은 게임 객체들의 집합이다. 게임 객체는 셰이더를 포함한다. 
+	//애니메이트를 위해 사용
 	CGameObject **m_ppObjects = NULL; 
 	int m_nObjects = 0;
 

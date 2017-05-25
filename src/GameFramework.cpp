@@ -474,7 +474,8 @@ void CGameFramework::FrameAdvance()
 		TRUE, &d3dDsvCPUDescriptorHandle);
 
 
-	float pfClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f };/*Colors::Azure*/
+	//float pfClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f };/*Colors::Azure*/
+	float pfClearColor[4] = { 1,1,1,1 };
 	//원하는 색상으로 렌더 타겟(뷰)을 지운다.
 	m_pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, 
 		pfClearColor, 0, NULL); 

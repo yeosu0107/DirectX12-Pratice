@@ -40,12 +40,21 @@ private:
 protected: 
 	ID3D12Resource *m_pd3dVertexBuffer = NULL; 
 	ID3D12Resource *m_pd3dVertexUploadBuffer = NULL;
+	ID3D12Resource *m_pd3dIndexBuffer = NULL;
+	ID3D12Resource *m_pd3dIndexUploadBuffer = NULL;
+
 	D3D12_VERTEX_BUFFER_VIEW m_d3dVertexBufferView;
+	D3D12_INDEX_BUFFER_VIEW m_d3dIndexBufferView;
+
 	D3D12_PRIMITIVE_TOPOLOGY m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST; 
 	UINT m_nSlot = 0; 
 	UINT m_nVertices = 0; 
 	UINT m_nStride = 0; 
 	UINT m_nOffset = 0;
+
+	UINT m_nIndices = 0;
+	UINT m_nStartIndex = 0;
+	int m_nBaseVertex = 0;
 
 public:
 	CMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
@@ -65,4 +74,22 @@ class CTriangleMesh : public CMesh
 public:    
 	CTriangleMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual ~CTriangleMesh() { } 
+};
+
+class CCube : public CMesh
+{
+private:
+	XMFLOAT3 m_vNormal[6] = {
+		{ 1.0f, 0.0f, 0.0f }, //오른쪽
+		{ -1.0f, 0.0f, 0.0f }, //왼쪽
+		{ 0.0f, 1.0f, 0.0f }, //위
+		{ 0.0f, -1.0f, 0.0f }, //아래
+		{ 0.0f, 0.0f, -1.0f }, //앞
+		{ 0.0f, 0.0f, 1.0f }, //뒤
+	};
+	float m_fScalar[6];
+public:
+	CCube(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, 
+		float width, float height, float depth);
+	virtual ~CCube() { }
 };

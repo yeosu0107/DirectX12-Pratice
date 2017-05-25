@@ -179,37 +179,35 @@ void CShader::ReleaseShaderVariables()
 {
 }
 
-//void CShader::ReleaseUploadBuffers() { 
-//	if (m_ppObjects) { 
-//		for (int j = 0; j < m_nObjects; j++) 
-//			if (m_ppObjects[j]) 
-//				m_ppObjects[j]->ReleaseUploadBuffers(); 
-//	} 
-//}
+void CShader::ReleaseUploadBuffers() { 
+	if (m_ppObjects) { 
+		for (int j = 0; j < m_nObjects; j++) 
+			if (m_ppObjects[j]) 
+				m_ppObjects[j]->ReleaseUploadBuffers(); 
+	} 
+}
 
-//
-//void CShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, void *pContext) {
-//	CTriangleMesh *pTriangleMesh = new CTriangleMesh(pd3dDevice, pd3dCommandList);
-//	m_nObjects = 1;
-//	m_ppObjects = new CGameObject*[m_nObjects];
-//	m_ppObjects[0] = new CGameObject();
-//	m_ppObjects[0]->SetMesh(pTriangleMesh);
-//}
-//
-//void CShader::ReleaseObjects() {
-//	if (m_ppObjects) {
-//		for (int j = 0; j < m_nObjects; j++)
-//			if (m_ppObjects[j])
-//				delete m_ppObjects[j];
-//		delete[] m_ppObjects;
-//	}
-//}
-//
-//void CShader::AnimateObjects(float fTimeElapsed) {
-//	for (int j = 0; j < m_nObjects; j++) {
-//		m_ppObjects[j]->Animate(fTimeElapsed);
-//	}
-//}
+
+void CShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, 
+	void *pContext, CGameObject** ppObjects) {
+	m_nObjects = 1;
+	m_ppObjects = ppObjects;
+}
+
+void CShader::ReleaseObjects() {
+	if (m_ppObjects) {
+		for (int j = 0; j < m_nObjects; j++)
+			if (m_ppObjects[j])
+				delete m_ppObjects[j];
+		delete[] m_ppObjects;
+	}
+}
+
+void CShader::AnimateObjects(float fTimeElapsed) {
+	/*for (int j = 0; j < m_nObjects; j++) {
+		m_ppObjects[j]->Animate(fTimeElapsed);
+	}*/
+}
 
 void CShader::OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList) { 
 	//파이프라인에 그래픽스 상태 객체를 설정한다. 
@@ -218,10 +216,12 @@ void CShader::OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList) {
 
 void CShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera) {
 	OnPrepareRender(pd3dCommandList);
-	/*for (int j = 0; j < m_nObjects; j++) { 
-		if (m_ppObjects[j]) 
-			m_ppObjects[j]->Render(pd3dCommandList); 
-	}*/
+	for (int j = 0; j < m_nObjects; j++) { 
+		if (m_ppObjects[j]) {
+			UpdateShaderVariable(pd3dCommandList, &m_ppObjects[j]->getMatrix());
+			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
+		}
+	}
 }
 
 CDiffusedShader::CDiffusedShader() { 

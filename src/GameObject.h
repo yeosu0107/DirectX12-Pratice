@@ -30,6 +30,7 @@ public:
 	virtual void OnPrepareRender(); 
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 
+	XMFLOAT4X4& getMatrix() { return m_xmf4x4World; }
 };
 
 class CRotatingObject : public CGameObject 

@@ -1,5 +1,5 @@
 #pragma once
-//#include "GameObject.h"
+#include "GameObject.h"
 #include "Camera.h"
 
 struct CB_GAMEOBJECT_INFO 
@@ -14,8 +14,8 @@ private: int
 
 protected: 
 	//셰이더가 포함하는 게임 객체들의 리스트(배열)이다. 
-	//CGameObject **m_ppObjects = NULL; 
-	//int m_nObjects = 0;
+	CGameObject **m_ppObjects = NULL; 
+	int m_nObjects = 0;
 
 	//파이프라인 상태 객체들의 리스트(배열)이다. 
 	ID3D12PipelineState **m_ppd3dPipelineStates = NULL; 
@@ -51,11 +51,11 @@ public:
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void UpdateShaderVariable(ID3D12GraphicsCommandList *pd3dCommandList, XMFLOAT4X4 *pxmf4x4World);
 	
-	//virtual void ReleaseUploadBuffers();
-	/*virtual void BuildObjects(ID3D12Device *pd3dDevice, 
-		ID3D12GraphicsCommandList *pd3dCommandList, void *pContext = NULL); 
+	virtual void ReleaseUploadBuffers();
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, 
+		ID3D12GraphicsCommandList *pd3dCommandList, void *pContext, CGameObject** pObject); 
 	virtual void AnimateObjects(float fTimeElapsed); 
-	virtual void ReleaseObjects();*/
+	virtual void ReleaseObjects();
 	
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
