@@ -281,7 +281,7 @@ void CGameFramework::BuildObjects()
 	m_pCamera->GenerateProjectionMatrix(1.0f, 500.0f, 
 		float(client_width) / float(client_height), 90.0f); 
 
-	m_pCamera->GenerateViewMatrix(XMFLOAT3(0.0f, 0.0f, -15.0f), 
+	m_pCamera->GenerateViewMatrix(XMFLOAT3(0.0f, 0.0f, -50.0f), 
 		XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
 
 	//씬 객체를 생성하고 씬에 포함될 게임 객체들을 생성한다. 
@@ -438,7 +438,7 @@ void CGameFramework::AnimateObjects()
 
 void CGameFramework::FrameAdvance()
 {    
-	m_GameTimer.Tick(60.0f);
+	m_GameTimer.Tick(60); //60프레임 고정
 	ProcessInput();
 
 	AnimateObjects();

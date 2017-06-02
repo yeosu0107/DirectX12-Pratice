@@ -21,6 +21,8 @@ void CMesh::ReleaseUploadBuffers() {
 		m_pd3dVertexUploadBuffer->Release(); 
 	if (m_pd3dIndexUploadBuffer)
 		m_pd3dIndexUploadBuffer->Release();
+	m_pd3dVertexUploadBuffer = NULL;
+	m_pd3dIndexUploadBuffer = NULL;
 };
 
 void CMesh::Render(ID3D12GraphicsCommandList *pd3dCommandList) { 
@@ -67,7 +69,7 @@ CCube::CCube(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandLis
 	//큐브 매쉬 선언
 	m_nVertices = 8;
 	m_nStride = sizeof(CDiffusedVertex);
-	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	
 
 	float fx = width*0.5f, fy = height*0.5f, fz = depth*0.5f;
@@ -98,18 +100,34 @@ CCube::CCube(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandLis
 	m_d3dVertexBufferView.StrideInBytes = m_nStride;
 	m_d3dVertexBufferView.SizeInBytes = m_nStride * m_nVertices;
 
-	UINT index[18];
-	index[0] = 5; index[1] = 6; index[2] = 4;
-	index[3] = 7; index[4] = 0; index[5] = 3;
-	index[6] = 1; index[7] = 2; index[8] = 2;
-	index[9] = 3; index[10] = 3; index[11] = 7;
-
-	index[12] = 2; index[13] = 6; index[14] = 1;
-	index[15] = 5; index[16] = 0; index[17] = 4;
-
-	m_nIndices = 18;
+	m_nIndices = 36;
+	UINT pnIndices[36];
+	//ⓐ 앞면(Front) 사각형의 위쪽 삼각형
+	pnIndices[0] = 3; pnIndices[1] = 1; pnIndices[2] = 0;
+	//ⓑ 앞면(Front) 사각형의 아래쪽 삼각형
+	pnIndices[3] = 2; pnIndices[4] = 1; pnIndices[5] = 3;
+	//ⓒ 윗면(Top) 사각형의 위쪽 삼각형
+	pnIndices[6] = 0; pnIndices[7] = 5; pnIndices[8] = 4;
+	//ⓓ 윗면(Top) 사각형의 아래쪽 삼각형
+	pnIndices[9] = 1; pnIndices[10] = 5; pnIndices[11] = 0;
+	//ⓔ 뒷면(Back) 사각형의 위쪽 삼각형
+	pnIndices[12] = 3; pnIndices[13] = 4; pnIndices[14] = 7;
+	//ⓕ 뒷면(Back) 사각형의 아래쪽 삼각형
+	pnIndices[15] = 0; pnIndices[16] = 4; pnIndices[17] = 3;
+	//ⓖ 아래면(Bottom) 사각형의 위쪽 삼각형
+	pnIndices[18] = 1; pnIndices[19] = 6; pnIndices[20] = 5;
+	//ⓗ 아래면(Bottom) 사각형의 아래쪽 삼각형
+	pnIndices[21] = 2; pnIndices[22] = 6; pnIndices[23] = 1;
+	//ⓘ 옆면(Left) 사각형의 위쪽 삼각형
+	pnIndices[24] = 2; pnIndices[25] = 7; pnIndices[26] = 6;
+	//ⓙ 옆면(Left) 사각형의 아래쪽 삼각형
+	pnIndices[27] = 3; pnIndices[28] = 7; pnIndices[29] = 2;
+	//ⓚ 옆면(Right) 사각형의 위쪽 삼각형
+	pnIndices[30] = 6; pnIndices[31] = 4; pnIndices[32] = 5;
+	//ⓛ 옆면(Right) 사각형의 아래쪽 삼각형
+	pnIndices[33] = 7; pnIndices[34] = 4; pnIndices[35] = 6;
 	////메쉬를 리소스(정점 버퍼)로 생성한다. 
-	m_pd3dIndexBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, index, sizeof(UINT)*m_nIndices, D3D12_HEAP_TYPE_DEFAULT,
+	m_pd3dIndexBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, pnIndices, sizeof(UINT)*m_nIndices, D3D12_HEAP_TYPE_DEFAULT,
 		D3D12_RESOURCE_STATE_INDEX_BUFFER, &m_pd3dIndexUploadBuffer);
 
 	m_d3dIndexBufferView.BufferLocation = m_pd3dIndexBuffer->GetGPUVirtualAddress();

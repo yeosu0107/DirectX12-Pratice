@@ -251,7 +251,7 @@ namespace Matrix4x4
 	inline XMFLOAT4X4 PerspectiveFovLH(float fFovAngleY, float fAspectRatio, float fNearZ, float fFarZ)
 	{
 		XMFLOAT4X4 xmmtx4x4Result;
-		XMStoreFloat4x4(&xmmtx4x4Result, XMMatrixPerspectiveFovLH(XMConvertToRadians(fFovAngleY), fAspectRatio, fNearZ, fFarZ));
+		XMStoreFloat4x4(&xmmtx4x4Result, XMMatrixPerspectiveFovLH(fFovAngleY, fAspectRatio, fNearZ, fFarZ));
 		return(xmmtx4x4Result);
 	}
 
