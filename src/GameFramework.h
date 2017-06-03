@@ -11,6 +11,7 @@
 #include "Timer.h"
 #include "Scene.h"
 #include "Camera.h"
+#include "Player.h"
 
 class CGameFramework
 {
@@ -78,6 +79,8 @@ private:
 	//게임 오브젝트 변수
 public:
 	CCamera *m_pCamera = NULL;
+	CPlayer *m_pPlayer = NULL;
+	POINT m_ptOldCursorPos;
 
 	CGameFramework(void);
 	~CGameFramework(void);

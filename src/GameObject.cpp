@@ -11,20 +11,16 @@ CGameObject::CGameObject()
 CGameObject::~CGameObject()
 {
 	if (m_pMesh) m_pMesh->Release(); 
-	if (m_pShader) { 
-		m_pShader->ReleaseShaderVariables(); 
-		m_pShader->Release(); 
-	}
 }
 
 void CGameObject::SetShader(CShader *pShader) { 
-	if (m_pShader) 
-		m_pShader->Release(); 
+	//if (m_pShader) 
+	//	m_pShader->Release(); 
 
-	m_pShader = pShader; 
+	//m_pShader = pShader; 
 
-	if (m_pShader) 
-		m_pShader->AddRef(); 
+	//if (m_pShader) 
+	//	m_pShader->AddRef(); 
 }
 
 void CGameObject::SetMesh(CMesh *pMesh) { 
@@ -67,7 +63,8 @@ void CGameObject::CreateShaderVariables(ID3D12Device *pd3dDevice,
 }
 void CGameObject::ReleaseShaderVariables()
 {
-}
+}
+
 void CGameObject::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList)
 {
 	XMFLOAT4X4 xmf4x4World;

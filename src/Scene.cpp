@@ -89,7 +89,7 @@ void CScene::ReleaseUploadBuffers() {
 }
 
 ID3D12RootSignature *CScene::GetGraphicsRootSignature() { 
-	return(m_pd3dGraphicsRootSignature); 
+	return m_pd3dGraphicsRootSignature; 
 }
 
 ID3D12RootSignature *CScene::CreateGraphicsRootSignature(ID3D12Device *pd3dDevice) {

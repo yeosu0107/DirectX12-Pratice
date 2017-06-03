@@ -273,20 +273,17 @@ void CGameFramework::BuildObjects()
 {
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 
-	//카메라 객체를 생성하여 뷰포트, 씨저 사각형, 투영 변환 행렬, 카메라 변환 행렬을 생성하고 설정한다. 
+	m_pScene = new CScene();
+	if(m_pScene)
+		m_pScene->BuildObjects(pd3Device.Get(), m_pd3dCommandList);
+
+	CAirplanePlayer *pPlain = new CAirplanePlayer(pd3Device.Get(),
+		m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
+	m_pPlayer = pPlain;
 	m_pCamera = new CCamera(); 
-	m_pCamera->SetViewport(0, 0, client_width, client_height, 0.0f, 1.0f); 
-	m_pCamera->SetScissorRect(0, 0, client_width, client_height); 
+	m_pCamera = m_pPlayer->ChangeCamera((DWORD)(0x01),
+		m_GameTimer.GetTimeElapsed());
 
-	m_pCamera->GenerateProjectionMatrix(1.0f, 500.0f, 
-		float(client_width) / float(client_height), 90.0f); 
-
-	m_pCamera->GenerateViewMatrix(XMFLOAT3(0.0f, 0.0f, -50.0f), 
-		XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
-
-	//씬 객체를 생성하고 씬에 포함될 게임 객체들을 생성한다. 
-	m_pScene = new CScene(); 
-	m_pScene->BuildObjects(pd3Device.Get(), m_pd3dCommandList);
 
 	//씬 객체를 생성하기 위하여 필요한 그래픽 명령 리스트들을 명령 큐에 추가한다. 
 	m_pd3dCommandList->Close(); 
@@ -342,7 +339,45 @@ void CGameFramework::OnDestroy()
 
 void CGameFramework::ProcessInput()
 {
+	static UCHAR pKeyBuffer[256];
+	DWORD dwDirection = 0;
+
+	if (::GetKeyboardState(pKeyBuffer))
+	{
+		if (pKeyBuffer[VK_W] & 0xF0) dwDirection |= DIR_FORWARD;
+		if (pKeyBuffer[VK_S] & 0xF0) dwDirection |= DIR_BACKWARD;
+		if (pKeyBuffer[VK_A] & 0xF0) dwDirection |= DIR_LEFT;
+		if (pKeyBuffer[VK_D] & 0xF0) dwDirection |= DIR_RIGHT;
+		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
+		if (pKeyBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
+	}
+	float cxDelta = 0.0f, cyDelta = 0.0f;
+	POINT ptCursorPos;
 	
+	if (::GetCapture() == m_hWnd)
+	{
+		::SetCursor(NULL);
+		::GetCursorPos(&ptCursorPos);
+		cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 3.0f;
+		cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 3.0f;
+		::SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
+	}
+	
+	if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
+	{
+		if (cxDelta || cyDelta) {
+			if (pKeyBuffer[VK_RBUTTON] & 0xF0)
+				m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
+			else
+				m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
+		}
+
+		if (dwDirection) {
+			m_pPlayer->Move(dwDirection, 50.0f * m_GameTimer.GetTimeElapsed(), true);
+		}
+	}
+	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
+
 }
 
 void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
@@ -350,9 +385,14 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 	switch (nMessageID) {
 	case WM_LBUTTONDOWN:
 	case WM_RBUTTONDOWN:
+		::SetCapture(hWnd);
+		::GetCursorPos(&m_ptOldCursorPos);
+
 		break;
 	case WM_LBUTTONUP:
 	case WM_RBUTTONUP:
+		::ReleaseCapture();
+
 		break;
 	case WM_MOUSEMOVE:
 		break;
@@ -370,6 +410,12 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			::PostQuitMessage(0);
 			break;
 		case VK_RETURN:
+			break;
+		case VK_F1:
+		case VK_F2:
+		case VK_F3:
+			m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1),
+				m_GameTimer.GetTimeElapsed());
 			break;
 		case VK_F8:
 			break;
@@ -439,6 +485,7 @@ void CGameFramework::AnimateObjects()
 void CGameFramework::FrameAdvance()
 {    
 	m_GameTimer.Tick(60); //60프레임 고정
+	
 	ProcessInput();
 
 	AnimateObjects();
@@ -488,6 +535,12 @@ void CGameFramework::FrameAdvance()
 	//랜더링
 	if (m_pScene)
 		m_pScene->Render(m_pd3dCommandList, m_pCamera);
+#ifdef _WITH_PLAYER_TOP
+	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle,
+		D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+#endif
+	if (m_pPlayer) 
+		m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
 	////////////////////////////////////////////////
 
 	//랜더타겟에 대한 랜더링 끝나기를 대기

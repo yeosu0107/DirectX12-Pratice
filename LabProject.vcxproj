@@ -181,6 +181,7 @@
     <ClCompile Include="src\GameObject.cpp" />
     <ClCompile Include="src\LabProject.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\stdafx.cpp">
@@ -196,6 +197,7 @@
     <ClInclude Include="src\GameObject.h" />
     <ClInclude Include="src\LabProject.h" />
     <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\Player.h" />
     <ClInclude Include="src\Resource.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Shader.h" />

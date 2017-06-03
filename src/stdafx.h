@@ -70,7 +70,12 @@ extern ID3D12Resource *CreateBufferResource(ID3D12Device *pd3dDevice,
 	D3D12_RESOURCE_STATES d3dResourceStates = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, 
 	ID3D12Resource **ppd3dUploadBuffer = NULL);
 
-
+const int VK_Q = 0x51;
+const int VK_W = 0x57;
+const int VK_E = 0x45;
+const int VK_A = 0x41;
+const int VK_S = 0x53;
+const int VK_D = 0x44;
 
 
 namespace Vector3

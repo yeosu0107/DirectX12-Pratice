@@ -28,6 +28,9 @@
     <Filter Include="Draw">
       <UniqueIdentifier>{10b8d9a0-f94d-4c6a-b667-5dcaee516890}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Object">
+      <UniqueIdentifier>{25869d9e-2890-41ec-ae3c-71bc928892f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="LabProject.ico">
@@ -59,9 +62,6 @@
     <ClCompile Include="src\Scene.cpp">
       <Filter>GameFrameWork\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="src\GameObject.cpp">
-      <Filter>Draw</Filter>
-    </ClCompile>
     <ClCompile Include="src\Mesh.cpp">
       <Filter>Draw</Filter>
     </ClCompile>
@@ -70,6 +70,12 @@
     </ClCompile>
     <ClCompile Include="src\Camera.cpp">
       <Filter>Draw</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameObject.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Player.cpp">
+      <Filter>Object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -91,9 +97,6 @@
     <ClInclude Include="src\Scene.h">
       <Filter>GameFrameWork\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="src\GameObject.h">
-      <Filter>Draw</Filter>
-    </ClInclude>
     <ClInclude Include="src\Mesh.h">
       <Filter>Draw</Filter>
     </ClInclude>
@@ -102,6 +105,12 @@
     </ClInclude>
     <ClInclude Include="src\Camera.h">
       <Filter>Draw</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GameObject.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Player.h">
+      <Filter>Object</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

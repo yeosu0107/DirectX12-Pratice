@@ -79,17 +79,18 @@ public:
 class CCube : public CMesh
 {
 private:
-	XMFLOAT3 m_vNormal[6] = {
-		{ 1.0f, 0.0f, 0.0f }, //오른쪽
-		{ -1.0f, 0.0f, 0.0f }, //왼쪽
-		{ 0.0f, 1.0f, 0.0f }, //위
-		{ 0.0f, -1.0f, 0.0f }, //아래
-		{ 0.0f, 0.0f, -1.0f }, //앞
-		{ 0.0f, 0.0f, 1.0f }, //뒤
-	};
-	float m_fScalar[6];
+
 public:
 	CCube(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, 
 		float width, float height, float depth);
 	virtual ~CCube() { }
+};
+
+class CAirplane : public CMesh 
+{
+public:
+	CAirplane(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, 
+		float fWidth = 20.0f, float fHeight = 20.0f, float fDepth = 4.0f,
+		XMFLOAT4 xmf4Color = XMFLOAT4(1.0f, 1.0f, 0.0f, 0.0f));
+	virtual ~CAirplane();
 };

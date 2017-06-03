@@ -11,7 +11,6 @@ private:
 protected:
 	XMFLOAT4X4 m_xmf4x4World; 
 	CMesh *m_pMesh = NULL;
-	CShader *m_pShader = NULL;
 
 public:
 	CGameObject();
