@@ -19,6 +19,11 @@ CPlayer::CPlayer()
 	m_fYaw = 0.0f;
 	m_pPlayerUpdatedContext = NULL;
 	m_pCameraUpdatedContext = NULL;
+
+	
+
+	SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(width * 0.5f, height * 0.5f, depth * 0.5f), 
+		XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
 CPlayer::~CPlayer()
@@ -209,14 +214,35 @@ void CPlayer::OnPrepareRender()
 void CPlayer::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)
 {
 	DWORD nCameraMode = (pCamera) ? pCamera->GetMode() : 0x00;
-	if (nCameraMode == THIRD_PERSON_CAMERA) CGameObject::Render(pd3dCommandList, pCamera);
+	if (nCameraMode == THIRD_PERSON_CAMERA && !die) 
+		CGameObject::Render(pd3dCommandList, pCamera);
+
+	if (paticle->getRun())
+		paticle->Render(pd3dCommandList, pCamera);
+}
+
+void CPlayer::Animate(float fTime) {
+	CGameObject::Animate(fTime);
+
+	if (paticle->getRun())
+		paticle->Animate(fTime);
+}
+
+void CPlayer::Die()
+{
+	if (die)
+		return;
+	else
+		die = true;
+	paticle->setPositions(this->GetPosition());
+	paticle->setRun();
 }
 
 CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
 	*pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature)
 {
 
-	CMesh *pAirplaneMesh = new CAirplane(pd3dDevice, pd3dCommandList, 20.0f, 20.0f, 4.0f, XMFLOAT4(0.0f, 0.5f, 0.0f, 0.0f));
+	CMesh *pAirplaneMesh = new CAirplane(pd3dDevice, pd3dCommandList, width, height, depth, XMFLOAT4(0.0f, 0.5f, 0.0f, 0.0f));
 	SetMesh(pAirplaneMesh);
 
 	m_pCamera = ChangeCamera(SPACESHIP_CAMERA, 0.0f);

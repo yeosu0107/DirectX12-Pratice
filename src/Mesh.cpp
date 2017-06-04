@@ -135,7 +135,8 @@ CAirplane::CAirplane(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3d
 	CDiffusedVertex pVertices[24 * 3];
 
 	float x1 = fx * 0.2f, y1 = fy * 0.2f, x2 = fx * 0.1f, y3 = fy * 0.3f, y2 = ((y1 - (fy -
-		y3)) / x1) * x2 + (fy - y3);
+		y3)) / x1) * x2 + (fy - y3);
+
 
 	//비행기 메쉬의 위쪽 면
 	pVertices[i++] = CDiffusedVertex(XMFLOAT3(0.0f, +(fy + y3), -fz),
@@ -292,9 +293,74 @@ CAirplane::CAirplane(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3d
 		D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dVertexUploadBuffer);
 	m_d3dVertexBufferView.BufferLocation = m_pd3dVertexBuffer->GetGPUVirtualAddress();
 	m_d3dVertexBufferView.StrideInBytes = m_nStride;
-	m_d3dVertexBufferView.SizeInBytes = m_nStride * m_nVertices;
+	m_d3dVertexBufferView.SizeInBytes = m_nStride * m_nVertices;
+
 }
 
 CAirplane::~CAirplane()
 {
 }
+
+CMap::CMap(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, float width, float height, float depth) : CMesh(pd3dDevice, pd3dCommandList)
+{
+	//큐브 매쉬 선언
+	m_nVertices = 8;
+	m_nStride = sizeof(CDiffusedVertex);
+	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+	float fx = width*0.5f, fy = height*0.5f, fz = depth;
+
+	XMFLOAT4 frontColor = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
+	XMFLOAT4 endColor = XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f);
+
+	CDiffusedVertex pVertices[8];
+	pVertices[0] = CDiffusedVertex(XMFLOAT3(-fx, +fy, 0), frontColor);
+	pVertices[1] = CDiffusedVertex(XMFLOAT3(+fx, +fy, 0), frontColor);
+	pVertices[2] = CDiffusedVertex(XMFLOAT3(+fx, +fy, +fz), endColor);
+	pVertices[3] = CDiffusedVertex(XMFLOAT3(-fx, +fy, +fz), endColor);
+	pVertices[4] = CDiffusedVertex(XMFLOAT3(-fx, -fy, 0), frontColor);
+	pVertices[5] = CDiffusedVertex(XMFLOAT3(+fx, -fy, 0), frontColor);
+	pVertices[6] = CDiffusedVertex(XMFLOAT3(+fx, -fy, +fz), endColor);
+	pVertices[7] = CDiffusedVertex(XMFLOAT3(-fx, -fy, +fz), endColor);
+
+	//메쉬를 리소스(정점 버퍼)로 생성한다. 
+
+	m_pd3dVertexBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList,
+		pVertices, m_nStride * m_nVertices, D3D12_HEAP_TYPE_DEFAULT,
+		D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dVertexUploadBuffer);
+	//정점 버퍼 뷰를 생성한다. 
+	m_d3dVertexBufferView.BufferLocation = m_pd3dVertexBuffer->GetGPUVirtualAddress();
+	m_d3dVertexBufferView.StrideInBytes = m_nStride;
+	m_d3dVertexBufferView.SizeInBytes = m_nStride * m_nVertices;
+
+	m_nIndices = 36;
+	UINT pnIndices[36];
+
+	//왼쪽
+	pnIndices[0] = 3; pnIndices[1] = 0; pnIndices[2] = 1;
+	pnIndices[3] = 2; pnIndices[4] = 3; pnIndices[5] = 1;
+	//뒤
+	pnIndices[6] = 0; pnIndices[7] = 0; pnIndices[8] = 5;
+	pnIndices[9] = 1; pnIndices[10] = 4; pnIndices[11] = 5;
+	//위
+	pnIndices[12] = 3; pnIndices[13] = 7; pnIndices[14] = 4;
+	pnIndices[15] = 0; pnIndices[16] = 3; pnIndices[17] = 4;
+	//오른쪽
+	pnIndices[18] = 1; pnIndices[19] = 5; pnIndices[20] = 6;
+	pnIndices[21] = 2; pnIndices[22] = 1; pnIndices[23] = 6;
+
+	pnIndices[24] = 2; pnIndices[25] = 7; pnIndices[26] = 6;
+	pnIndices[27] = 3; pnIndices[28] = 7; pnIndices[29] = 2;
+
+	pnIndices[30] = 6; pnIndices[31] = 5; pnIndices[32] = 4;
+	pnIndices[33] = 7; pnIndices[34] = 6; pnIndices[35] = 4;
+
+	////메쉬를 리소스(정점 버퍼)로 생성한다. 
+	m_pd3dIndexBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, pnIndices, sizeof(UINT)*m_nIndices, D3D12_HEAP_TYPE_DEFAULT,
+		D3D12_RESOURCE_STATE_INDEX_BUFFER, &m_pd3dIndexUploadBuffer);
+
+	m_d3dIndexBufferView.BufferLocation = m_pd3dIndexBuffer->GetGPUVirtualAddress();
+	m_d3dIndexBufferView.Format = DXGI_FORMAT_R32_UINT;
+	m_d3dIndexBufferView.SizeInBytes = sizeof(UINT)*m_nIndices;
+}
+

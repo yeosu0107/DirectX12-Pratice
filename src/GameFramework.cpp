@@ -281,9 +281,11 @@ void CGameFramework::BuildObjects()
 		m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
 	m_pPlayer = pPlain;
 	m_pCamera = new CCamera(); 
-	m_pCamera = m_pPlayer->ChangeCamera((DWORD)(0x01),
+	m_pCamera = m_pPlayer->ChangeCamera((DWORD)(0x03),
 		m_GameTimer.GetTimeElapsed());
 
+	CPaticles* paticles = new CPaticles(50, pd3Device.Get(), m_pd3dCommandList);
+	m_pPlayer->setPaticle(paticles);
 
 	//씬 객체를 생성하기 위하여 필요한 그래픽 명령 리스트들을 명령 큐에 추가한다. 
 	m_pd3dCommandList->Close(); 
@@ -372,8 +374,9 @@ void CGameFramework::ProcessInput()
 				m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
 		}
 
-		if (dwDirection) {
-			m_pPlayer->Move(dwDirection, 50.0f * m_GameTimer.GetTimeElapsed(), true);
+		if (dwDirection && !m_pPlayer->getDie()) {
+			m_pPlayer->Move(dwDirection, 300.0f * m_GameTimer.GetTimeElapsed(), false);
+			//m_pPlayer->Move(dwDirection, 5.0f, false);
 		}
 	}
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
@@ -478,8 +481,17 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 
 void CGameFramework::AnimateObjects()
 {
-	if (m_pScene)
-		m_pScene->AnimateObjects(m_GameTimer.GetTimeElapsed());
+	bool playerDie = false;
+	if (m_pPlayer) {
+		m_pPlayer->Animate(m_GameTimer.GetTimeElapsed());
+	}
+	if (m_pScene) {
+		m_pScene->AnimateObjects(m_GameTimer.GetTimeElapsed(), m_pPlayer->GetPosition());
+		playerDie = m_pScene->CrashObjects(*m_pPlayer->getOOBB());
+	}
+	if (playerDie) {
+		m_pPlayer->Die();
+	}
 }
 
 void CGameFramework::FrameAdvance()

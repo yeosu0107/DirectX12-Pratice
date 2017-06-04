@@ -265,6 +265,7 @@ void CPlayerShader::CreateShader(ID3D12Device *pd3dDevice,
 	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
 }
 
+
 EnemyShader::EnemyShader() {}
 EnemyShader::~EnemyShader() {}
 
@@ -299,13 +300,15 @@ void EnemyShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 			}
 		}
 	}
-	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
 }
 void EnemyShader::AnimateObjects(float fTimeElapsed) {
 	for (int j = 0; j < m_nObjects; j++)
 	{
 		m_ppObjects[j]->Animate(fTimeElapsed);
-	}
+	}
+
 }
 void EnemyShader::ReleaseObjects() {
 	if (m_ppObjects)
@@ -359,6 +362,99 @@ void EnemyShader::ReleaseUploadBuffers() {
 }
 void EnemyShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera) {
 	CShader::Render(pd3dCommandList, pCamera);
+	for (int j = 0; j < m_nObjects; j++)
+	{
+		if (m_ppObjects[j])
+		{
+			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
+		}
+	}
+}
+
+CMapShader::CMapShader() {}
+CMapShader::~CMapShader() {}
+
+void CMapShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
+	*pd3dCommandList) {
+	CMap *pMesh = new CMap(pd3dDevice, pd3dCommandList, width, height, depth);
+	
+	m_nObjects = 5;
+	m_ppObjects = new CWallObject*[m_nObjects];
+
+	float size = 100.0f;
+
+	CWallObject *map = NULL;
+	int index = 0;
+	for (int i = 0; i < m_nObjects; ++i) {
+		map = new CWallObject();
+		map->setObject(width, height, depth);
+		map->SetMesh(pMesh);
+		map->SetPosition(0.0f, 0.0f, (depth * i));
+		m_ppObjects[index++] = map;
+	}
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+}
+void CMapShader::AnimateObjects(XMFLOAT3 pos, float fTimeElapsed) {
+	for (int j = 0; j < m_nObjects; j++)
+	{
+		m_ppObjects[j]->Animate(pos, fTimeElapsed);
+	}
+
+}
+void CMapShader::ReleaseObjects() {
+	if (m_ppObjects)
+	{
+		for (int j = 0; j < m_nObjects; j++)
+		{
+			if (m_ppObjects[j])
+				delete m_ppObjects[j];
+		}
+		delete[] m_ppObjects;
+	}
+}
+
+D3D12_INPUT_LAYOUT_DESC CMapShader::CreateInputLayout() {
+	UINT nInputElementDescs = 2;
+	D3D12_INPUT_ELEMENT_DESC *pd3dInputElementDescs = new
+		D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
+
+	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
+		D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+
+	pd3dInputElementDescs[1] = { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12,
+		D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+
+	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
+	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
+	d3dInputLayoutDesc.NumElements = nInputElementDescs;
+	return(d3dInputLayoutDesc);
+}
+D3D12_SHADER_BYTECODE CMapShader::CreateVertexShader(ID3DBlob **ppd3dShaderBlob) {
+	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VSDiffused", "vs_5_1",
+		ppd3dShaderBlob));
+}
+D3D12_SHADER_BYTECODE CMapShader::CreatePixelShader(ID3DBlob **ppd3dShaderBlob) {
+	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PSDiffused", "ps_5_1",
+		ppd3dShaderBlob));
+}
+void CMapShader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature
+	*pd3dGraphicsRootSignature) {
+
+	m_nPipelineStates = 1;
+	m_ppd3dPipelineStates = new ID3D12PipelineState*[m_nPipelineStates];
+	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+}
+void CMapShader::ReleaseUploadBuffers() {
+	if (m_ppObjects)
+	{
+		for (int j = 0; j < m_nObjects; j++)
+			m_ppObjects[j]->ReleaseUploadBuffers();
+	}
+}
+void CMapShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera) {
+	//CShader::Render(pd3dCommandList, pCamera);
+	OnPrepareRender(pd3dCommandList);
 	for (int j = 0; j < m_nObjects; j++)
 	{
 		if (m_ppObjects[j])

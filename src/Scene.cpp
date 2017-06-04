@@ -20,12 +20,21 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	//쉐이더 생성
 	m_nShaders = 1;
-	m_ppShaders = new EnemyShader[m_nShaders];
+	m_ppShaders = new CMapShader[m_nShaders];
 
 	m_ppShaders[0].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	m_ppShaders[0].BuildObjects(pd3dDevice, pd3dCommandList);
 	
+	m_nWall = m_ppShaders[0].getWallnum();
+	m_pWall = m_ppShaders[0].getWalls();
 	
+	float width = m_pWall[0]->getWidth();
+	float height = m_pWall[0]->getHeight();
+
+	m_wallPlanes[0] = XMFLOAT4(+1.0f, 0.0f, 0.0f, width);
+	m_wallPlanes[1] = XMFLOAT4(-1.0f, 0.0f, 0.0f, width);
+	m_wallPlanes[2] = XMFLOAT4(0.0f, +1.0f, 0.0f, height);
+	m_wallPlanes[3] = XMFLOAT4(0.0f, -1.0f, 0.0f, height);
 }
 
 void CScene::ReleaseObjects()
@@ -48,13 +57,41 @@ bool CScene::ProcessInput(UCHAR *pKeysBuffer)
 	return false;
 }
 
-void CScene::AnimateObjects(float fTimeElapsed)
+
+
+
+void CScene::AnimateObjects(float fTimeElapsed, XMFLOAT3 player)
 {
 	for (int i = 0; i < m_nShaders; i++) { 
-		m_ppShaders[i].AnimateObjects(fTimeElapsed); 
+		m_ppShaders[i].AnimateObjects(player, fTimeElapsed);
 	}
+
 }
 
+bool CScene::CrashObjects(BoundingOrientedBox& player)
+{
+	//printf("%f %f\n", player.Center.y, player.Extents.y);
+	for (int index = 0; index < m_nWall; ++index) {
+		ContainmentType containType = m_pWall[index]->getOOBB()->Contains(player);
+		switch (containType) {
+		case CONTAINS:
+			break;
+		case DISJOINT:
+			break;
+		case INTERSECTING:
+			for (int i = 0; i < 4; ++i) {
+				PlaneIntersectionType intersectType = player.Intersects(XMLoadFloat4(&m_wallPlanes[i]));
+				if (intersectType == BACK || intersectType == INTERSECTING) {
+					//printf("%d %d 충돌\n", index, i);
+					return true;
+				}
+			}
+			
+			break;
+		}
+	}
+	return false;
+}
 
 void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera) 
 {

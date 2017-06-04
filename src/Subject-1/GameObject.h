@@ -1,3 +1,4 @@
+#include "..\GameObject.h"
 #pragma once
 #include <stdio.h>
 
@@ -197,6 +198,9 @@ private:
 public:
 	Paticle() {}
 	~Paticle() { /*CGameObject::~CGameObject(); */}
-	virtual void Animate();
+	void Paticle::setPaticle(XMFLOAT3 tdir, XMFLOAT3 taxis, float mov, float rot)
+	{
+	}
+	virtual void Anmate();
 };
 

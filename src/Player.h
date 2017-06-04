@@ -15,6 +15,9 @@
 class CPlayer : public CGameObject
 {
 protected:
+	bool die = false;
+	CPaticles* paticle = NULL;
+
 	CCamera *m_pCamera = NULL;
 
 	XMFLOAT3 m_xmf3Position;
@@ -26,11 +29,17 @@ protected:
 	float m_fYaw;
 	float m_fRoll;
 
+	float width = 20.0f;
+	float height = 20.0f;
+	float depth = 4.0f;
+
 	XMFLOAT3 m_xmf3Velocity;
 	XMFLOAT3 m_xmf3Gravity;
 
 	float m_fMaxVelocityXZ;
 	float m_fMaxVelocityY;
+
+	int numofPaticle=0.0f;
 
 	//마찰력
 	float m_fFriction;
@@ -100,6 +109,13 @@ public:
 	virtual void OnPrepareRender();
 	//플레이어의 카메라가 3인칭 카메라일 때 플레이어(메쉬)를 렌더링한다.
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera = NULL);
+	virtual void Animate(float fTime);
+
+	void setPaticle(CPaticles* object) {
+		paticle = object;
+	}
+	void Die();
+	bool getDie() const { return die; }
 };
 
 class CAirplanePlayer : public CPlayer

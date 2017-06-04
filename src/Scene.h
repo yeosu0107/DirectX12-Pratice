@@ -4,12 +4,16 @@
 #include "Camera.h"
 class CScene
 {
+private:
+	XMFLOAT4 m_wallPlanes[4];
 protected: 
 	//씬은 셰이더들의 집합이다. 셰이더들은 게임 객체들의 집합이다.
 	//랜더를 위해 사용
-	EnemyShader *m_ppShaders = NULL;
+	CMapShader *m_ppShaders = NULL;
 	int m_nShaders = 0;
 
+	CWallObject **m_pWall = NULL;
+	int m_nWall = 0;
 
 	ID3D12RootSignature *m_pd3dGraphicsRootSignature = NULL;
 
@@ -22,7 +26,8 @@ public:
 	void ReleaseObjects();
 
 	bool ProcessInput(UCHAR *pKeysBuffer);
-	void AnimateObjects(float fTimeElapsed);
+	void AnimateObjects(float fTimeElapsed, XMFLOAT3 player);
+	bool CrashObjects(BoundingOrientedBox& m_pPlayer);
 	void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 
 	bool OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam); 

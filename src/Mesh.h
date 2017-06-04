@@ -86,6 +86,14 @@ public:
 	virtual ~CCube() { }
 };
 
+class CMap : public CMesh
+{
+public:
+	CMap(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList,
+		float width, float height, float depth);
+	virtual ~CMap() { }
+};
+
 class CAirplane : public CMesh 
 {
 public:
