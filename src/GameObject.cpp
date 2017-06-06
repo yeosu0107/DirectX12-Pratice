@@ -24,6 +24,15 @@ void CGameObject::SetShader(CShader *pShader) {
 	//	m_pShader->AddRef(); 
 }
 
+void CGameObject::SetObject(float w, float h, float d)
+{
+	width = w * 0.5f;
+	height = h * 0.5f;
+	depth = d * 0.5f;
+
+	SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(width, height, depth), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
+}
+
 void CGameObject::SetMesh(CMesh *pMesh) { 
 	if (m_pMesh) 
 		m_pMesh->Release();
@@ -146,6 +155,12 @@ void CGameObject::MoveVector(XMFLOAT3 dir, float fDistance)
 	CGameObject::SetPosition(xmf3Position);
 }
 
+void CGameObject::Move(float fDist) {
+	XMFLOAT3 pos = GetPosition();
+	pos = Vector3::Add(pos, movingDir, fDist);
+	CGameObject::SetPosition(pos);
+}
+
 void CGameObject::Rotate(XMFLOAT3 * pxmf3Axis, float fAngle)
 {
 	XMMATRIX mtxRotate = XMMatrixRotationAxis(XMLoadFloat3(pxmf3Axis),
@@ -161,16 +176,19 @@ void CGameObject::Rotate(float fPitch, float fYaw, float fRoll)
 }
 
 CRotatingObject::CRotatingObject() {
-	m_xmf3RotationAxis = XMFLOAT3(1.0f, 5.0f, -5.0f);
-	m_fRotationSpeed = 90.0f;
+	//m_xmf3RotationAxis = XMFLOAT3(1.0f, 5.0f, -5.0f);
+	//m_fRotationSpeed = 90.0f;
 }
 
 CRotatingObject::~CRotatingObject() {
 }
 
+
+
 void CRotatingObject::Animate(float fTimeElapsed) {
-	CGameObject::Animate(fTimeElapsed);
 	CGameObject::Rotate(&m_xmf3RotationAxis, m_fRotationSpeed * fTimeElapsed);
+	CGameObject::Move(1.0f);
+	CGameObject::Animate(fTimeElapsed);
 }
 
 CWallObject::CWallObject()
@@ -181,14 +199,7 @@ CWallObject::~CWallObject()
 {
 }
 
-void CWallObject::setObject(float w, float h, float d)
-{
-	width = w * 0.5f;
-	height = h * 0.5f;
-	depth = d * 0.5f;
 
-	SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(width, height, depth), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
-}
 
 void CWallObject::Animate(float fTimeElapsed)
 {

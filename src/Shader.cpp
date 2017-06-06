@@ -276,7 +276,7 @@ void EnemyShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 	m_nObjects = 10;
 	m_ppObjects = new CGameObject*[m_nObjects];
 	
-	std::default_random_engine dre;
+	std::default_random_engine dre(1000);
 	std::uniform_int_distribution<int> xPos(-mapWidth / 2 + 13.0f, mapWidth / 2 - 13.0f);
 	std::uniform_int_distribution<int> yPos(-mapHeight / 2 + 13.0f, mapHeight / 2 - 13.0f);
 	std::uniform_int_distribution<int> zPos(0 + 50.0f, mapDepth);
@@ -287,8 +287,10 @@ void EnemyShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 		pRotatingObject->SetMesh(pCubeMesh);
 		//각 정육면체 객체의 위치를 설정한다. 
 		pRotatingObject->SetPosition(xPos(dre), yPos(dre), zPos(dre));
-		pRotatingObject->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-		pRotatingObject->SetRotationSpeed(10.0f*(i % 10) + 3.0f);
+		pRotatingObject->SetRotationAxis(XMFLOAT3(1.0f, 3.0f, 1.0f));
+		pRotatingObject->SetRotationSpeed(90.0f);
+		pRotatingObject->setMovingDir(XMFLOAT3(1.0f, 1.0f, 1.0f));
+		pRotatingObject->SetObject(12.0f, 12.0f, 12.0f);
 		m_ppObjects[i] = pRotatingObject;
 	}
 	
@@ -379,7 +381,7 @@ void CMapShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLis
 	int index = 0;
 	for (int i = 0; i < m_nObjects; ++i) {
 		map = new CWallObject();
-		map->setObject(width, height, depth);
+		map->SetObject(width, height, depth);
 		map->SetMesh(pMesh);
 		map->SetPosition(0.0f, 0.0f, (depth * i));
 		m_ppObjects[index++] = map;

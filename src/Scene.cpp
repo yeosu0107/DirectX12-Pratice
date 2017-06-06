@@ -42,7 +42,9 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	EnemyShader* enemyShader = new EnemyShader();
 	enemyShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	enemyShader->BuildObjects(pd3dDevice, pd3dCommandList);
-	enemyShader->BuildObjects(pd3dDevice, pd3dCommandList);
+	
+	m_nEnemy = enemyShader->getObjectsNum();
+	m_pEnemy = enemyShader->GetObjects();
 
 	m_ppShaders[1] = enemyShader;
 }
@@ -80,8 +82,53 @@ void CScene::AnimateObjects(float fTimeElapsed, XMFLOAT3 player)
 
 bool CScene::CrashObjects(BoundingOrientedBox& player)
 {
-	//printf("%f %f\n", player.Center.y, player.Extents.y);
+	
+		//적 객체 - 벽
+	for (int i = 0; i < m_nEnemy; ++i) {
+		int nindex = -1;
+		for (int index = 0; index < m_nWall; ++index) {
+			ContainmentType containType = m_pWall[index]->getOOBB()->Contains(*m_pEnemy[i]->getOOBB());
+			switch (containType) {
+			case CONTAINS:
+				break;
+			case DISJOINT:
+				break;
+			case INTERSECTING: {
+				int nPlaneIndex = -1;
+				nindex = index;
+				for (int j = 0; j < 4; j++)
+				{
+					PlaneIntersectionType intersectType = m_pEnemy[i]->getOOBB()->Intersects(XMLoadFloat4(&m_wallPlanes[j]));
+					if (intersectType == INTERSECTING)
+					{
+						nPlaneIndex = j;
+						break;
+					}
+				}
+				if (nPlaneIndex != -1)
+				{
+					XMVECTOR xmvNormal = XMVectorSet(m_wallPlanes[nPlaneIndex].x, m_wallPlanes[nPlaneIndex].y, m_wallPlanes[nPlaneIndex].z, 0.0f);
+					XMVECTOR xmvReflect = XMVector3Reflect(XMLoadFloat3(&m_pEnemy[i]->getMovingDir()), xmvNormal);
+					XMStoreFloat3(&m_pEnemy[i]->getMovingDir(), xmvReflect);
+				}
+			}
+			break;
+			}
+			if (nindex != -1)
+				break;
+		}
+	}
+	for (int index = 0; index < m_nEnemy; ++index) {
+		for (int j = (index + 1); j < m_nEnemy; ++j) {
+			if (m_pEnemy[index]->getOOBB()->Intersects(*m_pEnemy[j]->getOOBB())) {
+				XMFLOAT3 tDir = m_pEnemy[index]->getMovingDir();
+				m_pEnemy[index]->setMovingDir(m_pEnemy[j]->getMovingDir());
+				m_pEnemy[j]->setMovingDir(tDir);
+			}
+		}
+	}
 	for (int index = 0; index < m_nWall; ++index) {
+		//플레이어 - 벽
 		ContainmentType containType = m_pWall[index]->getOOBB()->Contains(player);
 		switch (containType) {
 		case CONTAINS:
@@ -92,13 +139,14 @@ bool CScene::CrashObjects(BoundingOrientedBox& player)
 			for (int i = 0; i < 4; ++i) {
 				PlaneIntersectionType intersectType = player.Intersects(XMLoadFloat4(&m_wallPlanes[i]));
 				if (intersectType == BACK || intersectType == INTERSECTING) {
-					//printf("%d %d 충돌\n", index, i);
 					return true;
 				}
 			}
 			
 			break;
 		}
+		
+		
 	}
 	return false;
 }

@@ -15,6 +15,9 @@ protected:
 	CWallObject **m_pWall = NULL;
 	int m_nWall = 0;
 
+	CGameObject **m_pEnemy = NULL;
+	int m_nEnemy = 0;
+
 	ID3D12RootSignature *m_pd3dGraphicsRootSignature = NULL;
 
 
