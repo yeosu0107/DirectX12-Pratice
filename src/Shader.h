@@ -2,6 +2,11 @@
 #include "GameObject.h"
 #include "Camera.h"
 
+const float mapWidth = 300.0f;
+const float mapHeight = 200.0f;
+const float mapDepth = 200.0f;
+
+
 struct CB_GAMEOBJECT_INFO 
 { 
 	XMFLOAT4X4 m_xmf4x4World; 
@@ -9,14 +14,11 @@ struct CB_GAMEOBJECT_INFO
 
 class CShader
 {
-private: int 
-	m_nReferences = 0;
-
 protected: 
 	//셰이더가 포함하는 게임 객체들의 리스트(배열)이다. 
 	CGameObject **m_ppObjects = NULL; 
 	int m_nObjects = 0;
-
+	int m_nReferences = 0;
 	//파이프라인 상태 객체들의 리스트(배열)이다. 
 	ID3D12PipelineState **m_ppd3dPipelineStates = NULL; 
 	int m_nPipelineStates = 0;
@@ -54,12 +56,15 @@ public:
 	virtual void ReleaseUploadBuffers();
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, 
 		ID3D12GraphicsCommandList *pd3dCommandList, void *pContext, CGameObject** pObject); 
-	virtual void AnimateObjects(float fTimeElapsed); 
+	virtual void AnimateObjects(float fTimeElapsed);
 	virtual void ReleaseObjects();
 	
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 
+	virtual void updatePlayerPos(XMFLOAT3&) {}
+	CGameObject** GetObjects() { return m_ppObjects; }
+	int	getObjectsNum() const { return m_nObjects; }
 };
 
 class CPlayerShader : public CShader 
@@ -99,19 +104,18 @@ public:
 class CMapShader : public CShader
 {
 private:
-	float width=300.0f;
-	float height=200.0f;
-	float depth=200.0f;
+	float width=mapWidth;
+	float height=mapHeight;
+	float depth=mapDepth;
 
-	CWallObject **m_ppObjects = NULL;
-	
+	XMFLOAT3 playerPos;
 public:
 	CMapShader();
 	virtual ~CMapShader();
 
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
 		*pd3dCommandList);
-	virtual void AnimateObjects(XMFLOAT3 pos, float fTimeElapsed);
+	virtual void  AnimateObjects(float fTimeElapsed);
 	virtual void ReleaseObjects();
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
@@ -121,7 +125,5 @@ public:
 	virtual void ReleaseUploadBuffers();
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 
-	CWallObject** getWalls() { return m_ppObjects; }
-	int getWallnum() const { return m_nObjects; }
-
+	void updatePlayerPos(XMFLOAT3& player) { playerPos = player; }
 };

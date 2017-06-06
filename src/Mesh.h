@@ -29,7 +29,8 @@ public:
 	CDiffusedVertex(XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Diffuse) { 
 		m_xmf3Position = xmf3Position; 
 		m_xmf4Diffuse = xmf4Diffuse; 
-	} 
+	}
+
 	~CDiffusedVertex() { }
 };
 

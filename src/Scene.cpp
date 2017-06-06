@@ -19,14 +19,17 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 
 	//½¦ÀÌ´õ »ý¼º
-	m_nShaders = 1;
-	m_ppShaders = new CMapShader[m_nShaders];
+	m_nShaders = 2;
+	m_ppShaders = new CShader*[m_nShaders];
 
-	m_ppShaders[0].CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-	m_ppShaders[0].BuildObjects(pd3dDevice, pd3dCommandList);
+	CMapShader* mapShader = new CMapShader();
+	mapShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	mapShader->BuildObjects(pd3dDevice, pd3dCommandList);
 	
-	m_nWall = m_ppShaders[0].getWallnum();
-	m_pWall = m_ppShaders[0].getWalls();
+	m_ppShaders[0] = mapShader;
+
+	m_nWall = mapShader->getObjectsNum();
+	m_pWall = (CWallObject**)mapShader->GetObjects();
 	
 	float width = m_pWall[0]->getWidth();
 	float height = m_pWall[0]->getHeight();
@@ -35,6 +38,13 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_wallPlanes[1] = XMFLOAT4(-1.0f, 0.0f, 0.0f, width);
 	m_wallPlanes[2] = XMFLOAT4(0.0f, +1.0f, 0.0f, height);
 	m_wallPlanes[3] = XMFLOAT4(0.0f, -1.0f, 0.0f, height);
+
+	EnemyShader* enemyShader = new EnemyShader();
+	enemyShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	enemyShader->BuildObjects(pd3dDevice, pd3dCommandList);
+	enemyShader->BuildObjects(pd3dDevice, pd3dCommandList);
+
+	m_ppShaders[1] = enemyShader;
 }
 
 void CScene::ReleaseObjects()
@@ -43,9 +53,8 @@ void CScene::ReleaseObjects()
 		m_pd3dGraphicsRootSignature->Release();
 	if (m_ppShaders){
 		for (int i = 0; i < m_nShaders; i++) { 
-			m_ppShaders[i].ReleaseShaderVariables(); 
-			m_ppShaders[i].ReleaseObjects();
-			//m_ppShaders[i]->Release(); 
+			m_ppShaders[i]->ReleaseShaderVariables(); 
+			m_ppShaders[i]->ReleaseObjects();
 		} 
 		delete[] m_ppShaders;
 	}
@@ -63,7 +72,8 @@ bool CScene::ProcessInput(UCHAR *pKeysBuffer)
 void CScene::AnimateObjects(float fTimeElapsed, XMFLOAT3 player)
 {
 	for (int i = 0; i < m_nShaders; i++) { 
-		m_ppShaders[i].AnimateObjects(player, fTimeElapsed);
+		m_ppShaders[i]->updatePlayerPos(player);
+		m_ppShaders[i]->AnimateObjects(fTimeElapsed);
 	}
 
 }
@@ -102,7 +112,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		pCamera->UpdateShaderVariables(pd3dCommandList);
 	
 	for (int i = 0; i < m_nShaders; i++) { 
-		m_ppShaders[i].Render(pd3dCommandList, pCamera); 
+		m_ppShaders[i]->Render(pd3dCommandList, pCamera);
 	} 
 	
 }
@@ -121,7 +131,7 @@ bool CScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wPar
 void CScene::ReleaseUploadBuffers() { 
 	if (m_ppShaders) { 
 		for (int j = 0; j < m_nShaders; j++) 
-				m_ppShaders[j].ReleaseUploadBuffers(); 
+				m_ppShaders[j]->ReleaseUploadBuffers();
 	} 
 }
 

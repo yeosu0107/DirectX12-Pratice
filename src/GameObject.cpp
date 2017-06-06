@@ -169,6 +169,7 @@ CRotatingObject::~CRotatingObject() {
 }
 
 void CRotatingObject::Animate(float fTimeElapsed) {
+	CGameObject::Animate(fTimeElapsed);
 	CGameObject::Rotate(&m_xmf3RotationAxis, m_fRotationSpeed * fTimeElapsed);
 }
 
@@ -189,13 +190,9 @@ void CWallObject::setObject(float w, float h, float d)
 	SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(width, height, depth), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
-void CWallObject::Animate(XMFLOAT3 pos, float fTimeElapsed)
+void CWallObject::Animate(float fTimeElapsed)
 {
 	CGameObject::Animate(fTimeElapsed);
-	XMFLOAT3 tmp = this->GetPosition();
-	if (pos.z - 200.0f > tmp.z + depth) {
-		this->MoveForward(1000.0f);
-	}
 }
 
 void Paticle::setPaticle(XMFLOAT3 tdir, XMFLOAT3 taxis, float mov, float rot)

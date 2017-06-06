@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Shader.h"
-
+#include <random>
 
 CShader::CShader()
 {
@@ -272,34 +272,26 @@ EnemyShader::~EnemyShader() {}
 void EnemyShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
 	*pd3dCommandList) {
 	CCube *pCubeMesh = new CCube(pd3dDevice, pd3dCommandList, 12.0f, 12.0f, 12.0f);
-	/*x-축, y-축, z-축 양의 방향의 객체 개수이다. 각 값을 1씩 늘리거나 줄이면서 실행할 때 프레임 레이트가 어떻게
-	변하는 가를 살펴보기 바란다.*/
-	int xObjects = 10, yObjects = 10, zObjects = 10, i = 0;
-	//x-축, y-축, z-축으로 21개씩 총 21 x 21 x 21 = 9261개의 정육면체를 생성하고 배치한다. 
-	m_nObjects = (xObjects * 2 + 1) * (yObjects * 2 + 1) * (zObjects * 2 + 1);
-	//m_nObjects = 1;
+	
+	m_nObjects = 10;
 	m_ppObjects = new CGameObject*[m_nObjects];
-	float fxPitch = 12.0f * 2.5f;
-	float fyPitch = 12.0f * 2.5f;
-	float fzPitch = 12.0f * 2.5f;
-	CRotatingObject *pRotatingObject = NULL;
+	
+	std::default_random_engine dre;
+	std::uniform_int_distribution<int> xPos(-mapWidth / 2 + 13.0f, mapWidth / 2 - 13.0f);
+	std::uniform_int_distribution<int> yPos(-mapHeight / 2 + 13.0f, mapHeight / 2 - 13.0f);
+	std::uniform_int_distribution<int> zPos(0 + 50.0f, mapDepth);
 
-	for (int x = -xObjects; x <= xObjects; x++)
-	{
-		for (int y = -yObjects; y <= yObjects; y++)
-		{
-			for (int z = -zObjects; z <= zObjects; z++)
-			{
-				pRotatingObject = new CRotatingObject();
-				pRotatingObject->SetMesh(pCubeMesh);
-				//각 정육면체 객체의 위치를 설정한다. 
-				pRotatingObject->SetPosition(fxPitch*x, fyPitch*y, fzPitch*z);
-				pRotatingObject->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-				pRotatingObject->SetRotationSpeed(10.0f*(i % 10) + 3.0f);
-				m_ppObjects[i++] = pRotatingObject;
-			}
-		}
+	CRotatingObject *pRotatingObject = NULL;
+	for (int i = 0; i < m_nObjects; ++i) {
+		pRotatingObject = new CRotatingObject();
+		pRotatingObject->SetMesh(pCubeMesh);
+		//각 정육면체 객체의 위치를 설정한다. 
+		pRotatingObject->SetPosition(xPos(dre), yPos(dre), zPos(dre));
+		pRotatingObject->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
+		pRotatingObject->SetRotationSpeed(10.0f*(i % 10) + 3.0f);
+		m_ppObjects[i] = pRotatingObject;
 	}
+	
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
 }
@@ -379,7 +371,7 @@ void CMapShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLis
 	CMap *pMesh = new CMap(pd3dDevice, pd3dCommandList, width, height, depth);
 	
 	m_nObjects = 5;
-	m_ppObjects = new CWallObject*[m_nObjects];
+	m_ppObjects = new CGameObject*[m_nObjects];
 
 	float size = 100.0f;
 
@@ -394,11 +386,18 @@ void CMapShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLis
 	}
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
+	playerPos = XMFLOAT3(0.0f, 0.0f, 0.0f);
 }
-void CMapShader::AnimateObjects(XMFLOAT3 pos, float fTimeElapsed) {
+void CMapShader::AnimateObjects(float fTimeElapsed) {
+	float forwardScale = depth * m_nObjects;
+
 	for (int j = 0; j < m_nObjects; j++)
 	{
-		m_ppObjects[j]->Animate(pos, fTimeElapsed);
+		XMFLOAT3 tmp = m_ppObjects[j]->GetPosition();
+		if (playerPos.z  > tmp.z + depth) {
+			m_ppObjects[j]->MoveForward(forwardScale);
+		}
+		m_ppObjects[j]->Animate(fTimeElapsed);
 	}
 
 }
@@ -445,6 +444,7 @@ void CMapShader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature
 	m_ppd3dPipelineStates = new ID3D12PipelineState*[m_nPipelineStates];
 	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
 }
+
 void CMapShader::ReleaseUploadBuffers() {
 	if (m_ppObjects)
 	{
@@ -453,7 +453,6 @@ void CMapShader::ReleaseUploadBuffers() {
 	}
 }
 void CMapShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera) {
-	//CShader::Render(pd3dCommandList, pCamera);
 	OnPrepareRender(pd3dCommandList);
 	for (int j = 0; j < m_nObjects; j++)
 	{

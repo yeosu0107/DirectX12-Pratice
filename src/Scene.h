@@ -9,7 +9,7 @@ private:
 protected: 
 	//씬은 셰이더들의 집합이다. 셰이더들은 게임 객체들의 집합이다.
 	//랜더를 위해 사용
-	CMapShader *m_ppShaders = NULL;
+	CShader **m_ppShaders = NULL;
 	int m_nShaders = 0;
 
 	CWallObject **m_pWall = NULL;

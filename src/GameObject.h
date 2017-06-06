@@ -88,7 +88,7 @@ public:
 	virtual ~CWallObject();
 
 	void setObject(float w, float h, float d);
-	virtual void Animate(XMFLOAT3 pos, float fTimeElapsed);
+	virtual void Animate(float fTimeElapsed);
 
 	float getWidth() const { return width; }
 	float getHeight() const { return height; }
