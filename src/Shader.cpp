@@ -189,10 +189,8 @@ void CShader::ReleaseUploadBuffers() {
 }
 
 
-void CShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, 
-	void *pContext, CGameObject** ppObjects) {
+void CShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList) {
 	m_nObjects = 1;
-	m_ppObjects = ppObjects;
 }
 
 void CShader::ReleaseObjects() {
@@ -567,9 +565,54 @@ void CInstancingShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 void CInstancingShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera
 	*pCamera)
 {
-	EnemyShader::Render(pd3dCommandList, pCamera);
+	CShader::Render(pd3dCommandList, pCamera);
 	//모든 게임 객체의 인스턴싱 데이터를 버퍼에 저장한다.
 	UpdateShaderVariables(pd3dCommandList);
 	//하나의 정점 데이터를 사용하여 모든 게임 객체(인스턴스)들을 렌더링한다. 
 	m_ppObjects[0]->Render(pd3dCommandList, pCamera, m_nObjects);
+}
+
+void CPaticleShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList)
+{
+	m_nObjects = 100;
+	m_ppObjects = new CGameObject*[m_nObjects];
+
+	std::default_random_engine dre;
+	std::uniform_int_distribution<> dir(-10, 10);
+	std::uniform_int_distribution<> rot(0, 1);
+
+	Paticle* paticle = nullptr;
+	for (int i = 0; i < m_nObjects; ++i) {
+		paticle->setPaticle(XMFLOAT3(dir(dre), dir(dre), dir(dre)),
+			XMFLOAT3(rot(dre), rot(dre), rot(dre)), 5.0f, 0.5f);
+		m_ppObjects[i] = paticle;
+	}
+	CCube* paticleMesh = new CCube(pd3dDevice, pd3dCommandList, 2.5f, 2.5f, 2.5f);
+	m_ppObjects[0]->SetMesh(paticleMesh);
+}
+
+
+void CPaticleShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera)
+{
+	if (!run)
+		return;
+	CInstancingShader::Render(pd3dCommandList, pCamera);
+}
+
+void CPaticleShader::AnimateObjects(float fTime)
+{
+	if (!run)
+		return;
+	if (runtime > maxtime) {
+		runtime = 0.0f;
+		run = false;
+	}
+	CShader::AnimateObjects(fTime);
+	runtime += fTime*50.0f;
+}
+
+void CPaticleShader::setPosition(XMFLOAT3 pos)
+{
+	for (int i = 0; i < m_nObjects; ++i)
+		m_ppObjects[i]->SetPosition(pos);
 }

@@ -15,9 +15,6 @@
 class CPlayer : public CGameObject
 {
 protected:
-	bool die = false;
-	CPaticles* paticle = NULL;
-
 	CCamera *m_pCamera = NULL;
 
 	XMFLOAT3 m_xmf3Position;
@@ -111,11 +108,7 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera = NULL);
 	virtual void Animate(float fTime);
 
-	void setPaticle(CPaticles* object) {
-		paticle = object;
-	}
-	void Die();
-	bool getDie() const { return die; }
+
 };
 
 class CAirplanePlayer : public CPlayer

@@ -20,6 +20,7 @@ protected:
 	BoundingOrientedBox	m_xmOOBBTransformed; //월드좌표계에서의 충돌 영역
 
 	XMFLOAT3 movingDir;
+	bool live;
 public:
 	CGameObject();
 	virtual ~CGameObject();
@@ -68,6 +69,8 @@ public:
 	void SetOOBB(XMFLOAT3& xmCenter, XMFLOAT3& xmExtents, XMFLOAT4& xmOrientation) { m_xmOOBBTransformed = m_xmOOBB = BoundingOrientedBox(xmCenter, xmExtents, xmOrientation); }
 	BoundingOrientedBox* getOOBB() { return &m_xmOOBBTransformed; } //트랜스폼 oobb주소 반환
 	XMFLOAT4X4& getMatrix() { return m_xmf4x4World; }
+
+	virtual void Destroy() { live = false; }
 };
 
 class CRotatingObject : public CGameObject 

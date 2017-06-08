@@ -214,28 +214,13 @@ void CPlayer::OnPrepareRender()
 void CPlayer::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)
 {
 	DWORD nCameraMode = (pCamera) ? pCamera->GetMode() : 0x00;
-	if (nCameraMode == THIRD_PERSON_CAMERA && !die) 
+	if (nCameraMode == THIRD_PERSON_CAMERA) 
 		CGameObject::Render(pd3dCommandList, pCamera);
 
-	if (paticle->getRun())
-		paticle->Render(pd3dCommandList, pCamera);
 }
 
 void CPlayer::Animate(float fTime) {
 	CGameObject::Animate(fTime);
-
-	if (paticle->getRun())
-		paticle->Animate(fTime);
-}
-
-void CPlayer::Die()
-{
-	if (die)
-		return;
-	else
-		die = true;
-	paticle->setPositions(this->GetPosition());
-	paticle->setRun();
 }
 
 CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList

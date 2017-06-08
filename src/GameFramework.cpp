@@ -290,8 +290,7 @@ void CGameFramework::BuildObjects()
 	m_pCamera = m_pPlayer->ChangeCamera((DWORD)(0x03),
 		m_GameTimer.GetTimeElapsed());
 
-	CPaticles* paticles = new CPaticles(50, pd3Device.Get(), m_pd3dCommandList);
-	m_pPlayer->setPaticle(paticles);
+
 
 	//씬 객체를 생성하기 위하여 필요한 그래픽 명령 리스트들을 명령 큐에 추가한다. 
 	m_pd3dCommandList->Close(); 
@@ -380,7 +379,7 @@ void CGameFramework::ProcessInput()
 				m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
 		}
 
-		if (dwDirection && !m_pPlayer->getDie()) {
+		if (dwDirection /*&& !m_pPlayer->getDie()*/) {
 			m_pPlayer->Move(dwDirection, 300.0f * m_GameTimer.GetTimeElapsed(), false);
 			//m_pPlayer->Move(dwDirection, 5.0f, false);
 		}
@@ -496,7 +495,7 @@ void CGameFramework::AnimateObjects()
 		playerDie = m_pScene->CrashObjects(*m_pPlayer->getOOBB());
 	}
 	if (playerDie) {
-		m_pPlayer->Die();
+		//m_pPlayer->Die();
 	}
 }
 
