@@ -277,9 +277,15 @@ void CGameFramework::BuildObjects()
 	if(m_pScene)
 		m_pScene->BuildObjects(pd3Device.Get(), m_pd3dCommandList);
 
-	CAirplanePlayer *pPlain = new CAirplanePlayer(pd3Device.Get(),
-		m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
-	m_pPlayer = pPlain;
+	/*CAirplanePlayer *pPlain = new CAirplanePlayer(pd3Device.Get(),
+		m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());*/
+	CPlayerShader* playerShader = new CPlayerShader();
+	playerShader->CreateShader(pd3Device.Get(), m_pScene->GetGraphicsRootSignature());
+	playerShader->BuildObjects(pd3Device.Get(), m_pd3dCommandList);
+
+	m_playerShader = playerShader;
+
+	m_pPlayer = (CPlayer*)m_playerShader->GetObjects()[0];
 	m_pCamera = new CCamera(); 
 	m_pCamera = m_pPlayer->ChangeCamera((DWORD)(0x03),
 		m_GameTimer.GetTimeElapsed());
@@ -482,7 +488,7 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 void CGameFramework::AnimateObjects()
 {
 	bool playerDie = false;
-	if (m_pPlayer) {
+	if (m_playerShader) {
 		m_pPlayer->Animate(m_GameTimer.GetTimeElapsed());
 	}
 	if (m_pScene) {
@@ -551,8 +557,8 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle,
 		D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 #endif
-	if (m_pPlayer) 
-		m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
+	if (m_playerShader)
+		m_playerShader->Render(m_pd3dCommandList, m_pCamera);
 	////////////////////////////////////////////////
 
 	//랜더타겟에 대한 랜더링 끝나기를 대기
