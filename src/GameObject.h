@@ -7,6 +7,8 @@ class CGameObject
 {
 private: 
 protected:
+	bool die = false;
+
 	float width = 0.0f;
 	float height = 0.0f;
 	float depth = 0.0f;
@@ -55,6 +57,8 @@ public:
 	void SetPosition(XMFLOAT3 xmf3Position);
 	void Rotate(XMFLOAT3 *pxmf3Axis, float fAngle);
 	void Rotate(float fPitch = 10.0f, float fYaw = 10.0f, float fRoll = 10.0f);
+	void Scale(float num);
+	void setScale(float num);
 
 	void MoveStrafe(float fDistance = 1.0f);
 	void MoveUp(float fDistance = 1.0f);
@@ -68,6 +72,9 @@ public:
 	void SetOOBB(XMFLOAT3& xmCenter, XMFLOAT3& xmExtents, XMFLOAT4& xmOrientation) { m_xmOOBBTransformed = m_xmOOBB = BoundingOrientedBox(xmCenter, xmExtents, xmOrientation); }
 	BoundingOrientedBox* getOOBB() { return &m_xmOOBBTransformed; } //트랜스폼 oobb주소 반환
 	XMFLOAT4X4& getMatrix() { return m_xmf4x4World; }
+
+	bool getDie() const { return die; }
+	void setDie(bool type) { die = type; }
 };
 
 class CRotatingObject : public CGameObject 
@@ -90,9 +97,6 @@ class CWallObject : public CGameObject
 private:
 	bool set = false;
 	int index = -1;
-
-	
-
 
 public:
 	CWallObject();
@@ -123,24 +127,3 @@ public:
 	virtual void Animate(float fTimeElapsed);
 };
 
-class CPaticles
-{
-private:
-	Paticle *paticle = NULL;
-	int numOfPaticle = 0;
-
-	bool run = false;
-	float runtime = 0.0f;
-	float maxtime = 50.0f;
-public:
-	CPaticles(int num, ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
-	~CPaticles();
-
-	void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
-	void Animate(float fTimeElapsed);
-
-	void setPositions(XMFLOAT3 pos); 
-	void setRun();
-
-	bool getRun() const { return run; }
-};

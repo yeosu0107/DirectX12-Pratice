@@ -182,6 +182,20 @@ void CGameObject::Rotate(float fPitch, float fYaw, float fRoll)
 	m_xmf4x4World = Matrix4x4::Multiply(mtxRotate, m_xmf4x4World);
 }
 
+void CGameObject::Scale(float num)
+{
+	m_xmf4x4World._11 *= num;
+	m_xmf4x4World._22 *= num;
+	m_xmf4x4World._33 *= num;
+}
+
+void CGameObject::setScale(float num)
+{
+	m_xmf4x4World._11 = num;
+	m_xmf4x4World._22 = num;
+	m_xmf4x4World._33 = num;
+}
+
 CRotatingObject::CRotatingObject() {
 	//m_xmf3RotationAxis = XMFLOAT3(1.0f, 5.0f, -5.0f);
 	//m_fRotationSpeed = 90.0f;
@@ -223,68 +237,11 @@ void Paticle::setPaticle(XMFLOAT3 tdir, XMFLOAT3 taxis, float mov, float rot)
 
 void Paticle::Animate(float fTimeElapsed)
 {
-	/*if (rotSpeed != 0.0f)
-		Rotate(&axis, rotSpeed * fTimeElapsed);*/
+	//if (rotSpeed != 0.0f)
+	//	Rotate(&axis, rotSpeed * fTimeElapsed);
+	
 	if (movingSpeed != 0.0f)
 		MoveVector(dir, movingSpeed * fTimeElapsed);
 }
 
-CPaticles::CPaticles(int num, ID3D12Device *pd3dDevice, 
-	ID3D12GraphicsCommandList *pd3dCommandList)
-{
-	numOfPaticle = num;
-	paticle = new Paticle[num];
 
-	std::default_random_engine dre;
-	std::uniform_int_distribution<> dir(-10, 10);
-	std::uniform_int_distribution<> rot(0, 1);
-
-	CCube* paticleMesh = new CCube(pd3dDevice, pd3dCommandList, 2.5f, 2.5f, 2.5f);
-
-	for (int i = 0; i < numOfPaticle; ++i) {
-		paticle[i].setPaticle(XMFLOAT3(dir(dre), dir(dre), dir(dre)),
-			XMFLOAT3(rot(dre), rot(dre), rot(dre)), 5.0f, 0.5f);
-		paticle[i].SetMesh(paticleMesh);
-		//paticle[i].SetPosition(pos);
-	}
-}
-
-CPaticles::~CPaticles()
-{
-	delete[] paticle;
-}
-
-void CPaticles::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera)
-{
-	if (!run)
-		return;
-	for (int i = 0; i < numOfPaticle; ++i)
-		paticle[i].Render(pd3dCommandList, pCamera);
-}
-
-void CPaticles::Animate(float fTimeElapsed)
-{
-	if (!run)
-		return;
-	if (runtime > maxtime) {
-		runtime = 0.0f;
-		run = false;
-	}
-	for (int i = 0; i < numOfPaticle; ++i)
-		paticle[i].Animate(fTimeElapsed);
-	//printf("%f\n", runtime);
-	runtime += fTimeElapsed * 50.0f;
-}
-
-void CPaticles::setPositions(XMFLOAT3 pos)
-{
-	for (int i = 0; i < numOfPaticle; ++i)
-		paticle[i].SetPosition(pos);
-}
-
-void CPaticles::setRun() {
-	if (!run) {
-		runtime = 0.0f;
-		run = true;
-	}
-}

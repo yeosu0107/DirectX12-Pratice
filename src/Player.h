@@ -15,8 +15,7 @@
 class CPlayer : public CGameObject
 {
 protected:
-	bool die = false;
-	//CPaticles* paticle = NULL;
+	
 
 	CCamera *m_pCamera = NULL;
 
@@ -38,8 +37,6 @@ protected:
 
 	float m_fMaxVelocityXZ;
 	float m_fMaxVelocityY;
-
-	int numofPaticle=0.0f;
 
 	//¸¶Âû·Â
 	float m_fFriction;
@@ -111,7 +108,7 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera = NULL);
 	virtual void Animate(float fTime);
 
-	/*void setPaticle(CPaticles* object) {
+	/*void setPaticle(CPaticlesShader* object) {
 		paticle = object;
 	}*/
 	void Die();

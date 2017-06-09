@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Scene.h"
+#include "EXShader.h"
 
 
 CScene::CScene()
@@ -18,10 +19,11 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
 
-	//½¦ÀÌ´õ »ý¼º
+	//¼ÎÀÌ´õ »ý¼º
 	m_nShaders = 2;
 	m_ppShaders = new CShader*[m_nShaders];
 
+	//¸Ê ¼ÎÀÌ´õ
 	CMapShader* mapShader = new CMapShader();
 	mapShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	mapShader->BuildObjects(pd3dDevice, pd3dCommandList);
@@ -39,6 +41,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_wallPlanes[2] = XMFLOAT4(0.0f, +1.0f, 0.0f, height);
 	m_wallPlanes[3] = XMFLOAT4(0.0f, -1.0f, 0.0f, height);
 
+	//Àû ¼ÎÀÌ´õ
 	CInstancingShader* EnemyShader = new CInstancingShader();
 	EnemyShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	EnemyShader->BuildObjects(pd3dDevice, pd3dCommandList);
@@ -47,6 +50,16 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_pEnemy = EnemyShader->GetObjects();
 
 	m_ppShaders[1] = EnemyShader;
+
+	//ÆÄÆ¼Å¬ ¼ÎÀÌ´õ »ý¼º
+	m_nPaticleShaders = 1;
+	m_PaticleShaders = new CPaticlesShader*[m_nPaticleShaders];
+
+	CPaticlesShader* paticleShader = new CPaticlesShader();
+	paticleShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	paticleShader->BuildObjects(pd3dDevice, pd3dCommandList);
+
+	m_PaticleShaders[0] = paticleShader;
 }
 
 void CScene::ReleaseObjects()
@@ -73,18 +86,21 @@ bool CScene::ProcessInput(UCHAR *pKeysBuffer)
 
 void CScene::AnimateObjects(float fTimeElapsed, XMFLOAT3 player)
 {
-	for (int i = 0; i < m_nShaders; i++) { 
+	for (int i = 0; i < m_nShaders; ++i) { 
 		m_ppShaders[i]->updatePlayerPos(player);
 		m_ppShaders[i]->AnimateObjects(fTimeElapsed);
 	}
-
+	for (int i = 0; i < m_nPaticleShaders; ++i) {
+		if (m_PaticleShaders[i]->getRun())
+			m_PaticleShaders[i]->AnimateObjects(fTimeElapsed);
+	}
 }
 
-bool CScene::CrashObjects(BoundingOrientedBox& player)
+bool CScene::CrashObjects(BoundingOrientedBox& player, bool playerDeath)
 {
-	
-		//Àû °´Ã¼ - º®
+		
 	for (int i = 0; i < m_nEnemy; ++i) {
+		//Àû °´Ã¼ - º®
 		int nindex = -1;
 		for (int index = 0; index < m_nWall; ++index) {
 			ContainmentType containType = m_pWall[index]->getOOBB()->Contains(*m_pEnemy[i]->getOOBB());
@@ -117,14 +133,31 @@ bool CScene::CrashObjects(BoundingOrientedBox& player)
 			if (nindex != -1)
 				break;
 		}
-	}
-	for (int index = 0; index < m_nEnemy; ++index) {
-		for (int j = (index + 1); j < m_nEnemy; ++j) {
-			if (m_pEnemy[index]->getOOBB()->Intersects(*m_pEnemy[j]->getOOBB())) {
-				XMFLOAT3 tDir = m_pEnemy[index]->getMovingDir();
-				m_pEnemy[index]->setMovingDir(m_pEnemy[j]->getMovingDir());
+
+		//Àû °´Ã¼ - Àû °´Ã¼
+		for (int j = (i + 1); j < m_nEnemy; ++j) {
+			if (m_pEnemy[i]->getOOBB()->Intersects(*m_pEnemy[j]->getOOBB())) {
+				XMFLOAT3 tDir = m_pEnemy[i]->getMovingDir();
+				m_pEnemy[i]->setMovingDir(m_pEnemy[j]->getMovingDir());
 				m_pEnemy[j]->setMovingDir(tDir);
 			}
+		}
+	}
+	if (playerDeath)
+		return true;
+
+	//ÇÃ·¹ÀÌ¾î - Àû °´Ã¼
+	for (int index = 0; index < m_nEnemy; ++index) {
+		ContainmentType containType = m_pEnemy[index]->getOOBB()->Contains(player);
+		switch (containType) {
+		case CONTAINS:
+			break;
+		case DISJOINT:
+			break;
+		case INTERSECTING:
+			m_PaticleShaders[0]->setPosition(player.Center);
+			m_PaticleShaders[0]->setRun();
+			return true;
 		}
 	}
 	for (int index = 0; index < m_nWall; ++index) {
@@ -139,14 +172,14 @@ bool CScene::CrashObjects(BoundingOrientedBox& player)
 			for (int i = 0; i < 4; ++i) {
 				PlaneIntersectionType intersectType = player.Intersects(XMLoadFloat4(&m_wallPlanes[i]));
 				if (intersectType == BACK || intersectType == INTERSECTING) {
+					m_PaticleShaders[0]->setPosition(player.Center);
+					m_PaticleShaders[0]->setRun();
 					return true;
 				}
 			}
 			
 			break;
 		}
-		
-		
 	}
 	return false;
 }
@@ -159,10 +192,14 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	if (pCamera) 
 		pCamera->UpdateShaderVariables(pd3dCommandList);
 	
-	for (int i = 0; i < m_nShaders; i++) { 
+	for (int i = 0; i < m_nShaders; ++i) { 
 		m_ppShaders[i]->Render(pd3dCommandList, pCamera);
 	} 
 	
+	for (int i = 0; i < m_nPaticleShaders; ++i) {
+		if (m_PaticleShaders[i]->getRun())
+			m_PaticleShaders[i]->Render(pd3dCommandList, pCamera);
+	}
 }
 
 

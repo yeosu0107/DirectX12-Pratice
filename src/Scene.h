@@ -1,5 +1,6 @@
 #pragma once
 #include "Shader.h"
+#include "EXShader.h"
 #include "GameObject.h"
 #include "Camera.h"
 class CScene
@@ -11,6 +12,9 @@ protected:
 	//랜더를 위해 사용
 	CShader **m_ppShaders = NULL;
 	int m_nShaders = 0;
+
+	CPaticlesShader** m_PaticleShaders = NULL;
+	int m_nPaticleShaders = 0;
 
 	CWallObject **m_pWall = NULL;
 	int m_nWall = 0;
@@ -30,7 +34,7 @@ public:
 
 	bool ProcessInput(UCHAR *pKeysBuffer);
 	void AnimateObjects(float fTimeElapsed, XMFLOAT3 player);
-	bool CrashObjects(BoundingOrientedBox& m_pPlayer);
+	bool CrashObjects(BoundingOrientedBox& m_pPlayer, bool playerDeath);
 	void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 
 	bool OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam); 

@@ -48,6 +48,8 @@
 #include <DirectXColors.h>
 #include <DirectXCollision.h>
 
+#include <random>
+
 
 
 using namespace DirectX;

@@ -65,9 +65,6 @@
     <ClCompile Include="src\Mesh.cpp">
       <Filter>Draw</Filter>
     </ClCompile>
-    <ClCompile Include="src\Shader.cpp">
-      <Filter>Draw</Filter>
-    </ClCompile>
     <ClCompile Include="src\Camera.cpp">
       <Filter>Draw</Filter>
     </ClCompile>
@@ -76,6 +73,12 @@
     </ClCompile>
     <ClCompile Include="src\Player.cpp">
       <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Shader.cpp">
+      <Filter>셰이더</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EXShader.cpp">
+      <Filter>셰이더</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -100,9 +103,6 @@
     <ClInclude Include="src\Mesh.h">
       <Filter>Draw</Filter>
     </ClInclude>
-    <ClInclude Include="src\Shader.h">
-      <Filter>Draw</Filter>
-    </ClInclude>
     <ClInclude Include="src\Camera.h">
       <Filter>Draw</Filter>
     </ClInclude>
@@ -111,6 +111,12 @@
     </ClInclude>
     <ClInclude Include="src\Player.h">
       <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Shader.h">
+      <Filter>셰이더</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EXShader.h">
+      <Filter>셰이더</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

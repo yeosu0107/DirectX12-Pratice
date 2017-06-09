@@ -177,6 +177,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\EXShader.cpp" />
     <ClCompile Include="src\GameFramework.cpp" />
     <ClCompile Include="src\GameObject.cpp" />
     <ClCompile Include="src\LabProject.cpp" />
@@ -193,6 +194,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\EXShader.h" />
     <ClInclude Include="src\GameFramework.h" />
     <ClInclude Include="src\GameObject.h" />
     <ClInclude Include="src\LabProject.h" />

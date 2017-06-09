@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "GameFramework.h"
+#include "EXShader.h"
 
 enum gameStatus {main=0, Gameloop, die};
 
@@ -489,7 +490,7 @@ void CGameFramework::AnimateObjects()
 
 	if (m_pScene) {
 		m_pScene->AnimateObjects(m_GameTimer.GetTimeElapsed(), m_pPlayer->GetPosition());
-		playerDie = m_pScene->CrashObjects(*m_pPlayer->getOOBB());
+		playerDie = m_pScene->CrashObjects(*m_pPlayer->getOOBB(), m_pPlayer->getDie());
 	}
 	if (playerDie) {
 		m_pPlayer->Die();

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Shader.h"
 #include "Player.h"
-#include <random>
+
 
 CShader::CShader()
 {
@@ -217,11 +217,7 @@ void CShader::OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList) {
 
 void CShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera) {
 	OnPrepareRender(pd3dCommandList);
-	for (int j = 0; j < m_nObjects; j++) { 
-		if (m_ppObjects[j]) {
-			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
-		}
-	}
+	
 }
 
 CPlayerShader::CPlayerShader() { 
@@ -291,6 +287,11 @@ void CPlayerShader::ReleaseUploadBuffers()
 void CPlayerShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)
 {
 	CShader::Render(pd3dCommandList, pCamera);
+	for (int j = 0; j < m_nObjects; j++) {
+		if (m_ppObjects[j]) {
+			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
+		}
+	}
 }
 
 ObjectShader::ObjectShader() {}
@@ -303,7 +304,11 @@ void ObjectShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandL
 }
 void ObjectShader::AnimateObjects(float fTimeElapsed) {
 	CShader::AnimateObjects(fTimeElapsed);
-
+	/*for (int j = 0; j < m_nObjects; j++) {
+		
+		m_ppObjects[j]->Animate(fTimeElapsed);
+		
+	}*/
 }
 void ObjectShader::ReleaseObjects() {
 	CShader::ReleaseObjects();
@@ -345,6 +350,11 @@ void ObjectShader::ReleaseUploadBuffers() {
 }
 void ObjectShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera) {
 	CShader::Render(pd3dCommandList, pCamera);
+	for (int j = 0; j < m_nObjects; j++) {
+		if (m_ppObjects[j]) {
+			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
+		}
+	}
 }
 
 CMapShader::CMapShader() {}
@@ -426,6 +436,11 @@ void CMapShader::ReleaseUploadBuffers() {
 }
 void CMapShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera) {
 	CShader::Render(pd3dCommandList, pCamera);
+	for (int j = 0; j < m_nObjects; j++) {
+		if (m_ppObjects[j]) {
+			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
+		}
+	}
 }
 
 CInstancingShader::CInstancingShader()
@@ -521,7 +536,7 @@ void CInstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCom
 }
 
 void CInstancingShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
-{
+{  
 	m_nObjects = 50;
 	m_ppObjects = new CGameObject*[m_nObjects];
 
@@ -554,14 +569,7 @@ void CInstancingShader::ReleaseObjects()
 void CInstancingShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera
 	*pCamera)
 {
-	//ObjectShader::Render(pd3dCommandList, pCamera);
-
-	OnPrepareRender(pd3dCommandList);
-	for (int j = 0; j < m_nObjects; j++) {
-		if (m_ppObjects[j]) {
-			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
-		}
-	}
+	ObjectShader::Render(pd3dCommandList, pCamera);
 
 	//모든 게임 객체의 인스턴싱 데이터를 버퍼에 저장한다.
 	UpdateShaderVariables(pd3dCommandList);
