@@ -62,7 +62,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_BulletShader = bulletShader;
 
 	//파티클 셰이더 생성
-	m_nPaticleShaders = 11;
+	m_nPaticleShaders = 1 + m_nEnemy;
 	m_PaticleShaders = new CPaticlesShader*[m_nPaticleShaders];
 
 	CPaticlesShader* paticleShader = NULL;
@@ -161,7 +161,7 @@ bool CScene::CrashObjects(BoundingOrientedBox& player, bool playerDeath)
 			if (m_pEnemy[i]->getOOBB()->Intersects(*m_pBullet[bi]->getOOBB())) {
 				m_PaticleShaders[nowPaticle]->setPosition(m_pEnemy[i]->GetPosition());
 				m_PaticleShaders[nowPaticle]->setRun();
-				
+				m_pEnemy[i]->Reset(player.Center);
 				//m_pBullet[bi]->setDie(true);
 				
 				nowPaticle += 1;

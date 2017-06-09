@@ -33,6 +33,7 @@ class CBulletShader : public CInstancingShader
 {
 private:
 	int nowIndex = 0;
+
 	int nowtime = 10;
 	int maxDelay = 10;
 

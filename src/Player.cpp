@@ -5,7 +5,7 @@
 CPlayer::CPlayer()
 {
 	m_pCamera = NULL;
-	m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_xmf3Position = XMFLOAT3(0.0f, 100.0f, 0.0f);
 	m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
 	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
 	m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
@@ -79,8 +79,12 @@ void CPlayer::Move(XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 
 void CPlayer::Rotate(float x, float y, float z)
 {
-	DWORD nCameraMode = m_pCamera->GetMode();
+	//DWORD nCameraMode = m_pCamera->GetMode();
 	
+	XMFLOAT3 saveLook = m_xmf3Look;
+	XMFLOAT3 saveUp = m_xmf3Up;
+	XMFLOAT3 saveRight = m_xmf3Right;
+
 	if (x != 0.0f)
 	{
 		XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right),
@@ -102,10 +106,22 @@ void CPlayer::Rotate(float x, float y, float z)
 		m_xmf3Up = Vector3::TransformNormal(m_xmf3Up, xmmtxRotate);
 		m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
 	}
-	m_pCamera->Rotate(x, y, z);
-	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
-	m_xmf3Right = Vector3::CrossProduct(m_xmf3Up, m_xmf3Look, true);
-	m_xmf3Up = Vector3::CrossProduct(m_xmf3Look, m_xmf3Right, true);
+
+	XMFLOAT3 baseLookv = XMFLOAT3(0.0f, 0.0f, 1.0f);
+	XMFLOAT3 nowLookv = m_xmf3Look;
+	float angle = Vector3::Angle(baseLookv, nowLookv);
+
+	if (angle > 60.0f) {
+		m_xmf3Look = saveLook;
+		m_xmf3Right = saveRight;
+		m_xmf3Up = saveUp;
+	}
+	else {
+		m_pCamera->Rotate(x, y, z);
+		m_xmf3Look = Vector3::Normalize(m_xmf3Look);
+		m_xmf3Right = Vector3::CrossProduct(m_xmf3Up, m_xmf3Look, true);
+		m_xmf3Up = Vector3::CrossProduct(m_xmf3Look, m_xmf3Right, true);
+	}
 }
 
 void CPlayer::Update(float fTimeElapsed)

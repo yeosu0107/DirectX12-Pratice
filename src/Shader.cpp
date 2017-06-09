@@ -364,7 +364,7 @@ void CMapShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLis
 	*pd3dCommandList) {
 	CMap *pMesh = new CMap(pd3dDevice, pd3dCommandList, width, height, depth);
 	
-	m_nObjects = 5;
+	m_nObjects = 7;
 	m_ppObjects = new CGameObject*[m_nObjects];
 
 	float size = 100.0f;
@@ -579,4 +579,14 @@ void CInstancingShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCame
 	//하나의 정점 데이터를 사용하여 모든 게임 객체(인스턴스)들을 렌더링한다.
 	m_ppObjects[0]->Render(pd3dCommandList, pCamera, m_nObjects,
 		m_d3dInstancingBufferView);
+}
+
+void CInstancingShader::AnimateObjects(float fTimeElapsed)
+{
+	for (int j = 0; j < m_nObjects; j++) {
+		if (m_ppObjects[j]->GetPosition().y+50.0f < playerPos.y)
+			m_ppObjects[j]->Reset(playerPos);
+
+		m_ppObjects[j]->Animate(fTimeElapsed);
+	}
 }

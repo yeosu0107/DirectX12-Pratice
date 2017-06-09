@@ -382,7 +382,7 @@ void CGameFramework::ProcessInput()
 		}
 
 		if (dwDirection && !m_pPlayer->getDie()) {
-			m_pPlayer->Move(dwDirection, 300.0f * m_GameTimer.GetTimeElapsed(), false);
+			m_pPlayer->Move(dwDirection, 200.0f * m_GameTimer.GetTimeElapsed(), false);
 			//m_pPlayer->Move(dwDirection, 5.0f, false);
 		}
 	}

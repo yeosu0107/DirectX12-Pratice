@@ -211,10 +211,17 @@ void CRotatingObject::Animate(float fTimeElapsed) {
 	CGameObject::Move(1.0f);
 	CGameObject::Animate(fTimeElapsed);
 }
+std::default_random_engine dre(1000);
+std::uniform_int_distribution<int> xPos(-mapWidth / 2 + 13.0f, mapWidth / 2 - 13.0f);
+std::uniform_int_distribution<int> yPos(-mapHeight / 2 + 13.0f, mapHeight / 2 - 13.0f);
+std::uniform_int_distribution<int> zPos(0 + 50.0f, mapDepth);
 
-void CRotatingObject::Reset()
+void CRotatingObject::Reset(XMFLOAT3 pos)
 {
-
+	SetPosition(xPos(dre), yPos(dre), pos.z + 800.0f + zPos(dre));
+	SetRotationAxis(XMFLOAT3(1.0f, 3.0f, 1.0f));
+	SetRotationSpeed(90.0f);
+	setMovingDir(XMFLOAT3(0.5f, 0.5f, 0.5f));
 }
 
 CWallObject::CWallObject()
@@ -263,4 +270,9 @@ void CBullet::Animate(float fTimeElapsed)
 {
 	Move(10.0f);
 	CGameObject::Animate(fTimeElapsed);
+	runtime += 1.0f;
+	if (runtime >= maxtime) {
+		runtime = 0;
+		setDie(true);
+	}
 }

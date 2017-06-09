@@ -75,6 +75,7 @@ public:
 
 	bool getDie() const { return die; }
 	void setDie(bool type) { die = type; }
+	virtual void Reset(XMFLOAT3 pos) {}
 };
 
 class CRotatingObject : public CGameObject 
@@ -91,7 +92,7 @@ public:
 	void SetRotationAxis(XMFLOAT3 xmf3RotationAxis) { m_xmf3RotationAxis = xmf3RotationAxis; }
 	virtual void Animate(float fTimeElapsed);
 	
-	void Reset();
+	virtual void Reset(XMFLOAT3 pos);
 };
 
 class CWallObject : public CGameObject
@@ -131,6 +132,8 @@ public:
 class CBullet : public CGameObject
 {
 private:
+	float runtime = 0.0f;
+	float maxtime = 50.0f;
 public:
 	CBullet();
 	virtual ~CBullet();

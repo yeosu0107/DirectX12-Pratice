@@ -145,6 +145,8 @@ public:
 
 class CInstancingShader : public ObjectShader
 {
+private:
+	XMFLOAT3 playerPos;
 public:
 	CInstancingShader();
 	virtual ~CInstancingShader();
@@ -161,6 +163,9 @@ public:
 		*pd3dCommandList);
 	virtual void ReleaseObjects();
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
+
+	virtual void  AnimateObjects(float fTimeElapsed);
+	void updatePlayerPos(XMFLOAT3& player) { playerPos = player; }
 protected:
 	//인스턴스 정점 버퍼와 정점 버퍼 뷰이다. 
 	ID3D12Resource *m_pd3dcbGameObjects = NULL;

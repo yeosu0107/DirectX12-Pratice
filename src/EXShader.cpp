@@ -150,8 +150,9 @@ void CBulletShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *
 void CBulletShader::AnimateObjects(float fTime)
 {
 	for (int j = 0; j < m_nObjects; j++) {
-		if(!m_ppObjects[j]->getDie())
+		if (!m_ppObjects[j]->getDie()) {
 			m_ppObjects[j]->Animate(fTime);
+		}
 	}
 }
 
