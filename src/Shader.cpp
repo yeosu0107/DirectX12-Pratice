@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Shader.h"
-#include "Player.h"
 #include <random>
 
 CShader::CShader()
@@ -189,8 +188,10 @@ void CShader::ReleaseUploadBuffers() {
 }
 
 
-void CShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList) {
+void CShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, 
+	void *pContext, CGameObject** ppObjects) {
 	m_nObjects = 1;
+	m_ppObjects = ppObjects;
 }
 
 void CShader::ReleaseObjects() {
@@ -264,33 +265,36 @@ void CPlayerShader::CreateShader(ID3D12Device *pd3dDevice,
 	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
 }
 
-void CPlayerShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
-	*pd3dCommandList) {
-	CAirplanePlayer *pPlain = new CAirplanePlayer(pd3dDevice, pd3dCommandList);
-	m_nObjects = 1;
-	m_ppObjects = new CGameObject*[m_nObjects];
-
-	m_ppObjects[0] = pPlain;
-}
-void CPlayerShader::AnimateObjects(float fTimeElapsed) {
-	CShader::AnimateObjects(fTimeElapsed);
-}
-void CPlayerShader::ReleaseObjects() {
-	CShader::ReleaseObjects();
-}
-void CPlayerShader::ReleaseUploadBuffers() {
-	CShader::ReleaseUploadBuffers();
-}
-void CPlayerShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera) {
-	CShader::Render(pd3dCommandList, pCamera);
-}
 
 EnemyShader::EnemyShader() {}
 EnemyShader::~EnemyShader() {}
 
 void EnemyShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
 	*pd3dCommandList) {
+	CCube *pCubeMesh = new CCube(pd3dDevice, pd3dCommandList, 12.0f, 12.0f, 12.0f);
 	
+	m_nObjects = 10;
+	m_ppObjects = new CGameObject*[m_nObjects];
+	
+	std::default_random_engine dre(1000);
+	std::uniform_int_distribution<int> xPos(-mapWidth / 2 + 13.0f, mapWidth / 2 - 13.0f);
+	std::uniform_int_distribution<int> yPos(-mapHeight / 2 + 13.0f, mapHeight / 2 - 13.0f);
+	std::uniform_int_distribution<int> zPos(0 + 50.0f, mapDepth);
+
+	CRotatingObject *pRotatingObject = NULL;
+	for (int i = 0; i < m_nObjects; ++i) {
+		pRotatingObject = new CRotatingObject();
+		pRotatingObject->SetMesh(pCubeMesh);
+		//각 정육면체 객체의 위치를 설정한다. 
+		pRotatingObject->SetPosition(xPos(dre), yPos(dre), zPos(dre));
+		pRotatingObject->SetRotationAxis(XMFLOAT3(1.0f, 3.0f, 1.0f));
+		pRotatingObject->SetRotationSpeed(90.0f);
+		pRotatingObject->setMovingDir(XMFLOAT3(1.0f, 1.0f, 1.0f));
+		pRotatingObject->SetObject(12.0f, 12.0f, 12.0f);
+		m_ppObjects[i] = pRotatingObject;
+	}
+	
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
 }
 void EnemyShader::AnimateObjects(float fTimeElapsed) {
@@ -459,160 +463,4 @@ void CMapShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCa
 			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
 		}
 	}
-}
-
-CInstancingShader::CInstancingShader()
-{
-}
-CInstancingShader::~CInstancingShader()
-{
-}
-
-D3D12_INPUT_LAYOUT_DESC CInstancingShader::CreateInputLayout()
-{
-	UINT nInputElementDescs = 2;
-	D3D12_INPUT_ELEMENT_DESC *pd3dInputElementDescs = new
-		D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
-	//정점 정보를 위한 입력 원소이다. 
-	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
-	D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	pd3dInputElementDescs[1] = { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12,
-	D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	
-	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
-	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
-	d3dInputLayoutDesc.NumElements = nInputElementDescs;
-	return(d3dInputLayoutDesc);
-}
-
-D3D12_SHADER_BYTECODE CInstancingShader::CreateVertexShader(ID3DBlob **ppd3dShaderBlob)
-{
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VSInstancing", "vs_5_1",
-		ppd3dShaderBlob));
-}
-D3D12_SHADER_BYTECODE CInstancingShader::CreatePixelShader(ID3DBlob **ppd3dShaderBlob)
-{
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PSInstancing", "ps_5_1",
-		ppd3dShaderBlob));
-}
-void CInstancingShader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature
-	*pd3dGraphicsRootSignature)
-{
-	m_nPipelineStates = 1;
-	m_ppd3dPipelineStates = new ID3D12PipelineState*[m_nPipelineStates];
-	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
-}
-
-void CInstancingShader::CreateShaderVariables(ID3D12Device *pd3dDevice,
-	ID3D12GraphicsCommandList *pd3dCommandList)
-{
-	//인스턴스 정보를 저장할 정점 버퍼를 업로드 힙 유형으로 생성한다. 
-	m_pd3dcbGameObjects = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL,
-	sizeof(VS_VB_INSTANCE) * m_nObjects, D3D12_HEAP_TYPE_UPLOAD,
-		D3D12_RESOURCE_STATE_GENERIC_READ, NULL);
-		//정점 버퍼(업로드 힙)에 대한 포인터를 저장한다. 
-	m_pd3dcbGameObjects->Map(0, NULL, (void **)&m_pcbMappedGameObjects);
-}
-void CInstancingShader::ReleaseShaderVariables()
-{
-	if (m_pd3dcbGameObjects) m_pd3dcbGameObjects->Unmap(0, NULL);
-	if (m_pd3dcbGameObjects) m_pd3dcbGameObjects->Release();
-}
-
-//인스턴싱 정보(객체의 월드 변환 행렬과 색상)를 정점 버퍼에 복사한다. 
-void CInstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList)
-{
-	pd3dCommandList->SetGraphicsRootShaderResourceView(2,
-		m_pd3dcbGameObjects->GetGPUVirtualAddress());
-	for (int j = 0; j < m_nObjects; j++)
-	{
-		m_pcbMappedGameObjects[j].m_xmcColor = (j % 2) ? XMFLOAT4(0.5f, 0.0f, 0.0f, 0.0f) :
-			XMFLOAT4(0.0f, 0.0f, 0.5f, 0.0f);
-		XMStoreFloat4x4(&m_pcbMappedGameObjects[j].m_xmf4x4Transform,
-			XMMatrixTranspose(XMLoadFloat4x4(&m_ppObjects[j]->getMatrix())));
-	}
-}
-
-void CInstancingShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
-	*pd3dCommandList)
-{
-	m_nObjects = 10;
-	m_ppObjects = new CGameObject*[m_nObjects];
-
-	std::default_random_engine dre(1000);
-	std::uniform_int_distribution<int> xPos(-mapWidth / 2 + 13.0f, mapWidth / 2 - 13.0f);
-	std::uniform_int_distribution<int> yPos(-mapHeight / 2 + 13.0f, mapHeight / 2 - 13.0f);
-	std::uniform_int_distribution<int> zPos(0 + 50.0f, mapDepth);
-
-	CRotatingObject *pRotatingObject = NULL;
-	for (int i = 0; i < m_nObjects; ++i) {
-		pRotatingObject = new CRotatingObject();
-		//pRotatingObject->SetMesh(pCubeMesh);
-		//각 정육면체 객체의 위치를 설정한다. 
-		pRotatingObject->SetPosition(xPos(dre), yPos(dre), zPos(dre));
-		pRotatingObject->SetRotationAxis(XMFLOAT3(1.0f, 3.0f, 1.0f));
-		pRotatingObject->SetRotationSpeed(90.0f);
-		pRotatingObject->setMovingDir(XMFLOAT3(1.0f, 1.0f, 1.0f));
-		pRotatingObject->SetObject(12.0f, 12.0f, 12.0f);
-		m_ppObjects[i] = pRotatingObject;
-	}
-	CCube *pCubeMesh = new CCube(pd3dDevice, pd3dCommandList, 12.0f, 12.0f, 12.0f);
-	m_ppObjects[0]->SetMesh(pCubeMesh);
-
-	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-}
-
-void CInstancingShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera
-	*pCamera)
-{
-	CShader::Render(pd3dCommandList, pCamera);
-	//모든 게임 객체의 인스턴싱 데이터를 버퍼에 저장한다.
-	UpdateShaderVariables(pd3dCommandList);
-	//하나의 정점 데이터를 사용하여 모든 게임 객체(인스턴스)들을 렌더링한다. 
-	m_ppObjects[0]->Render(pd3dCommandList, pCamera, m_nObjects);
-}
-
-void CPaticleShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList)
-{
-	m_nObjects = 100;
-	m_ppObjects = new CGameObject*[m_nObjects];
-
-	std::default_random_engine dre;
-	std::uniform_int_distribution<> dir(-10, 10);
-	std::uniform_int_distribution<> rot(0, 1);
-
-	Paticle* paticle = nullptr;
-	for (int i = 0; i < m_nObjects; ++i) {
-		paticle->setPaticle(XMFLOAT3(dir(dre), dir(dre), dir(dre)),
-			XMFLOAT3(rot(dre), rot(dre), rot(dre)), 5.0f, 0.5f);
-		m_ppObjects[i] = paticle;
-	}
-	CCube* paticleMesh = new CCube(pd3dDevice, pd3dCommandList, 2.5f, 2.5f, 2.5f);
-	m_ppObjects[0]->SetMesh(paticleMesh);
-}
-
-
-void CPaticleShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera)
-{
-	if (!run)
-		return;
-	CInstancingShader::Render(pd3dCommandList, pCamera);
-}
-
-void CPaticleShader::AnimateObjects(float fTime)
-{
-	if (!run)
-		return;
-	if (runtime > maxtime) {
-		runtime = 0.0f;
-		run = false;
-	}
-	CShader::AnimateObjects(fTime);
-	runtime += fTime*50.0f;
-}
-
-void CPaticleShader::setPosition(XMFLOAT3 pos)
-{
-	for (int i = 0; i < m_nObjects; ++i)
-		m_ppObjects[i]->SetPosition(pos);
 }

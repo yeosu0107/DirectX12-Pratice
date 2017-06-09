@@ -66,7 +66,7 @@ public:
 	void ReleaseUploadBuffers();
 
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList);
-	virtual void RenderInstance(ID3D12GraphicsCommandList *pd3dCommandList, UINT nInstances = 1);
+
 
 };
 

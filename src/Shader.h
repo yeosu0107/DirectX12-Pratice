@@ -6,12 +6,6 @@ const float mapWidth = 300.0f;
 const float mapHeight = 200.0f;
 const float mapDepth = 200.0f;
 
-//인스턴스 정보(게임 객체의 월드 변환 행렬과 객체의 색상)를 위한 구조체이다. 
-struct VS_VB_INSTANCE
-{
-	XMFLOAT4X4 m_xmf4x4Transform;
-	XMFLOAT4 m_xmcColor;
-};
 
 struct CB_GAMEOBJECT_INFO 
 { 
@@ -61,7 +55,7 @@ public:
 	
 	virtual void ReleaseUploadBuffers();
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, 
-		ID3D12GraphicsCommandList *pd3dCommandList); 
+		ID3D12GraphicsCommandList *pd3dCommandList, void *pContext, CGameObject** pObject); 
 	virtual void AnimateObjects(float fTimeElapsed);
 	virtual void ReleaseObjects();
 	
@@ -84,13 +78,6 @@ public:
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
 	virtual void CreateShader(ID3D12Device *pd3dDevice, 
 		ID3D12RootSignature *pd3dGraphicsRootSignature);
-
-	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
-		*pd3dCommandList);
-	virtual void AnimateObjects(float fTimeElapsed);
-	virtual void ReleaseObjects();
-	virtual void ReleaseUploadBuffers();
-	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 };
 
 class EnemyShader : public CShader
@@ -139,42 +126,4 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 
 	void updatePlayerPos(XMFLOAT3& player) { playerPos = player; }
-};
-
-class CInstancingShader : public CShader
-{
-public:
-	CInstancingShader();
-	virtual ~CInstancingShader();
-	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
-	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
-	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
-	virtual void CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature
-		*pd3dGraphicsRootSignature);
-	virtual void CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
-		*pd3dCommandList);
-	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);
-	virtual void ReleaseShaderVariables();
-	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
-		*pd3dCommandList);
-	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
-protected:
-	//인스턴스 데이터를 포함하는 버퍼와 포인터이다. 
-	ID3D12Resource *m_pd3dcbGameObjects = NULL;
-	VS_VB_INSTANCE *m_pcbMappedGameObjects = NULL;
-};
-
-class CPaticleShader : CInstancingShader
-{
-private:
-	bool run = false;
-	float runtime = 0.0f;
-	float maxtime = 50.0f;
-
-public:
-	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
-		*pd3dCommandList);
-	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
-	virtual void AnimateObjects(float fTime);
-	virtual void setPosition(XMFLOAT3 pos);
 };

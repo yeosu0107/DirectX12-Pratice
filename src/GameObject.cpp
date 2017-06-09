@@ -6,7 +6,6 @@
 CGameObject::CGameObject()
 {
 	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixIdentity());
-	live = true;
 }
 
 
@@ -70,14 +69,6 @@ void CGameObject::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pC
 	if (m_pMesh) {
 		m_pMesh->Render(pd3dCommandList);
 	}
-}
-
-void CGameObject::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera,
-	UINT nInstances)
-{
-	OnPrepareRender();
-	if (m_pMesh) 
-		m_pMesh->RenderInstance(pd3dCommandList, nInstances);
 }
 
 void CGameObject::CreateShaderVariables(ID3D12Device *pd3dDevice,
