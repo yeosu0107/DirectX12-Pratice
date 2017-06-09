@@ -159,9 +159,11 @@ public:
 	virtual void ReleaseShaderVariables();
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
 		*pd3dCommandList);
+	virtual void ReleaseObjects();
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 protected:
-	//인스턴스 데이터를 포함하는 버퍼와 포인터이다. 
+	//인스턴스 정점 버퍼와 정점 버퍼 뷰이다. 
 	ID3D12Resource *m_pd3dcbGameObjects = NULL;
 	VS_VB_INSTANCE *m_pcbMappedGameObjects = NULL;
-};
+	D3D12_VERTEX_BUFFER_VIEW m_d3dInstancingBufferView;
+};

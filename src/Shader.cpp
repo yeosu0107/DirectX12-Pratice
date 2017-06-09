@@ -437,20 +437,35 @@ CInstancingShader::~CInstancingShader()
 
 D3D12_INPUT_LAYOUT_DESC CInstancingShader::CreateInputLayout()
 {
-	UINT nInputElementDescs = 2;
-	D3D12_INPUT_ELEMENT_DESC *pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
-	
+	UINT nInputElementDescs = 7;
+	D3D12_INPUT_ELEMENT_DESC *pd3dInputElementDescs = new
+		D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
 	//정점 정보를 위한 입력 원소이다. 
 	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
-	D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
+	};
 	pd3dInputElementDescs[1] = { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12,
 	D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+
+	//인스턴싱 정보를 위한 입력 원소이다. 
+	pd3dInputElementDescs[2] = { "WORLDMATRIX", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0,
+	D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1 };
+	pd3dInputElementDescs[3] = { "WORLDMATRIX", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16,
+	D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1 };
+	pd3dInputElementDescs[4] = { "WORLDMATRIX", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32,
+	D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1 };
+	pd3dInputElementDescs[5] = { "WORLDMATRIX", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48,
+	D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1 };
+	pd3dInputElementDescs[6] = { "INSTANCECOLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1,
+	64, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1 };
 	
 	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
 	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
 	d3dInputLayoutDesc.NumElements = nInputElementDescs;
 	return(d3dInputLayoutDesc);
-}D3D12_SHADER_BYTECODE CInstancingShader::CreateVertexShader(ID3DBlob **ppd3dShaderBlob)
+}
+
+D3D12_SHADER_BYTECODE CInstancingShader::CreateVertexShader(ID3DBlob **ppd3dShaderBlob)
 {
 	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VSInstancing", "vs_5_1",
 		ppd3dShaderBlob));
@@ -473,24 +488,29 @@ void CInstancingShader::CreateShaderVariables(ID3D12Device *pd3dDevice,
 {
 	//인스턴스 정보를 저장할 정점 버퍼를 업로드 힙 유형으로 생성한다. 
 	m_pd3dcbGameObjects = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL,
-	sizeof(VS_VB_INSTANCE) * m_nObjects, D3D12_HEAP_TYPE_UPLOAD,
-		D3D12_RESOURCE_STATE_GENERIC_READ, NULL);
-
+		sizeof(VS_VB_INSTANCE) * m_nObjects, D3D12_HEAP_TYPE_UPLOAD,
+		D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
+	
 	//정점 버퍼(업로드 힙)에 대한 포인터를 저장한다. 
 	m_pd3dcbGameObjects->Map(0, NULL, (void **)&m_pcbMappedGameObjects);
+	
+	//정점 버퍼에 대한 뷰를 생성한다. 
+	m_d3dInstancingBufferView.BufferLocation =
+		m_pd3dcbGameObjects->GetGPUVirtualAddress();
+	m_d3dInstancingBufferView.StrideInBytes = sizeof(VS_VB_INSTANCE);
+	m_d3dInstancingBufferView.SizeInBytes = sizeof(VS_VB_INSTANCE) * m_nObjects;
 }
-
 void CInstancingShader::ReleaseShaderVariables()
 {
-	if (m_pd3dcbGameObjects)
-		m_pd3dcbGameObjects->Unmap(0, NULL);
 	if (m_pd3dcbGameObjects) 
+		m_pd3dcbGameObjects->Unmap(0, NULL);
+	if (m_pd3dcbGameObjects)
 		m_pd3dcbGameObjects->Release();
-}//인스턴싱 정보(객체의 월드 변환 행렬과 색상)를 정점 버퍼에 복사한다.
+}
+
+//인스턴싱 정보(객체의 월드 변환 행렬과 색상)를 정점 버퍼에 복사한다.
 void CInstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList)
 {
-	pd3dCommandList->SetGraphicsRootShaderResourceView(2,
-		m_pd3dcbGameObjects->GetGPUVirtualAddress());
 	for (int j = 0; j < m_nObjects; j++)
 	{
 		m_pcbMappedGameObjects[j].m_xmcColor = (j % 2) ? XMFLOAT4(0.5f, 0.0f, 0.0f, 0.0f) :
@@ -500,8 +520,9 @@ void CInstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCom
 	}
 }
 
-void CInstancingShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList){
-	m_nObjects = 10;
+void CInstancingShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
+{
+	m_nObjects = 50;
 	m_ppObjects = new CGameObject*[m_nObjects];
 
 	std::default_random_engine dre(1000);
@@ -524,14 +545,28 @@ void CInstancingShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 	CCube *pCubeMesh = new CCube(pd3dDevice, pd3dCommandList, 12.0f, 12.0f, 12.0f);
 	m_ppObjects[0]->SetMesh(pCubeMesh);
 
-	CreateShaderVariables(pd3dDevice, pd3dCommandList);}void CInstancingShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+}
+void CInstancingShader::ReleaseObjects()
+{
+	ObjectShader::ReleaseObjects();
+}
+void CInstancingShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera
 	*pCamera)
 {
-	ObjectShader::Render(pd3dCommandList, pCamera);
+	//ObjectShader::Render(pd3dCommandList, pCamera);
+
+	OnPrepareRender(pd3dCommandList);
+	for (int j = 0; j < m_nObjects; j++) {
+		if (m_ppObjects[j]) {
+			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
+		}
+	}
 
 	//모든 게임 객체의 인스턴싱 데이터를 버퍼에 저장한다.
 	UpdateShaderVariables(pd3dCommandList);
 	
 	//하나의 정점 데이터를 사용하여 모든 게임 객체(인스턴스)들을 렌더링한다.
-	m_ppObjects[0]->Render(pd3dCommandList, pCamera, m_nObjects);
-}
+	m_ppObjects[0]->Render(pd3dCommandList, pCamera, m_nObjects,
+		m_d3dInstancingBufferView);
+}

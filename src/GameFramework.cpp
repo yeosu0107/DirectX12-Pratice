@@ -589,6 +589,7 @@ void CGameFramework::WaitForGpuComplete() {
 	//CPU 펜스의 값을 증가한다. 
 	const UINT64 nFence = ++m_nFenceValue[m_nSwapChainBufferIndex];
 	HRESULT hResult = m_pd3dCommandQueue->Signal(m_pd3dFence, nFence); //GPU가 펜스의 값을 설정하는 명령을 명령 큐에 추가한다. 
+	UINT64 T = m_pd3dFence->GetCompletedValue();
 	if (m_pd3dFence->GetCompletedValue() < nFence) {
 		//펜스의 현재 값이 설정한 값보다 작으면 펜스의 현재 값이 설정한 값이 될 때까지 기다린다.
 		hResult = m_pd3dFence->SetEventOnCompletion(nFence, m_hFenceEvent); 

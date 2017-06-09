@@ -39,7 +39,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_wallPlanes[2] = XMFLOAT4(0.0f, +1.0f, 0.0f, height);
 	m_wallPlanes[3] = XMFLOAT4(0.0f, -1.0f, 0.0f, height);
 
-	ObjectShader* EnemyShader = new ObjectShader();
+	CInstancingShader* EnemyShader = new CInstancingShader();
 	EnemyShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	EnemyShader->BuildObjects(pd3dDevice, pd3dCommandList);
 	
