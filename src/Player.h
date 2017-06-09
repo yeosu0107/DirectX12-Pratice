@@ -15,7 +15,6 @@
 class CPlayer : public CGameObject
 {
 protected:
-	
 
 	CCamera *m_pCamera = NULL;
 

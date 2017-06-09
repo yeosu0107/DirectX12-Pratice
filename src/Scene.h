@@ -13,14 +13,21 @@ protected:
 	CShader **m_ppShaders = NULL;
 	int m_nShaders = 0;
 
+	CBulletShader *m_BulletShader = NULL;
+
 	CPaticlesShader** m_PaticleShaders = NULL;
 	int m_nPaticleShaders = 0;
+	int nowPaticle = 1;
+
 
 	CWallObject **m_pWall = NULL;
 	int m_nWall = 0;
 
 	CGameObject **m_pEnemy = NULL;
 	int m_nEnemy = 0;
+
+	CGameObject **m_pBullet = NULL;
+	int m_nBullet = 0;
 
 	ID3D12RootSignature *m_pd3dGraphicsRootSignature = NULL;
 
@@ -42,6 +49,7 @@ public:
 	
 	void ReleaseUploadBuffers();
 
+	void playerUpdate(XMFLOAT3 pos, XMFLOAT3 look);
 
 	//루트 시그너쳐 생성
 	ID3D12RootSignature *CreateGraphicsRootSignature(ID3D12Device *pd3dDevice); 

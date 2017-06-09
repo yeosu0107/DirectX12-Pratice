@@ -528,16 +528,18 @@ void CInstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCom
 {
 	for (int j = 0; j < m_nObjects; j++)
 	{
-		m_pcbMappedGameObjects[j].m_xmcColor = (j % 2) ? XMFLOAT4(0.5f, 0.0f, 0.0f, 0.0f) :
-			XMFLOAT4(0.0f, 0.0f, 0.5f, 0.0f);
-		XMStoreFloat4x4(&m_pcbMappedGameObjects[j].m_xmf4x4Transform,
-			XMMatrixTranspose(XMLoadFloat4x4(&m_ppObjects[j]->getMatrix())));
+		if (!m_ppObjects[j]->getDie()) {
+			m_pcbMappedGameObjects[j].m_xmcColor = (j % 2) ? XMFLOAT4(0.5f, 0.0f, 0.0f, 0.0f) :
+				XMFLOAT4(0.0f, 0.0f, 0.5f, 0.0f);
+			XMStoreFloat4x4(&m_pcbMappedGameObjects[j].m_xmf4x4Transform,
+				XMMatrixTranspose(XMLoadFloat4x4(&m_ppObjects[j]->getMatrix())));
+		}
 	}
 }
 
 void CInstancingShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {  
-	m_nObjects = 50;
+	m_nObjects = 15;
 	m_ppObjects = new CGameObject*[m_nObjects];
 
 	std::default_random_engine dre(1000);
@@ -552,7 +554,7 @@ void CInstancingShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 		pRotatingObject->SetPosition(xPos(dre), yPos(dre), zPos(dre));
 		pRotatingObject->SetRotationAxis(XMFLOAT3(1.0f, 3.0f, 1.0f));
 		pRotatingObject->SetRotationSpeed(90.0f);
-		pRotatingObject->setMovingDir(XMFLOAT3(1.0f, 1.0f, 1.0f));
+		pRotatingObject->setMovingDir(XMFLOAT3(0.5f, 0.5f, 0.5f));
 		pRotatingObject->SetObject(12.0f, 12.0f, 12.0f);
 		m_ppObjects[i] = pRotatingObject;
 	}

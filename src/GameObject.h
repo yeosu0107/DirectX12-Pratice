@@ -90,6 +90,8 @@ public:
 	void SetRotationSpeed(float fRotationSpeed) { m_fRotationSpeed = fRotationSpeed; } 
 	void SetRotationAxis(XMFLOAT3 xmf3RotationAxis) { m_xmf3RotationAxis = xmf3RotationAxis; }
 	virtual void Animate(float fTimeElapsed);
+	
+	void Reset();
 };
 
 class CWallObject : public CGameObject
@@ -102,7 +104,6 @@ public:
 	CWallObject();
 	virtual ~CWallObject();
 
-	
 	virtual void Animate(float fTimeElapsed);
 
 	float getWidth() const { return width; }
@@ -127,3 +128,12 @@ public:
 	virtual void Animate(float fTimeElapsed);
 };
 
+class CBullet : public CGameObject
+{
+private:
+public:
+	CBullet();
+	virtual ~CBullet();
+
+	virtual void Animate(float fTimeElapsed);
+};

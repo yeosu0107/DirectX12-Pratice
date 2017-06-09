@@ -300,6 +300,8 @@ void CGameFramework::BuildObjects()
 	//그래픽 리소스들을 생성하는 과정에 생성된 업로드 버퍼들을 소멸시킨다. 
 	if (m_pScene)
 		m_pScene->ReleaseUploadBuffers();
+	if (playerShader) 
+		playerShader->ReleaseUploadBuffers();
 
 	m_GameTimer.Reset();
 }
@@ -365,6 +367,7 @@ void CGameFramework::ProcessInput()
 		cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 3.0f;
 		cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 3.0f;
 		::SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
+		m_pScene->playerUpdate(m_pPlayer->GetPosition(), m_pPlayer->GetUp());
 	}
 	
 	if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
@@ -372,8 +375,10 @@ void CGameFramework::ProcessInput()
 		if (cxDelta || cyDelta) {
 			if (pKeyBuffer[VK_RBUTTON] & 0xF0)
 				m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
-			else
+			else {
 				m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
+				
+			}
 		}
 
 		if (dwDirection && !m_pPlayer->getDie()) {

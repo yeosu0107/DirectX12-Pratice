@@ -51,15 +51,29 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	m_ppShaders[1] = EnemyShader;
 
+	//ÃÑ¾Ë °´Ã¼ ¼ÎÀÌ´õ »ý¼º
+	CBulletShader* bulletShader = new CBulletShader();
+	bulletShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	bulletShader->BuildObjects(pd3dDevice, pd3dCommandList);
+
+	m_nBullet = bulletShader->getObjectsNum();
+	m_pBullet = bulletShader->GetObjects();
+
+	m_BulletShader = bulletShader;
+
 	//ÆÄÆ¼Å¬ ¼ÎÀÌ´õ »ý¼º
-	m_nPaticleShaders = 1;
+	m_nPaticleShaders = 11;
 	m_PaticleShaders = new CPaticlesShader*[m_nPaticleShaders];
 
-	CPaticlesShader* paticleShader = new CPaticlesShader();
-	paticleShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-	paticleShader->BuildObjects(pd3dDevice, pd3dCommandList);
+	CPaticlesShader* paticleShader = NULL;
+	for (int i = 0; i < m_nPaticleShaders; ++i) {
+		paticleShader = new CPaticlesShader();
+		paticleShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+		paticleShader->BuildObjects(pd3dDevice, pd3dCommandList);
 
-	m_PaticleShaders[0] = paticleShader;
+		m_PaticleShaders[i] = paticleShader;
+	}
+	
 }
 
 void CScene::ReleaseObjects()
@@ -78,18 +92,25 @@ void CScene::ReleaseObjects()
 
 bool CScene::ProcessInput(UCHAR *pKeysBuffer)
 {
+	
 	return false;
 }
 
-
+void CScene::playerUpdate(XMFLOAT3 pos, XMFLOAT3 look)
+{
+	m_BulletShader->Shoot(pos, look);
+}
 
 
 void CScene::AnimateObjects(float fTimeElapsed, XMFLOAT3 player)
 {
+	m_BulletShader->AnimateObjects(fTimeElapsed);
+
 	for (int i = 0; i < m_nShaders; ++i) { 
 		m_ppShaders[i]->updatePlayerPos(player);
 		m_ppShaders[i]->AnimateObjects(fTimeElapsed);
 	}
+
 	for (int i = 0; i < m_nPaticleShaders; ++i) {
 		if (m_PaticleShaders[i]->getRun())
 			m_PaticleShaders[i]->AnimateObjects(fTimeElapsed);
@@ -132,6 +153,21 @@ bool CScene::CrashObjects(BoundingOrientedBox& player, bool playerDeath)
 			}
 			if (nindex != -1)
 				break;
+		}
+
+		for (int bi = 0; bi < m_nBullet; ++bi) {
+			if (m_pBullet[bi]->getDie())
+				continue;
+			if (m_pEnemy[i]->getOOBB()->Intersects(*m_pBullet[bi]->getOOBB())) {
+				m_PaticleShaders[nowPaticle]->setPosition(m_pEnemy[i]->GetPosition());
+				m_PaticleShaders[nowPaticle]->setRun();
+				
+				//m_pBullet[bi]->setDie(true);
+				
+				nowPaticle += 1;
+				if (nowPaticle > m_nPaticleShaders-1)
+					nowPaticle = 1;
+			}
 		}
 
 		//Àû °´Ã¼ - Àû °´Ã¼
@@ -196,6 +232,8 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		m_ppShaders[i]->Render(pd3dCommandList, pCamera);
 	} 
 	
+	m_BulletShader->Render(pd3dCommandList, pCamera);
+
 	for (int i = 0; i < m_nPaticleShaders; ++i) {
 		if (m_PaticleShaders[i]->getRun())
 			m_PaticleShaders[i]->Render(pd3dCommandList, pCamera);

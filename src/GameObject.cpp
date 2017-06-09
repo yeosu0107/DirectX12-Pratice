@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "GameObject.h"
 #include "Shader.h"
-#include <random>
+
 
 CGameObject::CGameObject()
 {
@@ -212,6 +212,11 @@ void CRotatingObject::Animate(float fTimeElapsed) {
 	CGameObject::Animate(fTimeElapsed);
 }
 
+void CRotatingObject::Reset()
+{
+
+}
+
 CWallObject::CWallObject()
 {
 }
@@ -245,3 +250,17 @@ void Paticle::Animate(float fTimeElapsed)
 }
 
 
+CBullet::CBullet()
+{
+
+}
+CBullet::~CBullet()
+{
+
+}
+
+void CBullet::Animate(float fTimeElapsed)
+{
+	Move(10.0f);
+	CGameObject::Animate(fTimeElapsed);
+}
