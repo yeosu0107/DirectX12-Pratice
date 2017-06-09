@@ -78,6 +78,7 @@ private:
 
 	//게임 오브젝트 변수
 public:
+	CPlayerShader* playerShader = NULL;
 	CCamera *m_pCamera = NULL;
 	CPlayer *m_pPlayer = NULL;
 	POINT m_ptOldCursorPos;

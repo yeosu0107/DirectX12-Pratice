@@ -16,7 +16,7 @@ class CPlayer : public CGameObject
 {
 protected:
 	bool die = false;
-	CPaticles* paticle = NULL;
+	//CPaticles* paticle = NULL;
 
 	CCamera *m_pCamera = NULL;
 
@@ -111,9 +111,9 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera = NULL);
 	virtual void Animate(float fTime);
 
-	void setPaticle(CPaticles* object) {
+	/*void setPaticle(CPaticles* object) {
 		paticle = object;
-	}
+	}*/
 	void Die();
 	bool getDie() const { return die; }
 };
@@ -121,8 +121,7 @@ public:
 class CAirplanePlayer : public CPlayer
 {
 public:
-	CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList,
-		ID3D12RootSignature *pd3dGraphicsRootSignature);
+	CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual ~CAirplanePlayer();
 	virtual CCamera *ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
 	virtual void OnPrepareRender();

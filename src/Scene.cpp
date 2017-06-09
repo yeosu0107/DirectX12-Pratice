@@ -39,14 +39,14 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_wallPlanes[2] = XMFLOAT4(0.0f, +1.0f, 0.0f, height);
 	m_wallPlanes[3] = XMFLOAT4(0.0f, -1.0f, 0.0f, height);
 
-	EnemyShader* enemyShader = new EnemyShader();
-	enemyShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-	enemyShader->BuildObjects(pd3dDevice, pd3dCommandList);
+	ObjectShader* EnemyShader = new ObjectShader();
+	EnemyShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	EnemyShader->BuildObjects(pd3dDevice, pd3dCommandList);
 	
-	m_nEnemy = enemyShader->getObjectsNum();
-	m_pEnemy = enemyShader->GetObjects();
+	m_nEnemy = EnemyShader->getObjectsNum();
+	m_pEnemy = EnemyShader->GetObjects();
 
-	m_ppShaders[1] = enemyShader;
+	m_ppShaders[1] = EnemyShader;
 }
 
 void CScene::ReleaseObjects()

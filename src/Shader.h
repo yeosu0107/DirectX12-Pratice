@@ -78,15 +78,23 @@ public:
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
 	virtual void CreateShader(ID3D12Device *pd3dDevice, 
 		ID3D12RootSignature *pd3dGraphicsRootSignature);
+
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
+		*pd3dCommandList);
+	virtual void AnimateObjects(float fTimeElapsed);
+	virtual void ReleaseObjects();
+	
+	virtual void ReleaseUploadBuffers();
+	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 };
 
-class EnemyShader : public CShader
+class ObjectShader : public CShader
 {
 protected:
 
 public:
-	EnemyShader();
-	virtual ~EnemyShader();
+	ObjectShader();
+	virtual ~ObjectShader();
 
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
 		*pd3dCommandList);
