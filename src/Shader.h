@@ -12,6 +12,13 @@ struct CB_GAMEOBJECT_INFO
 	XMFLOAT4X4 m_xmf4x4World; 
 };
 
+//인스턴스 정보(게임 객체의 월드 변환 행렬과 객체의 색상)를 위한 구조체
+struct VS_VB_INSTANCE
+{
+	XMFLOAT4X4 m_xmf4x4Transform;
+	XMFLOAT4 m_xmcColor;
+};
+
 class CShader
 {
 protected: 
@@ -135,3 +142,26 @@ public:
 
 	void updatePlayerPos(XMFLOAT3& player) { playerPos = player; }
 };
+
+class CInstancingShader : public ObjectShader
+{
+public:
+	CInstancingShader();
+	virtual ~CInstancingShader();
+	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
+	virtual void CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature
+		*pd3dGraphicsRootSignature);
+	virtual void CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
+		*pd3dCommandList);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);
+	virtual void ReleaseShaderVariables();
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
+		*pd3dCommandList);
+	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
+protected:
+	//인스턴스 데이터를 포함하는 버퍼와 포인터이다. 
+	ID3D12Resource *m_pd3dcbGameObjects = NULL;
+	VS_VB_INSTANCE *m_pcbMappedGameObjects = NULL;
+};

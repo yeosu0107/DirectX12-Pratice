@@ -40,6 +40,21 @@ void CMesh::Render(ID3D12GraphicsCommandList *pd3dCommandList) {
 	//메쉬의 정점 버퍼 뷰를 렌더링한다(파이프라인(입력 조립기)을 작동하게 한다). 
 }
 
+void CMesh::RenderInstance(ID3D12GraphicsCommandList * pd3dCommandList, UINT nInstances)
+{
+	pd3dCommandList->IASetVertexBuffers(m_nSlot, 1, &m_d3dVertexBufferView);
+	pd3dCommandList->IASetPrimitiveTopology(m_d3dPrimitiveTopology);
+	if (m_pd3dIndexBuffer)
+	{
+		pd3dCommandList->IASetIndexBuffer(&m_d3dIndexBufferView);
+		pd3dCommandList->DrawIndexedInstanced(m_nIndices, nInstances, 0, 0, 0);
+	}
+	else
+	{
+		pd3dCommandList->DrawInstanced(m_nVertices, nInstances, m_nOffset, 0);
+	}
+}
+
 CTriangleMesh::CTriangleMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList) : CMesh(pd3dDevice, pd3dCommandList) {
 	//삼각형 메쉬를 정의한다. 
 	m_nVertices = 3; 

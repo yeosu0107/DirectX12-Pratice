@@ -71,6 +71,12 @@ void CGameObject::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pC
 	}
 }
 
+void CGameObject::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera, UINT nInstances)
+{
+	OnPrepareRender();
+	if (m_pMesh) m_pMesh->RenderInstance(pd3dCommandList, nInstances);
+}
+
 void CGameObject::CreateShaderVariables(ID3D12Device *pd3dDevice,
 	ID3D12GraphicsCommandList *pd3dCommandList)
 {

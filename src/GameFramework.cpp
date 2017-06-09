@@ -486,6 +486,7 @@ void CGameFramework::AnimateObjects()
 	if (playerShader) {
 		playerShader->AnimateObjects(m_GameTimer.GetTimeElapsed());
 	}
+
 	if (m_pScene) {
 		m_pScene->AnimateObjects(m_GameTimer.GetTimeElapsed(), m_pPlayer->GetPosition());
 		playerDie = m_pScene->CrashObjects(*m_pPlayer->getOOBB());
