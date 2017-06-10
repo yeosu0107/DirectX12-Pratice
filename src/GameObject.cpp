@@ -215,13 +215,42 @@ std::default_random_engine dre(1000);
 std::uniform_int_distribution<int> xPos(-mapWidth / 2 + 13.0f, mapWidth / 2 - 13.0f);
 std::uniform_int_distribution<int> yPos(-mapHeight / 2 + 13.0f, mapHeight / 2 - 13.0f);
 std::uniform_int_distribution<int> zPos(0 + 50.0f, mapDepth);
-
+std::uniform_int_distribution<int> type(0, 3);
 void CRotatingObject::Reset(XMFLOAT3 pos)
 {
 	SetPosition(xPos(dre), yPos(dre), pos.z + 800.0f + zPos(dre));
-	SetRotationAxis(XMFLOAT3(1.0f, 3.0f, 1.0f));
+	setType(type(dre));
 	SetRotationSpeed(90.0f);
-	setMovingDir(XMFLOAT3(0.5f, 0.5f, 0.5f));
+}
+
+void CRotatingObject::setType(int type)
+{
+	float xRot = 0.0f, yRot = 0.0f, zRot = 0.0f;
+	float xDir = 0.0f, yDir = 0.0f, zDir = 0.0f;
+	switch (type) {
+	case 0:
+		xDir = 1.0f;
+		xRot = 1.0f;
+		color = XMFLOAT4(0.9f, 0.9f, 0.0f, 0.0f);
+		break;
+	case 1:
+		yDir = 1.0f;
+		yRot = 1.0f;
+		color = XMFLOAT4(0.3f, 0.0f, 0.9f, 0.0f);
+		break;
+	case 2:
+		zDir = -1.0f;
+		zRot = 1.0f;
+		color = XMFLOAT4(0.0f, 0.9f, 0.0f, 0.0f);
+		break;
+	case 3:
+		xDir = 0.5f; yDir = 0.5f; zDir = -1.0f;
+		xRot = 1.0f; yRot = 3.0f; zRot = 1.0f;
+		color = XMFLOAT4(1.0f, 0.0f, 0.0f, 0.0f);
+		break;
+	}
+	SetRotationAxis(XMFLOAT3(xRot, yRot, zRot));
+	setMovingDir(XMFLOAT3(xDir, yDir, zDir));
 }
 
 CWallObject::CWallObject()
@@ -249,9 +278,6 @@ void Paticle::setPaticle(XMFLOAT3 tdir, XMFLOAT3 taxis, float mov, float rot)
 
 void Paticle::Animate(float fTimeElapsed)
 {
-	//if (rotSpeed != 0.0f)
-	//	Rotate(&axis, rotSpeed * fTimeElapsed);
-	
 	if (movingSpeed != 0.0f)
 		MoveVector(dir, movingSpeed * fTimeElapsed);
 }
@@ -270,9 +296,9 @@ void CBullet::Animate(float fTimeElapsed)
 {
 	Move(10.0f);
 	CGameObject::Animate(fTimeElapsed);
-	runtime += 1.0f;
+	/*runtime += 1.0f;
 	if (runtime >= maxtime) {
 		runtime = 0;
 		setDie(true);
-	}
+	}*/
 }

@@ -13,8 +13,6 @@
 #include "Camera.h"
 #include "Player.h"
 
-class UI;
-class Score;
 
 class CGameFramework
 {
@@ -76,9 +74,6 @@ private:
 	CGameTimer					m_GameTimer;
 	_TCHAR						m_pszFrameRate[50];
 
-	HDC							m_hDCFrameBuffer;
-
-	UI*							m_ui = NULL;
 
 public:
 	CPlayerShader* playerShader = NULL;
@@ -130,37 +125,5 @@ public:
 };
 
 
-class Score {
-private:
-	float distance;
-	float killCount;
-	float score;
-public:
-	Score() : distance{ 0 }, killCount{ 0 }, score{ 0 } {}
-	~Score() {}
-	void killEnemy() { killCount++; }
-	void moveForward(float dist) { distance += dist; }
-	int setScore() {
-		score = killCount * 100 + distance / 10;
-		return (int)score;
-	}
-	void ResetScore() { distance = 0; killCount = 0; score = 0; }
-	float getDist() const { return distance; }
-};
-
-class UI {
-private:
-	wchar_t m_score[50];
-	wchar_t m_start[30];
-	wchar_t m_gameover[30];
-	wchar_t m_restart[40];
-	wchar_t m_boostGauag[30];
-	//wchar_t m_speed[30];
-	wchar_t m_bulletspeed[30];
-public:
-	UI();
-	~UI();
-	void DrawUI(HDC m_hDCFrameBuffer, int status, int score, int boost, int bullet);
-};
 
 #endif 

@@ -162,7 +162,7 @@ bool CScene::CrashObjects(BoundingOrientedBox& player, bool playerDeath)
 				continue;
 			if (m_pEnemy[i]->getOOBB()->Intersects(*m_pBullet[bi]->getOOBB())) {
 				m_PaticleShaders[nowPaticle]->setPosition(m_pEnemy[i]->GetPosition());
-				m_PaticleShaders[nowPaticle]->setRun();
+				m_PaticleShaders[nowPaticle]->setRun(m_pEnemy[i]->getColor());
 				m_pEnemy[i]->Reset(player.Center);
 				//m_pBullet[bi]->setDie(true);
 				
@@ -194,7 +194,7 @@ bool CScene::CrashObjects(BoundingOrientedBox& player, bool playerDeath)
 			break;
 		case INTERSECTING:
 			m_PaticleShaders[0]->setPosition(player.Center);
-			m_PaticleShaders[0]->setRun();
+			m_PaticleShaders[0]->setRun(XMFLOAT4(1.0f, 0.0f, 0.0f, 0.0f));
 			return true;
 		}
 	}
@@ -211,7 +211,7 @@ bool CScene::CrashObjects(BoundingOrientedBox& player, bool playerDeath)
 				PlaneIntersectionType intersectType = player.Intersects(XMLoadFloat4(&m_wallPlanes[i]));
 				if (intersectType == BACK || intersectType == INTERSECTING) {
 					m_PaticleShaders[0]->setPosition(player.Center);
-					m_PaticleShaders[0]->setRun();
+					m_PaticleShaders[0]->setRun(XMFLOAT4(1.0f, 0.0f, 0.0f, 0.0f));
 					return true;
 				}
 			}

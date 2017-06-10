@@ -529,8 +529,9 @@ void CInstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCom
 	for (int j = 0; j < m_nObjects; j++)
 	{
 		if (!m_ppObjects[j]->getDie()) {
-			m_pcbMappedGameObjects[j].m_xmcColor = (j % 2) ? XMFLOAT4(0.5f, 0.0f, 0.0f, 0.0f) :
-				XMFLOAT4(0.0f, 0.0f, 0.5f, 0.0f);
+			/*m_pcbMappedGameObjects[j].m_xmcColor = (j % 2) ? XMFLOAT4(0.5f, 0.0f, 0.0f, 0.0f) :
+				XMFLOAT4(0.0f, 0.0f, 0.5f, 0.0f);*/
+			m_pcbMappedGameObjects[j].m_xmcColor = m_ppObjects[j]->getColor();
 			XMStoreFloat4x4(&m_pcbMappedGameObjects[j].m_xmf4x4Transform,
 				XMMatrixTranspose(XMLoadFloat4x4(&m_ppObjects[j]->getMatrix())));
 		}
@@ -539,22 +540,24 @@ void CInstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCom
 
 void CInstancingShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {  
-	m_nObjects = 15;
+	m_nObjects = 30;
 	m_ppObjects = new CGameObject*[m_nObjects];
 
 	std::default_random_engine dre(1000);
 	std::uniform_int_distribution<int> xPos(-mapWidth / 2 + 13.0f, mapWidth / 2 - 13.0f);
 	std::uniform_int_distribution<int> yPos(-mapHeight / 2 + 13.0f, mapHeight / 2 - 13.0f);
-	std::uniform_int_distribution<int> zPos(0 + 50.0f, mapDepth);
+	std::uniform_int_distribution<int> zPos(0 + 50.0f, mapDepth*3);
+	std::uniform_int_distribution<int> type(0, 3);
 
 	CRotatingObject *pRotatingObject = NULL;
 	for (int i = 0; i < m_nObjects; ++i) {
 		pRotatingObject = new CRotatingObject();
 		//각 정육면체 객체의 위치를 설정한다. 
 		pRotatingObject->SetPosition(xPos(dre), yPos(dre), zPos(dre));
-		pRotatingObject->SetRotationAxis(XMFLOAT3(1.0f, 3.0f, 1.0f));
+		pRotatingObject->setType(type(dre));
+		//pRotatingObject->SetRotationAxis(XMFLOAT3(1.0f, 3.0f, 1.0f));
+		//pRotatingObject->setMovingDir(XMFLOAT3(0.5f, 0.5f, 0.5f));
 		pRotatingObject->SetRotationSpeed(90.0f);
-		pRotatingObject->setMovingDir(XMFLOAT3(0.5f, 0.5f, 0.5f));
 		pRotatingObject->SetObject(12.0f, 12.0f, 12.0f);
 		m_ppObjects[i] = pRotatingObject;
 	}

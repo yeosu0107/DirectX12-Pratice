@@ -8,6 +8,7 @@ class CGameObject
 private: 
 protected:
 	bool die = false;
+	XMFLOAT4 color;
 
 	float width = 0.0f;
 	float height = 0.0f;
@@ -76,6 +77,9 @@ public:
 	bool getDie() const { return die; }
 	void setDie(bool type) { die = type; }
 	virtual void Reset(XMFLOAT3 pos) {}
+
+	XMFLOAT4& getColor() { return color; }
+	void setColor(XMFLOAT4& t) { color = t; }
 };
 
 class CRotatingObject : public CGameObject 
@@ -83,6 +87,7 @@ class CRotatingObject : public CGameObject
 private:
 	XMFLOAT3 m_xmf3RotationAxis; 
 	float m_fRotationSpeed;
+	
 
 public: 
 	CRotatingObject(); 
@@ -93,6 +98,7 @@ public:
 	virtual void Animate(float fTimeElapsed);
 	
 	virtual void Reset(XMFLOAT3 pos);
+	void setType(int type=0);
 };
 
 class CWallObject : public CGameObject

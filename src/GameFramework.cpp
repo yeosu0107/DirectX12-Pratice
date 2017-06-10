@@ -286,8 +286,6 @@ void CGameFramework::BuildObjects()
 	m_pCamera = new CCamera(); 
 	m_pCamera = m_pPlayer->ChangeCamera((DWORD)(0x03),
 		m_GameTimer.GetTimeElapsed());
-
-	m_ui = new UI();
 	
 
 	//씬 객체를 생성하기 위하여 필요한 그래픽 명령 리스트들을 명령 큐에 추가한다. 
@@ -313,10 +311,6 @@ void CGameFramework::ReleaseObjects()
 		m_pScene->ReleaseObjects();
 		delete m_pScene;
 	}
-	if (m_ui)
-		delete m_ui;
-
-	m_ui = nullptr;
 }
 
 void CGameFramework::OnDestroy()
@@ -361,6 +355,7 @@ void CGameFramework::ProcessInput()
 		if (pKeyBuffer[VK_D] & 0xF0) dwDirection |= DIR_RIGHT;
 		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeyBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
+		if (pKeyBuffer[VK_RETURN] & 0xF0) BuildObjects();
 	}
 	float cxDelta = 0.0f, cyDelta = 0.0f;
 	POINT ptCursorPos;
@@ -644,42 +639,4 @@ void CGameFramework::MoveToNextFrame() {
 		::WaitForSingleObject(m_hFenceEvent, INFINITE); 
 	}
 
-}
-
-
-UI::UI() {
-	wsprintf(m_gameover, L"Game Over");
-	wsprintf(m_restart, L"Press BackSpace to Restart");
-	wsprintf(m_start, L"Press Enter to Start");
-}
-
-UI::~UI() {
-
-}
-
-//RECT winRect = { 0,0,CLIENT_WIDTH, CLIENT_HEIGHT };
-
-void UI::DrawUI(HDC hdc, int status, int score, int boost, int bullet) {
-	switch (status) {
-	case gameStatus::main:
-		SetBkColor(hdc, RGB(255, 255, 0));
-		TextOut(hdc, FRAME_BUFFER_WIDTH / 2 - 60, FRAME_BUFFER_HEIGHT / 2 - 20, m_start, lstrlen(m_start));
-		break;
-	case gameStatus::Gameloop:
-		wsprintf(m_boostGauag, L"BoostGauge : %d", boost);
-		wsprintf(m_score, L"Score : %d", score);
-		//wsprintf(m_speed, L"now Speed : %d", (int)speed);
-		wsprintf(m_bulletspeed, L"Bullet Speed : %d", 11 - bullet);
-		TextOut(hdc, 10, 10, m_score, lstrlen(m_score));
-		TextOut(hdc, 10, 30, m_boostGauag, lstrlen(m_boostGauag));
-		//TextOut(hdc, 10, 50, m_speed, lstrlen(m_speed));
-		TextOut(hdc, 10, 50, m_bulletspeed, lstrlen(m_bulletspeed));
-		break;
-	case gameStatus::die:
-		wsprintf(m_score, L"Your Score : %d", score);
-		TextOut(hdc, FRAME_BUFFER_WIDTH / 2 - 30, FRAME_BUFFER_HEIGHT / 2 - 40, m_gameover, lstrlen(m_gameover));
-		TextOut(hdc, FRAME_BUFFER_WIDTH / 2 - 35, FRAME_BUFFER_HEIGHT / 2 - 20, m_score, lstrlen(m_score));
-		TextOut(hdc, FRAME_BUFFER_WIDTH / 2 - 80, FRAME_BUFFER_HEIGHT / 2, m_restart, lstrlen(m_restart));
-		break;
-	}
 }

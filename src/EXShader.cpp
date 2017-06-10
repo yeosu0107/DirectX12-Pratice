@@ -20,7 +20,7 @@ void CPaticlesShader::UpdateShaderVariables(ID3D12GraphicsCommandList * pd3dComm
 {
 	for (int j = 0; j < m_nObjects; j++)
 	{
-		m_pcbMappedGameObjects[j].m_xmcColor = XMFLOAT4(0.9f, 0.0f, 0.0f, 0.0f);
+		m_pcbMappedGameObjects[j].m_xmcColor = m_ppObjects[j]->getColor();
 		XMStoreFloat4x4(&m_pcbMappedGameObjects[j].m_xmf4x4Transform,
 			XMMatrixTranspose(XMLoadFloat4x4(&m_ppObjects[j]->getMatrix())));
 	}
@@ -86,10 +86,12 @@ void CPaticlesShader::setPosition(XMFLOAT3 pos)
 		m_ppObjects[i]->SetPosition(pos);
 }
 
-void CPaticlesShader::setRun() { 
+void CPaticlesShader::setRun(XMFLOAT4& color) { 
 	run = true; 
-	for (int i = 0; i < m_nObjects; ++i)
+	for (int i = 0; i < m_nObjects; ++i) {
 		m_ppObjects[i]->setScale(1.0f);
+		m_ppObjects[i]->setColor(color);
+	}
 }
 
 CBulletShader::CBulletShader() {}
@@ -108,7 +110,7 @@ void CBulletShader::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommand
 	for (int j = 0; j < m_nObjects; j++)
 	{
 		if (!m_ppObjects[j]->getDie()) {
-			m_pcbMappedGameObjects[j].m_xmcColor = XMFLOAT4(0.0f, 0.0f, 0.9f, 0.0f);
+			m_pcbMappedGameObjects[j].m_xmcColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
 			XMStoreFloat4x4(&m_pcbMappedGameObjects[j].m_xmf4x4Transform,
 				XMMatrixTranspose(XMLoadFloat4x4(&m_ppObjects[j]->getMatrix())));
 		}

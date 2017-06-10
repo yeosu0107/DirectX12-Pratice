@@ -9,6 +9,7 @@ class CPaticlesShader : public CInstancingShader
 private:
 	bool run = false;
 	float scale = 1.0f;
+
 	//float runtime = 0.0f;
 	//float maxtime = 50.0f;
 public:
@@ -24,7 +25,7 @@ public:
 	virtual void AnimateObjects(float fTime);
 	void setPosition(XMFLOAT3 pos);
 
-	void setRun();
+	void setRun(XMFLOAT4& color);
 	bool getRun() const { return run; }
 };
 

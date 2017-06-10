@@ -86,7 +86,7 @@ CCube::CCube(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandLis
 	
 
 	float fx = width*0.5f, fy = height*0.5f, fz = depth*0.5f;
-
+	
 	CDiffusedVertex pVertices[8];
 	pVertices[0] = CDiffusedVertex(XMFLOAT3(-fx, +fy, -fz), RANDOM_COLOR);
 	pVertices[1] = CDiffusedVertex(XMFLOAT3(+fx, +fy, -fz), RANDOM_COLOR);
@@ -323,8 +323,8 @@ CMap::CMap(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandLis
 
 	float fx = width*0.5f, fy = height*0.5f, fz = depth;
 
-	XMFLOAT4 frontColor = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
-	XMFLOAT4 endColor = XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f);
+	XMFLOAT4 frontColor = XMFLOAT4(0.0f, 0.0f, 1.0f, 0.0f);
+	XMFLOAT4 endColor = XMFLOAT4(0.0f, 0.9f, 0.9f, 0.0f);
 
 	CDiffusedVertex pVertices[8];
 	pVertices[0] = CDiffusedVertex(XMFLOAT3(-fx, +fy, 0), frontColor);
