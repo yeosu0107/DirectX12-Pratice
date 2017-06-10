@@ -51,6 +51,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	m_ppShaders[1] = EnemyShader;
 
+
 	//ÃÑ¾Ë °´Ã¼ ¼ÎÀÌ´õ »ý¼º
 	CBulletShader* bulletShader = new CBulletShader();
 	bulletShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
@@ -73,6 +74,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 		m_PaticleShaders[i] = paticleShader;
 	}
+	
 	
 }
 

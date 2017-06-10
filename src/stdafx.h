@@ -47,8 +47,11 @@
 #include <DirectXPackedVector.h>
 #include <DirectXColors.h>
 #include <DirectXCollision.h>
+#include <d3d12.h>
 
 #include <random>
+#include <iostream>
+#include <memory>
 
 
 
@@ -59,6 +62,7 @@ using Microsoft::WRL::ComPtr;
 #pragma comment(lib, "d3dcompiler.lib") 
 #pragma comment(lib, "d3d12.lib") 
 #pragma comment(lib, "dxgi.lib")
+
 
 #define FRANDDOM		(rand() / float(RAND_MAX))
 #define RANDOM_COLOR	XMFLOAT4(FRANDDOM, FRANDDOM, FRANDDOM, FRANDDOM)

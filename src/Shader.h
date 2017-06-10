@@ -70,6 +70,7 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 
 	virtual void updatePlayerPos(XMFLOAT3&) {}
+	virtual void updatePlayerRot(XMFLOAT3&, float&) {}
 	CGameObject** GetObjects() { return m_ppObjects; }
 	int	getObjectsNum() const { return m_nObjects; }
 };

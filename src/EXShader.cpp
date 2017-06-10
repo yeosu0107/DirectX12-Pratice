@@ -137,7 +137,7 @@ void CBulletShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 
 void CBulletShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)
 {
-	ObjectShader::Render(pd3dCommandList, pCamera);
+	CShader::Render(pd3dCommandList, pCamera);
 
 	//모든 게임 객체의 인스턴싱 데이터를 버퍼에 저장한다.
 	UpdateShaderVariables(pd3dCommandList);

@@ -375,7 +375,7 @@ void CMapShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLis
 		map = new CWallObject();
 		map->SetObject(width, height, depth);
 		map->SetMesh(pMesh);
-		map->SetPosition(0.0f, 0.0f, (depth * i));
+		map->SetPosition(0.0f, 0.0f, (depth * (i-1)));
 		m_ppObjects[index++] = map;
 	}
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -388,7 +388,7 @@ void CMapShader::AnimateObjects(float fTimeElapsed) {
 	for (int j = 0; j < m_nObjects; j++)
 	{
 		XMFLOAT3 tmp = m_ppObjects[j]->GetPosition();
-		if (playerPos.z  > tmp.z + depth) {
+		if (playerPos.z  > tmp.z + depth * 2) {
 			m_ppObjects[j]->MoveForward(forwardScale);
 		}
 		m_ppObjects[j]->Animate(fTimeElapsed);
@@ -584,7 +584,7 @@ void CInstancingShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCame
 void CInstancingShader::AnimateObjects(float fTimeElapsed)
 {
 	for (int j = 0; j < m_nObjects; j++) {
-		if (m_ppObjects[j]->GetPosition().y+50.0f < playerPos.y)
+		if (m_ppObjects[j]->GetPosition().z+100.0f < playerPos.z)
 			m_ppObjects[j]->Reset(playerPos);
 
 		m_ppObjects[j]->Animate(fTimeElapsed);

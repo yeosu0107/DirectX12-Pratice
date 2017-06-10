@@ -158,6 +158,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+
 	switch (message)
 	{
         case WM_SIZE:
@@ -168,6 +169,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_MOUSEMOVE:
         case WM_KEYDOWN:
 		case WM_KEYUP:
+			
 			gGameFramework.OnProcessingWindowMessage(hWnd, message, wParam, lParam);
 			break;
 		case WM_DESTROY:

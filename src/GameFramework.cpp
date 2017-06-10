@@ -65,6 +65,7 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 
 	m_hFenceEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 	//오브젝트 제어
+
 	BuildObjects();
 	
 	return(true);
@@ -273,7 +274,6 @@ void CGameFramework::OnResizeBackBuffers() {
 void CGameFramework::BuildObjects()
 {
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
-
 	m_pScene = new CScene();
 	if(m_pScene)
 		m_pScene->BuildObjects(pd3Device.Get(), m_pd3dCommandList);
@@ -287,6 +287,7 @@ void CGameFramework::BuildObjects()
 	m_pCamera = m_pPlayer->ChangeCamera((DWORD)(0x03),
 		m_GameTimer.GetTimeElapsed());
 
+	m_ui = new UI();
 	
 
 	//씬 객체를 생성하기 위하여 필요한 그래픽 명령 리스트들을 명령 큐에 추가한다. 
@@ -312,6 +313,10 @@ void CGameFramework::ReleaseObjects()
 		m_pScene->ReleaseObjects();
 		delete m_pScene;
 	}
+	if (m_ui)
+		delete m_ui;
+
+	m_ui = nullptr;
 }
 
 void CGameFramework::OnDestroy()
@@ -360,25 +365,26 @@ void CGameFramework::ProcessInput()
 	float cxDelta = 0.0f, cyDelta = 0.0f;
 	POINT ptCursorPos;
 	
-	if (::GetCapture() == m_hWnd)
+	if (::GetCapture() == m_hWnd && !m_pPlayer->getDie())
 	{
 		::SetCursor(NULL);
 		::GetCursorPos(&ptCursorPos);
 		cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 3.0f;
 		cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 3.0f;
 		::SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
+
 		m_pScene->playerUpdate(m_pPlayer->GetPosition(), m_pPlayer->GetUp());
 	}
-	
+	/*if (pKeyBuffer[VK_LBUTTON] & 0xF0) {
+		m_pScene->playerUpdate(m_pPlayer->GetPosition(), m_pPlayer->GetUp());
+	}*/
 	if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
 	{
 		if (cxDelta || cyDelta) {
 			if (pKeyBuffer[VK_RBUTTON] & 0xF0)
 				m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
-			else {
+			else
 				m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
-				
-			}
 		}
 
 		if (dwDirection && !m_pPlayer->getDie()) {
@@ -397,16 +403,29 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 	case WM_RBUTTONDOWN:
 		::SetCapture(hWnd);
 		::GetCursorPos(&m_ptOldCursorPos);
-
 		break;
 	case WM_LBUTTONUP:
 	case WM_RBUTTONUP:
 		::ReleaseCapture();
-
 		break;
 	case WM_MOUSEMOVE:
+		/*mouseEvent.cbSize = sizeof(TRACKMOUSEEVENT);
+		mouseEvent.dwFlags = TME_LEAVE;
+		mouseEvent.hwndTrack = hWnd;
+		mouseEvent.dwHoverTime = 10;
+		TrackMouseEvent(&mouseEvent);*/
+		//::SetCapture(hWnd);
+		//::GetCursorPos(&m_ptOldCursorPos);
+		//::ReleaseCapture();
 		break;
-	default: break;
+	case WM_MOUSEHOVER:
+		//::SetCapture(hWnd);
+		//::GetCursorPos(&m_ptOldCursorPos);
+		break;
+	case WM_MOUSELEAVE:
+		break;
+	default: 
+		break;
 	}
 }
 
@@ -561,6 +580,12 @@ void CGameFramework::FrameAdvance()
 #endif
 	if (playerShader) 
 		playerShader->Render(m_pd3dCommandList, m_pCamera);
+
+	//std::wstring output = std::wstring(L"Hello");
+	//ID3D12DescriptorHeap* heaps[] = { resource->Heap() };
+	//m_commandList->SetDescriptorHeaps(_countof(heaps), heaps);
+
+
 	////////////////////////////////////////////////
 
 	//랜더타겟에 대한 랜더링 끝나기를 대기
@@ -578,10 +603,16 @@ void CGameFramework::FrameAdvance()
 
 	WaitForGpuComplete(); //GPU가 모든 명령 리스트를 실행할 때 까지 기다린다.
 
+	//m_ui->DrawUI(m_hDCFrameBuffer, gameStatus::Gameloop, 0, 0, 0);
+	//PresentFrameBuffer();
 	//스왑체인 프레젠트
 	pdxgiSwapChain->Present(0, 0);
 
+	
+
 	MoveToNextFrame();
+
+	
 	
 	//프레임레이트 표현
 	_itow_s(m_GameTimer.GetFrameRate(), (m_pszFrameRate + 12), 37, 10);    
@@ -613,4 +644,42 @@ void CGameFramework::MoveToNextFrame() {
 		::WaitForSingleObject(m_hFenceEvent, INFINITE); 
 	}
 
+}
+
+
+UI::UI() {
+	wsprintf(m_gameover, L"Game Over");
+	wsprintf(m_restart, L"Press BackSpace to Restart");
+	wsprintf(m_start, L"Press Enter to Start");
+}
+
+UI::~UI() {
+
+}
+
+//RECT winRect = { 0,0,CLIENT_WIDTH, CLIENT_HEIGHT };
+
+void UI::DrawUI(HDC hdc, int status, int score, int boost, int bullet) {
+	switch (status) {
+	case gameStatus::main:
+		SetBkColor(hdc, RGB(255, 255, 0));
+		TextOut(hdc, FRAME_BUFFER_WIDTH / 2 - 60, FRAME_BUFFER_HEIGHT / 2 - 20, m_start, lstrlen(m_start));
+		break;
+	case gameStatus::Gameloop:
+		wsprintf(m_boostGauag, L"BoostGauge : %d", boost);
+		wsprintf(m_score, L"Score : %d", score);
+		//wsprintf(m_speed, L"now Speed : %d", (int)speed);
+		wsprintf(m_bulletspeed, L"Bullet Speed : %d", 11 - bullet);
+		TextOut(hdc, 10, 10, m_score, lstrlen(m_score));
+		TextOut(hdc, 10, 30, m_boostGauag, lstrlen(m_boostGauag));
+		//TextOut(hdc, 10, 50, m_speed, lstrlen(m_speed));
+		TextOut(hdc, 10, 50, m_bulletspeed, lstrlen(m_bulletspeed));
+		break;
+	case gameStatus::die:
+		wsprintf(m_score, L"Your Score : %d", score);
+		TextOut(hdc, FRAME_BUFFER_WIDTH / 2 - 30, FRAME_BUFFER_HEIGHT / 2 - 40, m_gameover, lstrlen(m_gameover));
+		TextOut(hdc, FRAME_BUFFER_WIDTH / 2 - 35, FRAME_BUFFER_HEIGHT / 2 - 20, m_score, lstrlen(m_score));
+		TextOut(hdc, FRAME_BUFFER_WIDTH / 2 - 80, FRAME_BUFFER_HEIGHT / 2, m_restart, lstrlen(m_restart));
+		break;
+	}
 }

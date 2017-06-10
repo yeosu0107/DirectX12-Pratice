@@ -13,11 +13,13 @@ protected:
 	CShader **m_ppShaders = NULL;
 	int m_nShaders = 0;
 
-	CBulletShader *m_BulletShader = NULL;
+	CBulletShader* m_BulletShader = NULL;
 
 	CPaticlesShader** m_PaticleShaders = NULL;
 	int m_nPaticleShaders = 0;
 	int nowPaticle = 1;
+
+	
 
 
 	CWallObject **m_pWall = NULL;
