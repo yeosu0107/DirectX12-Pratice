@@ -3,25 +3,40 @@
 #include "Shader.h"
 
 
-CGameObject::CGameObject()
+CGameObject::CGameObject(int nMeshes)
 {
-	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixIdentity());
+	m_xmf4x4World = Matrix4x4::Identity();
+	m_nMeshes = nMeshes;
+	m_ppMeshes = NULL;
+
+	if (m_nMeshes > 0)
+	{
+		m_ppMeshes = new CMesh*[m_nMeshes];
+		for (int i = 0; i < m_nMeshes; i++) m_ppMeshes[i] = NULL;
+	}
 }
 
 
 CGameObject::~CGameObject()
 {
-	if (m_pMesh) m_pMesh->Release(); 
+	if (m_ppMeshes)
+	{
+		for (int i = 0; i < m_nMeshes; i++)
+		{
+			if (m_ppMeshes[i]) m_ppMeshes[i]->Release();
+			m_ppMeshes[i] = NULL;
+		}
+		delete[] m_ppMeshes;
+	}
+	//if (m_pShader)
+	//{
+	//	m_pShader->ReleaseShaderVariables();
+	//	m_pShader->Release();
+	//}
 }
 
 void CGameObject::SetShader(CShader *pShader) { 
-	//if (m_pShader) 
-	//	m_pShader->Release(); 
 
-	//m_pShader = pShader; 
-
-	//if (m_pShader) 
-	//	m_pShader->AddRef(); 
 }
 
 void CGameObject::SetObject(float w, float h, float d)
@@ -33,22 +48,31 @@ void CGameObject::SetObject(float w, float h, float d)
 	SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(width, height, depth), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
-void CGameObject::SetMesh(CMesh *pMesh) { 
-	if (m_pMesh) 
-		m_pMesh->Release();
+void CGameObject::SetMesh(int nIndex, CMesh *pMesh) { 
+	if (m_ppMeshes)
+	{
+		if (m_ppMeshes[nIndex]) 
+			m_ppMeshes[nIndex]->Release();
 
-	m_pMesh = pMesh; 
+		m_ppMeshes[nIndex] = pMesh;
 
-	if (m_pMesh) 
-		m_pMesh->AddRef(); 
+		if (pMesh) 
+			pMesh->AddRef();
+	}
 }
 
 
 
 void CGameObject::ReleaseUploadBuffers() {
 	//정점 버퍼를 위한 업로드 버퍼를 소멸시킨다. 
-	if (m_pMesh) 
-		m_pMesh->ReleaseUploadBuffers(); 
+	if (m_ppMeshes)
+	{
+		for (int i = 0; i < m_nMeshes; i++)
+		{
+			if (m_ppMeshes[i]) 
+				m_ppMeshes[i]->ReleaseUploadBuffers();
+		}
+	}
 }
 
 void CGameObject::Animate(float fTimeElapsed) { 
@@ -66,8 +90,13 @@ void CGameObject::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pC
 	
 	UpdateShaderVariables(pd3dCommandList);
 	//게임 객체에 메쉬가 연결되어 있으면 메쉬를 렌더링한다. 
-	if (m_pMesh) {
-		m_pMesh->Render(pd3dCommandList);
+	if (m_ppMeshes)
+	{
+		for (int i = 0; i < m_nMeshes; i++)
+		{
+			if (m_ppMeshes[i])
+				m_ppMeshes[i]->Render(pd3dCommandList);
+		}
 	}
 }
 
@@ -75,7 +104,14 @@ void CGameObject::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pC
 	UINT nInstances, D3D12_VERTEX_BUFFER_VIEW d3dInstancingBufferView)
 {
 	OnPrepareRender();
-	if (m_pMesh) m_pMesh->Render(pd3dCommandList, nInstances, d3dInstancingBufferView);
+	if (m_ppMeshes)
+	{
+		for (int i = 0; i < m_nMeshes; i++)
+		{
+			if (m_ppMeshes[i])
+				m_ppMeshes[i]->Render(pd3dCommandList, nInstances, d3dInstancingBufferView);
+		}
+	}
 }
 
 void CGameObject::CreateShaderVariables(ID3D12Device *pd3dDevice,
@@ -196,7 +232,7 @@ void CGameObject::setScale(float num)
 	m_xmf4x4World._33 = num;
 }
 
-CRotatingObject::CRotatingObject() {
+CRotatingObject::CRotatingObject(int nMeshes) {
 	//m_xmf3RotationAxis = XMFLOAT3(1.0f, 5.0f, -5.0f);
 	//m_fRotationSpeed = 90.0f;
 }
@@ -253,20 +289,56 @@ void CRotatingObject::setType(int type)
 	setMovingDir(XMFLOAT3(xDir, yDir, zDir));
 }
 
-CWallObject::CWallObject()
+
+CHeightMapTerrain::CHeightMapTerrain(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
+	*pd3dCommandList, LPCTSTR pFileName, int nWidth, int nLength, 
+	int nBlockWidth, int nBlockLength, XMFLOAT3 xmf3Scale, 
+	XMFLOAT4 xmf4Color) : CGameObject(0)
 {
+	m_nWidth = nWidth;
+	m_nLength = nLength;
+	/*지형 객체는 격자 메쉬들의 배열로 만들 것이다. 
+	nBlockWidth, nBlockLength는 격자 메쉬 하나의 가로, 세로 크기이다. 
+	cxQuadsPerBlock, czQuadsPerBlock은 격자 메쉬의 가로 방향과 세로 방향 사각형의 개수이다.*/
+	int cxQuadsPerBlock = nBlockWidth - 1;
+	int czQuadsPerBlock = nBlockLength - 1;
+	m_xmf3Scale = xmf3Scale;
+
+	//지형에 사용할 높이 맵을 생성한다. 
+	m_pHeightMapImage = new CHeightMapImage(pFileName, nWidth, nLength, xmf3Scale);
+	//지형에서 가로 방향, 세로 방향으로 격자 메쉬가 몇 개가 있는 가를 나타낸다. 
+	long cxBlocks = (m_nWidth - 1) / cxQuadsPerBlock;
+	long czBlocks = (m_nLength - 1) / czQuadsPerBlock;
+	//지형 전체를 표현하기 위한 격자 메쉬의 개수이다. 
+	m_nMeshes = cxBlocks * czBlocks;
+	//지형 전체를 표현하기 위한 격자 메쉬에 대한 포인터 배열을 생성한다.
+
+	m_ppMeshes = new CMesh*[m_nMeshes];
+	for (int i = 0; i < m_nMeshes; i++)m_ppMeshes[i] = NULL;
+	CHeightMapGridMesh *pHeightMapGridMesh = NULL;
+	for (int z = 0, zStart = 0; z < czBlocks; z++)
+	{
+		for (int x = 0, xStart = 0; x < cxBlocks; x++)
+		{
+			//지형의 일부분을 나타내는 격자 메쉬의 시작 위치(좌표)이다.
+			xStart = x * (nBlockWidth - 1);
+			zStart = z * (nBlockLength - 1);
+			//지형의 일부분을 나타내는 격자 메쉬를 생성하여 지형 메쉬에 저장한다.
+			pHeightMapGridMesh = new CHeightMapGridMesh(pd3dDevice, pd3dCommandList, 
+				xStart, zStart, nBlockWidth, nBlockLength, xmf3Scale, xmf4Color, m_pHeightMapImage);
+			SetMesh(x + (z*cxBlocks), pHeightMapGridMesh);
+		}
+	}
+	//지형을 렌더링하기 위한 셰이더를 생성한다. 
+	//CTerrainShader *pShader = new CTerrainShader();
+	//pShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+	//SetShader(pShader);
+}
+CHeightMapTerrain::~CHeightMapTerrain(void)
+{
+	if (m_pHeightMapImage) delete m_pHeightMapImage;
 }
 
-CWallObject::~CWallObject()
-{
-}
-
-
-
-void CWallObject::Animate(float fTimeElapsed)
-{
-	CGameObject::Animate(fTimeElapsed);
-}
 
 void Paticle::setPaticle(XMFLOAT3 tdir, XMFLOAT3 taxis, float mov, float rot)
 {

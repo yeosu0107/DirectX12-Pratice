@@ -18,28 +18,21 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	//±×·¡ÇÈ ·çÆ® ½Ã±×³ÊÃÄ¸¦ »ý¼ºÇÑ´Ù. 
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
+	
 
 	//¼ÎÀÌ´õ »ý¼º
 	m_nShaders = 2;
 	m_ppShaders = new CShader*[m_nShaders];
 
 	//¸Ê ¼ÎÀÌ´õ
-	CMapShader* mapShader = new CMapShader();
+	CTerrainShader* mapShader = new CTerrainShader();
 	mapShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	mapShader->BuildObjects(pd3dDevice, pd3dCommandList);
 	
+	m_pTerrain = (CHeightMapTerrain*)mapShader->GetObjects()[0];
+
 	m_ppShaders[0] = mapShader;
 
-	m_nWall = mapShader->getObjectsNum();
-	m_pWall = (CWallObject**)mapShader->GetObjects();
-	
-	float width = m_pWall[0]->getWidth();
-	float height = m_pWall[0]->getHeight();
-
-	m_wallPlanes[0] = XMFLOAT4(+1.0f, 0.0f, 0.0f, width);
-	m_wallPlanes[1] = XMFLOAT4(-1.0f, 0.0f, 0.0f, width);
-	m_wallPlanes[2] = XMFLOAT4(0.0f, +1.0f, 0.0f, height);
-	m_wallPlanes[3] = XMFLOAT4(0.0f, -1.0f, 0.0f, height);
 
 	//Àû ¼ÎÀÌ´õ
 	CInstancingShader* EnemyShader = new CInstancingShader();
@@ -82,6 +75,7 @@ void CScene::ReleaseObjects()
 {
 	if (m_pd3dGraphicsRootSignature) 
 		m_pd3dGraphicsRootSignature->Release();
+
 	if (m_ppShaders){
 		for (int i = 0; i < m_nShaders; i++) { 
 			m_ppShaders[i]->ReleaseShaderVariables(); 
@@ -121,104 +115,6 @@ void CScene::AnimateObjects(float fTimeElapsed, XMFLOAT3 player)
 
 bool CScene::CrashObjects(BoundingOrientedBox& player, bool playerDeath)
 {
-		
-	for (int i = 0; i < m_nEnemy; ++i) {
-		//Àû °´Ã¼ - º®
-		int nindex = -1;
-		for (int index = 0; index < m_nWall; ++index) {
-			ContainmentType containType = m_pWall[index]->getOOBB()->Contains(*m_pEnemy[i]->getOOBB());
-			switch (containType) {
-			case CONTAINS:
-				break;
-			case DISJOINT:
-				break;
-			case INTERSECTING: {
-				int nPlaneIndex = -1;
-				nindex = index;
-				for (int j = 0; j < 4; j++)
-				{
-					PlaneIntersectionType intersectType = m_pEnemy[i]->getOOBB()->Intersects(XMLoadFloat4(&m_wallPlanes[j]));
-					if (intersectType == INTERSECTING)
-					{
-						nPlaneIndex = j;
-						break;
-					}
-				}
-				if (nPlaneIndex != -1)
-				{
-					XMVECTOR xmvNormal = XMVectorSet(m_wallPlanes[nPlaneIndex].x, m_wallPlanes[nPlaneIndex].y, m_wallPlanes[nPlaneIndex].z, 0.0f);
-					XMVECTOR xmvReflect = XMVector3Reflect(XMLoadFloat3(&m_pEnemy[i]->getMovingDir()), xmvNormal);
-					XMStoreFloat3(&m_pEnemy[i]->getMovingDir(), xmvReflect);
-				}
-			}
-			break;
-			}
-			if (nindex != -1)
-				break;
-		}
-
-		for (int bi = 0; bi < m_nBullet; ++bi) {
-			if (m_pBullet[bi]->getDie())
-				continue;
-			if (m_pEnemy[i]->getOOBB()->Intersects(*m_pBullet[bi]->getOOBB())) {
-				m_PaticleShaders[nowPaticle]->setPosition(m_pEnemy[i]->GetPosition());
-				m_PaticleShaders[nowPaticle]->setRun(m_pEnemy[i]->getColor());
-				m_pEnemy[i]->Reset(player.Center);
-				//m_pBullet[bi]->setDie(true);
-				
-				nowPaticle += 1;
-				if (nowPaticle > m_nPaticleShaders-1)
-					nowPaticle = 1;
-			}
-		}
-
-		//Àû °´Ã¼ - Àû °´Ã¼
-		for (int j = (i + 1); j < m_nEnemy; ++j) {
-			if (m_pEnemy[i]->getOOBB()->Intersects(*m_pEnemy[j]->getOOBB())) {
-				XMFLOAT3 tDir = m_pEnemy[i]->getMovingDir();
-				m_pEnemy[i]->setMovingDir(m_pEnemy[j]->getMovingDir());
-				m_pEnemy[j]->setMovingDir(tDir);
-			}
-		}
-	}
-	if (playerDeath)
-		return true;
-
-	//ÇÃ·¹ÀÌ¾î - Àû °´Ã¼
-	for (int index = 0; index < m_nEnemy; ++index) {
-		ContainmentType containType = m_pEnemy[index]->getOOBB()->Contains(player);
-		switch (containType) {
-		case CONTAINS:
-			break;
-		case DISJOINT:
-			break;
-		case INTERSECTING:
-			m_PaticleShaders[0]->setPosition(player.Center);
-			m_PaticleShaders[0]->setRun(XMFLOAT4(1.0f, 0.0f, 0.0f, 0.0f));
-			return true;
-		}
-	}
-	for (int index = 0; index < m_nWall; ++index) {
-		//ÇÃ·¹ÀÌ¾î - º®
-		ContainmentType containType = m_pWall[index]->getOOBB()->Contains(player);
-		switch (containType) {
-		case CONTAINS:
-			break;
-		case DISJOINT:
-			break;
-		case INTERSECTING:
-			for (int i = 0; i < 4; ++i) {
-				PlaneIntersectionType intersectType = player.Intersects(XMLoadFloat4(&m_wallPlanes[i]));
-				if (intersectType == BACK || intersectType == INTERSECTING) {
-					m_PaticleShaders[0]->setPosition(player.Center);
-					m_PaticleShaders[0]->setRun(XMFLOAT4(1.0f, 0.0f, 0.0f, 0.0f));
-					return true;
-				}
-			}
-			
-			break;
-		}
-	}
 	return false;
 }
 

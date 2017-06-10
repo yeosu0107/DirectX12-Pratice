@@ -88,7 +88,7 @@ public:
 		ID3D12RootSignature *pd3dGraphicsRootSignature);
 
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
-		*pd3dCommandList);
+		*pd3dCommandList, void *pContext);
 	virtual void AnimateObjects(float fTimeElapsed);
 	virtual void ReleaseObjects();
 	
@@ -117,31 +117,25 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 };
 
-class CMapShader : public CShader
+class CTerrainShader : public CShader
 {
 private:
-	float width=mapWidth;
-	float height=mapHeight;
-	float depth=mapDepth;
-
-	XMFLOAT3 playerPos;
+	//CHeightMapTerrain *m_pTerrain = NULL;
 public:
-	CMapShader();
-	virtual ~CMapShader();
-
-	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
-		*pd3dCommandList);
-	virtual void  AnimateObjects(float fTimeElapsed);
-	virtual void ReleaseObjects();
+	CTerrainShader();
+	virtual ~CTerrainShader();
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob **ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob **ppd3dShaderBlob);
 	virtual void CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature
 		*pd3dGraphicsRootSignature);
+
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
+		*pd3dCommandList);
 	virtual void ReleaseUploadBuffers();
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 
-	void updatePlayerPos(XMFLOAT3& player) { playerPos = player; }
+
 };
 
 class CInstancingShader : public ObjectShader

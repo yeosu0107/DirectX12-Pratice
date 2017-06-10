@@ -44,7 +44,7 @@ void CPaticlesShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComm
 	}
 
 	CCube* paticleMesh = new CCube(pd3dDevice, pd3dCommandList, 2.5f, 2.5f, 2.5f);
-	m_ppObjects[0]->SetMesh(paticleMesh);
+	m_ppObjects[0]->SetMesh(0, paticleMesh);
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
@@ -132,7 +132,7 @@ void CBulletShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 	}
 
 	CCube* bulletMesh = new CCube(pd3dDevice, pd3dCommandList, 2.5f, 2.5f, 2.5f);
-	m_ppObjects[0]->SetMesh(bulletMesh);
+	m_ppObjects[0]->SetMesh(0, bulletMesh);
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }

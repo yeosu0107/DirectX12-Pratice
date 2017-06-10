@@ -6,7 +6,7 @@
 class CScene
 {
 private:
-	XMFLOAT4 m_wallPlanes[4];
+
 protected: 
 	//씬은 셰이더들의 집합이다. 셰이더들은 게임 객체들의 집합이다.
 	//랜더를 위해 사용
@@ -19,20 +19,17 @@ protected:
 	int m_nPaticleShaders = 0;
 	int nowPaticle = 1;
 
-	
-
-
-	CWallObject **m_pWall = NULL;
-	int m_nWall = 0;
-
 	CGameObject **m_pEnemy = NULL;
 	int m_nEnemy = 0;
 
 	CGameObject **m_pBullet = NULL;
 	int m_nBullet = 0;
 
+	CHeightMapTerrain* m_pTerrain = NULL;
+
 	ID3D12RootSignature *m_pd3dGraphicsRootSignature = NULL;
 
+	
 
 public:
 	CScene();
@@ -57,6 +54,7 @@ public:
 	ID3D12RootSignature *CreateGraphicsRootSignature(ID3D12Device *pd3dDevice); 
 	ID3D12RootSignature *GetGraphicsRootSignature();
 
+	CHeightMapTerrain *GetTerrain() { return(m_pTerrain); }
 	//파이프라인 상태를 나타내는 인터페이스 포인터 
 	//ID3D12PipelineState *m_pd3dPipelineState; 
 };

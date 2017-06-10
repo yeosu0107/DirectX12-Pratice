@@ -263,12 +263,12 @@ void CPlayerShader::CreateShader(ID3D12Device *pd3dDevice,
 }
 
 void CPlayerShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
-	*pd3dCommandList)
+	*pd3dCommandList, void *pContext)
 {
 	m_nObjects = 1;
 	m_ppObjects = new CGameObject*[m_nObjects];
 	
-	CAirplanePlayer* player = new CAirplanePlayer(pd3dDevice, pd3dCommandList);
+	CTerrainPlayer* player = new CTerrainPlayer(pd3dDevice, pd3dCommandList, pContext, 1);
 
 	m_ppObjects[0] = player;
 }
@@ -357,88 +357,88 @@ void ObjectShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *p
 	}
 }
 
-CMapShader::CMapShader() {}
-CMapShader::~CMapShader() {}
-
-void CMapShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
-	*pd3dCommandList) {
-	CMap *pMesh = new CMap(pd3dDevice, pd3dCommandList, width, height, depth);
-	
-	m_nObjects = 7;
-	m_ppObjects = new CGameObject*[m_nObjects];
-
-	float size = 100.0f;
-
-	CWallObject *map = NULL;
-	int index = 0;
-	for (int i = 0; i < m_nObjects; ++i) {
-		map = new CWallObject();
-		map->SetObject(width, height, depth);
-		map->SetMesh(pMesh);
-		map->SetPosition(0.0f, 0.0f, (depth * (i-1)));
-		m_ppObjects[index++] = map;
-	}
-	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-
-	playerPos = XMFLOAT3(0.0f, 0.0f, 0.0f);
+CTerrainShader::CTerrainShader()
+{
 }
-void CMapShader::AnimateObjects(float fTimeElapsed) {
-	float forwardScale = depth * m_nObjects;
-
-	for (int j = 0; j < m_nObjects; j++)
-	{
-		XMFLOAT3 tmp = m_ppObjects[j]->GetPosition();
-		if (playerPos.z  > tmp.z + depth * 2) {
-			m_ppObjects[j]->MoveForward(forwardScale);
-		}
-		m_ppObjects[j]->Animate(fTimeElapsed);
-	}
-
-}
-void CMapShader::ReleaseObjects() {
-	CShader::ReleaseObjects();
+CTerrainShader::~CTerrainShader()
+{
 }
 
-D3D12_INPUT_LAYOUT_DESC CMapShader::CreateInputLayout() {
+D3D12_INPUT_LAYOUT_DESC CTerrainShader::CreateInputLayout()
+{
 	UINT nInputElementDescs = 2;
-	D3D12_INPUT_ELEMENT_DESC *pd3dInputElementDescs = new
-		D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
-
+	D3D12_INPUT_ELEMENT_DESC *pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
+	
 	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
 		D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-
 	pd3dInputElementDescs[1] = { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12,
 		D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-
+	
 	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
 	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
 	d3dInputLayoutDesc.NumElements = nInputElementDescs;
 	return(d3dInputLayoutDesc);
 }
-D3D12_SHADER_BYTECODE CMapShader::CreateVertexShader(ID3DBlob **ppd3dShaderBlob) {
+
+D3D12_SHADER_BYTECODE CTerrainShader::CreateVertexShader(ID3DBlob **ppd3dShaderBlob)
+{
 	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VSDiffused", "vs_5_1",
 		ppd3dShaderBlob));
 }
-D3D12_SHADER_BYTECODE CMapShader::CreatePixelShader(ID3DBlob **ppd3dShaderBlob) {
+D3D12_SHADER_BYTECODE CTerrainShader::CreatePixelShader(ID3DBlob **ppd3dShaderBlob)
+{
 	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PSDiffused", "ps_5_1",
 		ppd3dShaderBlob));
 }
-void CMapShader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature
-	*pd3dGraphicsRootSignature) {
-
+void CTerrainShader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature
+	*pd3dGraphicsRootSignature)
+{
 	m_nPipelineStates = 1;
 	m_ppd3dPipelineStates = new ID3D12PipelineState*[m_nPipelineStates];
 	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
 }
 
-void CMapShader::ReleaseUploadBuffers() {
+void CTerrainShader::BuildObjects(ID3D12Device *pd3dDevice, 
+	ID3D12GraphicsCommandList *pd3dCommandList) {
+
+	m_nObjects = 1;
+	m_ppObjects = new CGameObject*[m_nObjects];
+
+	CHeightMapTerrain *m_pTerrain = NULL;
+
+	//지형을 확대할 스케일 벡터이다. x-축과 z-축은 8배, y-축은 2배 확대한다. 
+	XMFLOAT3 xmf3Scale(8.0f, 2.0f, 8.0f);
+	XMFLOAT4 xmf4Color(0.0f, 0.2f, 0.0f, 0.0f);
+
+	//지형을 높이 맵 이미지 파일(HeightMap.raw)을 사용하여 생성한다. 높이 맵의 크기는 가로x세로(257x257)이다. 
+#ifdef _WITH_TERRAIN_PARTITION
+	/*하나의 격자 메쉬의 크기는 가로x세로(17x17)이다. 지형 전체는 가로 방향으로 16개, 세로 방향으로 16의 격자 메
+	쉬를 가진다. 지형을 구성하는 격자 메쉬의 개수는 총 256(16x16)개가 된다.*/
+	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature,
+		_T("../Assets/Image/Terrain/HeightMap.raw"), 257, 257, 17, 17, xmf3Scale, xmf4Color);
+#else
+
+	//지형을 하나의 격자 메쉬(257x257)로 생성한다. 
+	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList,
+		_T("HeightMap.raw"), 257, 257, 257, 257, xmf3Scale, xmf4Color);
+#endif
+
+	m_ppObjects[0] = m_pTerrain;
+}
+
+void CTerrainShader::ReleaseUploadBuffers()
+{
 	CShader::ReleaseUploadBuffers();
 }
-void CMapShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera) {
-	CShader::Render(pd3dCommandList, pCamera);
-	for (int j = 0; j < m_nObjects; j++) {
-		if (m_ppObjects[j]) {
-			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
+
+void CTerrainShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * pCamera)
+{
+	if (m_ppObjects) {
+		CShader::Render(pd3dCommandList, pCamera);
+		for (int j = 0; j < m_nObjects; j++) {
+			if (m_ppObjects[j]) {
+				m_ppObjects[j]->Render(pd3dCommandList, pCamera);
+			}
 		}
 	}
 }
@@ -540,7 +540,7 @@ void CInstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCom
 
 void CInstancingShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {  
-	m_nObjects = 30;
+	m_nObjects = 1;
 	m_ppObjects = new CGameObject*[m_nObjects];
 
 	std::default_random_engine dre(1000);
@@ -563,7 +563,7 @@ void CInstancingShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 	}
 
 	CCube *pCubeMesh = new CCube(pd3dDevice, pd3dCommandList, 12.0f, 12.0f, 12.0f);
-	m_ppObjects[0]->SetMesh(pCubeMesh);
+	m_ppObjects[0]->SetMesh(0, pCubeMesh);
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }

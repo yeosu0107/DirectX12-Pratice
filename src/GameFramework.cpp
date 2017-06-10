@@ -280,7 +280,7 @@ void CGameFramework::BuildObjects()
 
 	playerShader = new CPlayerShader();
 	playerShader->CreateShader(pd3Device.Get(), m_pScene->GetGraphicsRootSignature());
-	playerShader->BuildObjects(pd3Device.Get(), m_pd3dCommandList);
+	playerShader->BuildObjects(pd3Device.Get(), m_pd3dCommandList, m_pScene->GetTerrain());
 
 	m_pPlayer = (CPlayer*)playerShader->GetObjects()[0];
 	m_pCamera = new CCamera(); 
@@ -355,7 +355,6 @@ void CGameFramework::ProcessInput()
 		if (pKeyBuffer[VK_D] & 0xF0) dwDirection |= DIR_RIGHT;
 		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeyBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
-		if (pKeyBuffer[VK_RETURN] & 0xF0) BuildObjects();
 	}
 	float cxDelta = 0.0f, cyDelta = 0.0f;
 	POINT ptCursorPos;
@@ -368,11 +367,7 @@ void CGameFramework::ProcessInput()
 		cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 3.0f;
 		::SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
 
-		m_pScene->playerUpdate(m_pPlayer->GetPosition(), m_pPlayer->GetUp());
 	}
-	/*if (pKeyBuffer[VK_LBUTTON] & 0xF0) {
-		m_pScene->playerUpdate(m_pPlayer->GetPosition(), m_pPlayer->GetUp());
-	}*/
 	if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
 	{
 		if (cxDelta || cyDelta) {
@@ -438,8 +433,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 		case VK_F1:
 		case VK_F2:
 		case VK_F3:
-			m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1),
-				m_GameTimer.GetTimeElapsed());
+			m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
 			break;
 		case VK_F8:
 			break;
