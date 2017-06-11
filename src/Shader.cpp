@@ -369,10 +369,10 @@ void CMapShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLis
 
 	float size = 100.0f;
 
-	CWallObject *map = NULL;
+	CGameObject *map = NULL;
 	int index = 0;
 	for (int i = 0; i < m_nObjects; ++i) {
-		map = new CWallObject();
+		map = new CGameObject();
 		map->SetObject(width, height, depth);
 		map->SetMesh(pMesh);
 		map->SetPosition(0.0f, 0.0f, (depth * (i-1)));
@@ -569,12 +569,12 @@ void CInstancingShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 }
 void CInstancingShader::ReleaseObjects()
 {
-	ObjectShader::ReleaseObjects();
+	CShader::ReleaseObjects();
 }
 void CInstancingShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera
 	*pCamera)
 {
-	ObjectShader::Render(pd3dCommandList, pCamera);
+	CShader::Render(pd3dCommandList, pCamera);
 
 	//모든 게임 객체의 인스턴싱 데이터를 버퍼에 저장한다.
 	UpdateShaderVariables(pd3dCommandList);

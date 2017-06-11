@@ -31,7 +31,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_ppShaders[0] = mapShader;
 
 	m_nWall = mapShader->getObjectsNum();
-	m_pWall = (CWallObject**)mapShader->GetObjects();
+	m_pWall = mapShader->GetObjects();
 	
 	float width = m_pWall[0]->getWidth();
 	float height = m_pWall[0]->getHeight();

@@ -107,9 +107,6 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera = NULL);
 	virtual void Animate(float fTime);
 
-	/*void setPaticle(CPaticlesShader* object) {
-		paticle = object;
-	}*/
 	void Die();
 	bool getDie() const { return die; }
 };

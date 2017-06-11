@@ -355,7 +355,10 @@ void CGameFramework::ProcessInput()
 		if (pKeyBuffer[VK_D] & 0xF0) dwDirection |= DIR_RIGHT;
 		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeyBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
-		if (pKeyBuffer[VK_RETURN] & 0xF0) BuildObjects();
+		if (pKeyBuffer[VK_RETURN] & 0xF0) {
+			if(m_pPlayer->getDie())
+				BuildObjects();
+		}
 	}
 	float cxDelta = 0.0f, cyDelta = 0.0f;
 	POINT ptCursorPos;
@@ -383,7 +386,7 @@ void CGameFramework::ProcessInput()
 		}
 
 		if (dwDirection && !m_pPlayer->getDie()) {
-			m_pPlayer->Move(dwDirection, 200.0f * m_GameTimer.GetTimeElapsed(), false);
+			m_pPlayer->Move(dwDirection, 200.0f * m_GameTimer.GetTimeElapsed(), true);
 			//m_pPlayer->Move(dwDirection, 5.0f, false);
 		}
 	}
@@ -438,8 +441,8 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 		case VK_F1:
 		case VK_F2:
 		case VK_F3:
-			m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1),
-				m_GameTimer.GetTimeElapsed());
+		/*	m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1),
+				m_GameTimer.GetTimeElapsed());*/
 			break;
 		case VK_F8:
 			break;

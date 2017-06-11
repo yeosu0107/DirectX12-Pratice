@@ -22,7 +22,7 @@ protected:
 	
 
 
-	CWallObject **m_pWall = NULL;
+	CGameObject **m_pWall = NULL;
 	int m_nWall = 0;
 
 	CGameObject **m_pEnemy = NULL;

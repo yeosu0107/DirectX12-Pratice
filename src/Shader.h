@@ -144,7 +144,7 @@ public:
 	void updatePlayerPos(XMFLOAT3& player) { playerPos = player; }
 };
 
-class CInstancingShader : public ObjectShader
+class CInstancingShader : public CShader
 {
 private:
 	XMFLOAT3 playerPos;

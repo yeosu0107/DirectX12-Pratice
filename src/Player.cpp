@@ -238,7 +238,6 @@ void CPlayer::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamer
 
 void CPlayer::Animate(float fTime) {
 	CGameObject::Animate(fTime);
-
 }
 
 void CPlayer::Die()
@@ -256,7 +255,7 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 	CMesh *pAirplaneMesh = new CAirplane(pd3dDevice, pd3dCommandList, width, height, depth, XMFLOAT4(0.0f, 0.5f, 0.0f, 0.0f));
 	SetMesh(pAirplaneMesh);
 
-	m_pCamera = ChangeCamera(SPACESHIP_CAMERA, 0.0f);
+	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 	
 	SetPosition(XMFLOAT3(0.0f, 0.0f, -50.0f));
 }

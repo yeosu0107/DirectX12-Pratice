@@ -155,13 +155,6 @@ void CGameObject::MoveForward(float fDistance)
 	CGameObject::SetPosition(xmf3Position);
 }
 
-void CGameObject::MoveVector(XMFLOAT3 dir, float fDistance)
-{
-	XMFLOAT3 xmf3Position = GetPosition();
-	xmf3Position = Vector3::Add(xmf3Position, dir, fDistance);
-	CGameObject::SetPosition(xmf3Position);
-}
-
 void CGameObject::Move(float fDist) {
 	XMFLOAT3 pos = GetPosition();
 	pos = Vector3::Add(pos, movingDir, fDist);
@@ -253,33 +246,17 @@ void CRotatingObject::setType(int type)
 	setMovingDir(XMFLOAT3(xDir, yDir, zDir));
 }
 
-CWallObject::CWallObject()
+
+void Paticle::setPaticle(XMFLOAT3 tdir,float mov)
 {
-}
-
-CWallObject::~CWallObject()
-{
-}
-
-
-
-void CWallObject::Animate(float fTimeElapsed)
-{
-	CGameObject::Animate(fTimeElapsed);
-}
-
-void Paticle::setPaticle(XMFLOAT3 tdir, XMFLOAT3 taxis, float mov, float rot)
-{
-	dir = tdir;
-	axis = taxis;
+	setMovingDir(tdir);
 	movingSpeed = mov;
-	rotSpeed = rot;
 }
 
 void Paticle::Animate(float fTimeElapsed)
 {
 	if (movingSpeed != 0.0f)
-		MoveVector(dir, movingSpeed * fTimeElapsed);
+		Move(movingSpeed * fTimeElapsed);
 }
 
 

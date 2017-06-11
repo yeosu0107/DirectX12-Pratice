@@ -33,13 +33,11 @@ void CPaticlesShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsComm
 
 	std::default_random_engine dre;
 	std::uniform_int_distribution<int> dir(-10, 10);
-	std::uniform_int_distribution<int> rot(0, 1);
 
 	Paticle* paticle = NULL;
 	for (int i = 0; i < m_nObjects; ++i) {
 		paticle = new Paticle();
-		paticle->setPaticle(XMFLOAT3(dir(dre), dir(dre), dir(dre)),
-			XMFLOAT3(rot(dre), rot(dre), rot(dre)), 5.0f, 0.5f);
+		paticle->setPaticle(XMFLOAT3(dir(dre), dir(dre), dir(dre)), 5.0f);
 		m_ppObjects[i] = paticle;
 	}
 
@@ -54,7 +52,7 @@ void CPaticlesShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamer
 	if (!run)
 		return;
 
-	ObjectShader::Render(pd3dCommandList, pCamera);
+	CShader::Render(pd3dCommandList, pCamera);
 
 	//모든 게임 객체의 인스턴싱 데이터를 버퍼에 저장한다.
 	UpdateShaderVariables(pd3dCommandList);
@@ -69,7 +67,7 @@ void CPaticlesShader::AnimateObjects(float fTimeElapsed)
 	if (!run)
 		return;
 
-	if (scale < 0.3f) {
+	if (scale < 0.1f) {
 		run = false;
 		for (int i = 0; i < m_nObjects; ++i)
 			m_ppObjects[i]->setScale(1.0f);
@@ -89,6 +87,7 @@ void CPaticlesShader::setPosition(XMFLOAT3 pos)
 void CPaticlesShader::setRun(XMFLOAT4& color) { 
 	run = true; 
 	for (int i = 0; i < m_nObjects; ++i) {
+		scale = 1.0f;
 		m_ppObjects[i]->setScale(1.0f);
 		m_ppObjects[i]->setColor(color);
 	}

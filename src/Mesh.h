@@ -72,12 +72,6 @@ public:
 
 };
 
-class CTriangleMesh : public CMesh 
-{ 
-public:    
-	CTriangleMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
-	virtual ~CTriangleMesh() { } 
-};
 
 class CCube : public CMesh
 {

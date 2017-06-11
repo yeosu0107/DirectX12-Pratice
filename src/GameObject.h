@@ -54,6 +54,10 @@ public:
 	XMFLOAT3 GetUp();
 	XMFLOAT3 GetRight();
 
+	float getWidth() const { return width; }
+	float getHeight() const { return height; }
+	float getDepth() const { return depth; }
+
 	void SetPosition(float x, float y, float z);
 	void SetPosition(XMFLOAT3 xmf3Position);
 	void Rotate(XMFLOAT3 *pxmf3Axis, float fAngle);
@@ -64,7 +68,6 @@ public:
 	void MoveStrafe(float fDistance = 1.0f);
 	void MoveUp(float fDistance = 1.0f);
 	void MoveForward(float fDistance = 1.0f);
-	void MoveVector(XMFLOAT3 dir, float fDistance=1.0f);
 	void Move(float fDist = 3.0f);
 
 	void setMovingDir(XMFLOAT3 dir) { movingDir = dir; }
@@ -101,36 +104,15 @@ public:
 	void setType(int type=0);
 };
 
-class CWallObject : public CGameObject
-{
-private:
-	bool set = false;
-	int index = -1;
-
-public:
-	CWallObject();
-	virtual ~CWallObject();
-
-	virtual void Animate(float fTimeElapsed);
-
-	float getWidth() const { return width; }
-	float getHeight() const { return height; }
-	float getDepth() const { return depth; }
-};
-
 class Paticle : public CGameObject
 {
 private:
-	XMFLOAT3 dir = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	XMFLOAT3 axis = XMFLOAT3(0.0f, 0.0f, 0.0f);
-
 	float movingSpeed = 0.0f;
-	float rotSpeed = 0.0f;
 public:
 	Paticle() {	}
 	virtual ~Paticle() { }
 
-	void setPaticle(XMFLOAT3 tdir, XMFLOAT3 taxis, float mov, float rot);
+	void setPaticle(XMFLOAT3 tdir, float mov);
 
 	virtual void Animate(float fTimeElapsed);
 };
