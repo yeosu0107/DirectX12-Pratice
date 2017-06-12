@@ -350,7 +350,7 @@ void CGameFramework::ProcessInput()
 	if (::GetKeyboardState(pKeyBuffer))
 	{
 		if (pKeyBuffer[VK_W] & 0xF0) dwDirection |= DIR_FORWARD;
-		if (pKeyBuffer[VK_S] & 0xF0) dwDirection |= DIR_BACKWARD;
+		//if (pKeyBuffer[VK_S] & 0xF0) dwDirection |= DIR_BACKWARD;
 		if (pKeyBuffer[VK_A] & 0xF0) dwDirection |= DIR_LEFT;
 		if (pKeyBuffer[VK_D] & 0xF0) dwDirection |= DIR_RIGHT;
 		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;

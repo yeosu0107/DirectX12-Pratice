@@ -1,7 +1,7 @@
 #pragma once
 #include "Shader.h"
 
-const int numOfPaticles = 100;
+const int numOfPaticles = 200;
 const int maxBullet = 100;
 
 class CPaticlesShader : public CInstancingShader
