@@ -29,7 +29,8 @@ protected:
 
 	ID3D12RootSignature *m_pd3dGraphicsRootSignature = NULL;
 
-	
+	
+
 
 public:
 	CScene();
@@ -54,7 +55,8 @@ public:
 	ID3D12RootSignature *CreateGraphicsRootSignature(ID3D12Device *pd3dDevice); 
 	ID3D12RootSignature *GetGraphicsRootSignature();
 
-	CHeightMapTerrain *GetTerrain() { return(m_pTerrain); }
+	CHeightMapTerrain *GetTerrain() { return(m_pTerrain); }
+
 	//파이프라인 상태를 나타내는 인터페이스 포인터 
 	//ID3D12PipelineState *m_pd3dPipelineState; 
 };

@@ -348,7 +348,9 @@ CHeightMapImage::~CHeightMapImage()
 {
 	if (m_pHeightMapPixels) delete[] m_pHeightMapPixels;
 	m_pHeightMapPixels = NULL;
-}XMFLOAT3 CHeightMapImage::GetHeightMapNormal(int x, int z)
+}
+
+XMFLOAT3 CHeightMapImage::GetHeightMapNormal(int x, int z)
 {
 	//x-좌표와 z-좌표가 높이 맵의 범위를 벗어나면 
 	//지형의 법선 벡터는 y-축 방향 벡터이다. 
@@ -376,7 +378,9 @@ CHeightMapImage::~CHeightMapImage()
 	XMFLOAT3 xmf3Normal = Vector3::CrossProduct(xmf3Edge1, xmf3Edge2, true);
 	
 	return xmf3Normal;
-}
+}
+
+
 
 float CHeightMapImage::GetHeight(float fx, float fz)
 {
@@ -559,4 +563,4 @@ XMFLOAT4 CHeightMapGridMesh::OnGetColor(int x, int z, void *pContext)
 	//fScale은 조명 색상(밝기)이 반사되는 비율이다. 
 	XMFLOAT4 xmf4Color = Vector4::Multiply(fScale, xmf4IncidentLightColor);
 	return(xmf4Color);
-}
+}
