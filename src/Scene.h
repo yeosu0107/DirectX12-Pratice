@@ -57,6 +57,8 @@ public:
 
 	CHeightMapTerrain *GetTerrain() { return(m_pTerrain); }
 
+	CGameObject *PickObjectPointedByCursor(int xClient, int yClient, CCamera *pCamera);
+
 	//파이프라인 상태를 나타내는 인터페이스 포인터 
 	//ID3D12PipelineState *m_pd3dPipelineState; 
 };

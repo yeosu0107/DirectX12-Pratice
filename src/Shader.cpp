@@ -220,6 +220,8 @@ void CShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamer
 	
 }
 
+
+
 CPlayerShader::CPlayerShader() { 
 }
 
@@ -355,6 +357,26 @@ void ObjectShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *p
 			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
 		}
 	}
+}
+
+CGameObject *ObjectShader::PickObjectByRayIntersection(XMFLOAT3& xmf3PickPosition,
+	XMFLOAT4X4& xmf4x4View, float *pfNearHitDistance)
+{
+	int nIntersected = 0;
+	*pfNearHitDistance = FLT_MAX;
+	float fHitDistance = FLT_MAX;
+	CGameObject *pSelectedObject = NULL;
+	for (int j = 0; j < m_nObjects; j++)
+	{
+		nIntersected = m_ppObjects[j]->PickObjectByRayIntersection(xmf3PickPosition,
+			xmf4x4View, &fHitDistance);
+		if ((nIntersected > 0) && (fHitDistance < *pfNearHitDistance))
+		{
+			*pfNearHitDistance = fHitDistance;
+			pSelectedObject = m_ppObjects[j];
+		}
+	}
+	return(pSelectedObject);
 }
 
 CTerrainShader::CTerrainShader()
@@ -550,20 +572,25 @@ void CInstancingShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 	std::uniform_int_distribution<int> type(0, 3);
 
 	CRotatingObject *pRotatingObject = NULL;
+	CSphereMeshDiffused *pSphereMesh = new CSphereMeshDiffused(pd3dDevice,
+		pd3dCommandList, 6.0f, 20, 20);
+
 	for (int i = 0; i < m_nObjects; ++i) {
 		pRotatingObject = new CRotatingObject();
 		//각 정육면체 객체의 위치를 설정한다. 
-		pRotatingObject->SetPosition(xPos(dre), yPos(dre), zPos(dre));
+		pRotatingObject->SetPosition(2149 + xPos(dre), 246 + yPos(dre), 3527 + zPos(dre));
 		pRotatingObject->setType(type(dre));
+		pRotatingObject->setMovingDir(XMFLOAT3(0, 0, 0));
 		//pRotatingObject->SetRotationAxis(XMFLOAT3(1.0f, 3.0f, 1.0f));
 		//pRotatingObject->setMovingDir(XMFLOAT3(0.5f, 0.5f, 0.5f));
 		pRotatingObject->SetRotationSpeed(90.0f);
 		pRotatingObject->SetObject(12.0f, 12.0f, 12.0f);
 		m_ppObjects[i] = pRotatingObject;
+		m_ppObjects[i]->SetMesh(0, pSphereMesh);
 	}
 
-	CCube *pCubeMesh = new CCube(pd3dDevice, pd3dCommandList, 12.0f, 12.0f, 12.0f);
-	m_ppObjects[0]->SetMesh(0, pCubeMesh);
+	
+	
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
@@ -587,9 +614,6 @@ void CInstancingShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCame
 void CInstancingShader::AnimateObjects(float fTimeElapsed)
 {
 	for (int j = 0; j < m_nObjects; j++) {
-		if (m_ppObjects[j]->GetPosition().z+100.0f < playerPos.z)
-			m_ppObjects[j]->Reset(playerPos);
-
 		m_ppObjects[j]->Animate(fTimeElapsed);
 	}
 }

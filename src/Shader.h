@@ -73,6 +73,11 @@ public:
 	virtual void updatePlayerRot(XMFLOAT3&, float&) {}
 	CGameObject** GetObjects() { return m_ppObjects; }
 	int	getObjectsNum() const { return m_nObjects; }
+
+	virtual CGameObject *PickObjectByRayIntersection(XMFLOAT3& xmf3PickPosition,
+		XMFLOAT4X4& xmf4x4View, float *pfNearHitDistance) {
+		return nullptr;
+	}
 };
 
 class CPlayerShader : public CShader 
@@ -115,6 +120,9 @@ public:
 		*pd3dGraphicsRootSignature);
 	virtual void ReleaseUploadBuffers();
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
+
+	virtual CGameObject *PickObjectByRayIntersection(XMFLOAT3& xmf3PickPosition,
+		XMFLOAT4X4& xmf4x4View, float *pfNearHitDistance);
 };
 
 class CTerrainShader : public CShader

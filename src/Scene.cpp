@@ -216,3 +216,42 @@ ID3D12RootSignature *CScene::CreateGraphicsRootSignature(ID3D12Device *pd3dDevic
 		pd3dErrorBlob->Release();
 	return(pd3dGraphicsRootSignature);
 }
+
+CGameObject *CScene::PickObjectPointedByCursor(int xClient, int yClient, CCamera
+	*pCamera)
+{
+	if (!pCamera) return(NULL);
+	XMFLOAT4X4 xmf4x4View = pCamera->GetViewMatrix();
+	XMFLOAT4X4 xmf4x4Projection = pCamera->GetProjectionMatrix();
+	D3D12_VIEWPORT d3dViewport = pCamera->GetViewport();
+	XMFLOAT3 xmf3PickPosition;
+
+	/*화면 좌표계의 점 (xClient, yClient)를 화면 좌표 변환의 
+	역변환과 투영 변환의 역변환을 한다. 그 결과는 카메라
+	좌표계의 점이다. 투영 평면이 카메라에서 z-축으로 거리가 1이므로 
+	z-좌표는 1로 설정한다.*/
+
+	xmf3PickPosition.x = (((2.0f * xClient) / d3dViewport.Width) - 1) /
+		xmf4x4Projection._11;
+
+	xmf3PickPosition.y = -(((2.0f * yClient) / d3dViewport.Height) - 1) /
+		xmf4x4Projection._22;
+
+	xmf3PickPosition.z = 1.0f;
+
+	int nIntersected = 0;
+	float fHitDistance = FLT_MAX, fNearestHitDistance = FLT_MAX;
+	CGameObject *pIntersectedObject = NULL, *pNearestObject = NULL;
+	//셰이더의 모든 게임 객체들에 대한 마우스 픽킹을 수행하여 카메라와 가장 가까운 게임 객체를 구한다. 
+	for (int i = 0; i < m_nShaders; i++)
+	{
+		pIntersectedObject = m_ppShaders[i]->PickObjectByRayIntersection(xmf3PickPosition,
+			xmf4x4View, &fHitDistance);
+		if (pIntersectedObject && (fHitDistance < fNearestHitDistance))
+		{
+			fNearestHitDistance = fHitDistance;
+			pNearestObject = pIntersectedObject;
+		}
+	}
+	return(pNearestObject);
+}

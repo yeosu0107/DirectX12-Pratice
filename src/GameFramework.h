@@ -68,6 +68,8 @@ private:
 	//펜스 핸들
 	HANDLE m_hFenceEvent;
 
+
+
 #if defined(_DEBUG) 
 	ID3D12Debug *m_pd3dDebugController;
 #endif
@@ -82,6 +84,8 @@ public:
 	CCamera *m_pCamera = NULL;
 	CPlayer *m_pPlayer = NULL;
 	POINT m_ptOldCursorPos;
+	CGameObject *m_pSelectedObject = NULL;
+
 	//TRACKMOUSEEVENT mouseEvent;
 
 	CGameFramework(void);
@@ -113,7 +117,7 @@ public:
 	void OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	void OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK OnProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
-	
+	void ProcessSelectedObject(DWORD dwDirection, float cxDelta, float cyDelta);
 
 	//오브젝트 제어
 	void BuildObjects();
