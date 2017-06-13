@@ -245,8 +245,10 @@ void CFirstPersonCamera::Rotate(float x, float y, float z)
 CThirdPersonCamera::CThirdPersonCamera(CCamera *pCamera) : CCamera(pCamera)
 {
 	m_nMode = THIRD_PERSON_CAMERA;
+	m_xmf3Position.y = 10;
 	if (pCamera)
 	{
+		
 		if (pCamera->GetMode() == SPACESHIP_CAMERA)
 		{
 			m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
@@ -254,6 +256,7 @@ CThirdPersonCamera::CThirdPersonCamera(CCamera *pCamera) : CCamera(pCamera)
 			m_xmf3Look.y = 0.0f;
 			m_xmf3Right = Vector3::Normalize(m_xmf3Right);
 			m_xmf3Look = Vector3::Normalize(m_xmf3Look);
+			
 		}
 	}
 }

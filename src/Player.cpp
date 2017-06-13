@@ -464,7 +464,7 @@ void CTerrainPlayer::OnCameraUpdateCallback(float fTimeElapsed)
 {
 	XMFLOAT3 xmf3CameraPosition = m_pCamera->GetPosition();
 	CHeightMapTerrain *pTerrain = (CHeightMapTerrain *)m_pCameraUpdatedContext;
-	
+	//printf("%f %f %f\n", xmf3CameraPosition.x, xmf3CameraPosition.y, xmf3CameraPosition.z);
 	float fHeight = pTerrain->
 		GetHeight(xmf3CameraPosition.x, xmf3CameraPosition.z) + 5.0f;
 	
