@@ -587,6 +587,7 @@ void CInstancingShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 		//pRotatingObject->SetObject(12.0f, 12.0f, 12.0f);
 		m_ppObjects[i] = pRotatingObject;
 		m_ppObjects[i]->SetMesh(0, pSphereMesh);
+		m_ppObjects[i]->SetOOBB(pSphereMesh->GetBoundingBox());
 	}
 
 	

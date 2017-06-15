@@ -121,17 +121,19 @@ void CBulletShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 {
 	m_nObjects = maxBullet;
 	m_ppObjects = new CGameObject*[m_nObjects];
+	CCube* bulletMesh = new CCube(pd3dDevice, pd3dCommandList, 2.5f, 2.5f, 2.5f);
 
 	CBullet* bullet = NULL;
 	for (int i = 0; i < m_nObjects; ++i) {
 		bullet = new CBullet();
 		bullet->SetPosition(0.0f, 0.0f, 0.0f);
 		//bullet->SetObject(2.5f, 2.5f, 2.5f);
+		bullet->SetOOBB(bulletMesh->GetBoundingBox());
 		bullet->setDie(true);
 		m_ppObjects[i] = bullet;
 	}
 
-	CCube* bulletMesh = new CCube(pd3dDevice, pd3dCommandList, 2.5f, 2.5f, 2.5f);
+	
 	m_ppObjects[0]->SetMesh(0, bulletMesh);
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -229,6 +231,7 @@ void CMazeShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandL
 	m_ppObjects = new CGameObject*[m_nObjects];
 	int now = 0;
 	CGameObject* wall = nullptr;
+	CCube* pCube = new CCube(pd3dDevice, pd3dCommandList, 100.0f, 50.0f, 50.0f);
 	for (int i = 0; i < 10; ++i) {
 		for (int j = 0; j < 10; ++j) {
 			for (int z = 0; z < 2; ++z) {
@@ -262,12 +265,14 @@ void CMazeShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandL
 					fHeight = pTerrain->GetHeight(xPos, zPos);
 					wall->SetPosition(xPos, fHeight, zPos);
 				}
+				wall->SetOOBB(pCube->GetBoundingBox());
 				m_ppObjects[now++] = wall;
+				
 			}
 		}
 	}
 				
-	CCube* pCube = new CCube(pd3dDevice, pd3dCommandList, 100.0f, 50.0f, 50.0f);
+	
 	m_ppObjects[0]->SetMesh(0, pCube);
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);

@@ -124,7 +124,18 @@ void CScene::AnimateObjects(float fTimeElapsed, XMFLOAT3 player)
 
 bool CScene::CrashObjects(BoundingOrientedBox& player, bool playerDeath)
 {
-
+	for (int i = 0; i < m_nWall; ++i) {
+		ContainmentType containType = m_pWall[i]->getOOBB()->Contains(player);
+		switch (containType) {
+		case CONTAINS:
+			break;
+		case DISJOINT:
+			break;
+		case INTERSECTING:
+			printf("crash\n");
+			//return true;
+		}
+	}
 	return false;
 }
 

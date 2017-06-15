@@ -383,6 +383,7 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 	CCube *pCubeMesh = new CCube(pd3dDevice, pd3dCommandList,
 		4.0f, 12.0f, 4.0f);
 	SetMesh(0, pCubeMesh);
+	SetOOBB(pCubeMesh->GetBoundingBox());
 	////플레이어를 렌더링할 셰이더를 생성한다. 
 	//CPlayerShader *pShader = new CPlayerShader();
 	//pShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);

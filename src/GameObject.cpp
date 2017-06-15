@@ -45,7 +45,7 @@ void CGameObject::SetShader(CShader *pShader) {
 //	height = h * 0.5f;
 //	depth = d * 0.5f;
 //
-//	//SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(width, height, depth), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
+//	SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(width, height, depth), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 //}
 
 void CGameObject::SetMesh(int nIndex, CMesh *pMesh) { 
@@ -77,11 +77,11 @@ void CGameObject::ReleaseUploadBuffers() {
 
 void CGameObject::Animate(float fTimeElapsed) { 
 	//충돌영역
-	if (m_ppMeshes[0]) {
-		m_xmOOBBTransformed = m_ppMeshes[0]->GetBoundingBox();
-		m_xmOOBBTransformed.Transform(m_xmOOBBTransformed, XMLoadFloat4x4(&m_xmf4x4World));
-		XMStoreFloat4(&m_xmOOBBTransformed.Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmOOBBTransformed.Orientation)));
-	}
+	
+	m_xmOOBBTransformed = m_xmOOBB;
+	m_xmOOBBTransformed.Transform(m_xmOOBBTransformed, XMLoadFloat4x4(&m_xmf4x4World));
+	XMStoreFloat4(&m_xmOOBBTransformed.Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmOOBBTransformed.Orientation)));
+	
 }
 
 void CGameObject::OnPrepareRender() { 
