@@ -544,6 +544,8 @@ void CGameFramework::FrameAdvance()
 	ProcessInput();
 
 	AnimateObjects();
+	//플레이어 위치 찍어보기
+	//printf("%f %f %f\n", m_pPlayer->GetPosition().x, m_pPlayer->GetPosition().y, m_pPlayer->GetPosition().z);
 
 	//d3d 표현 부분
 	//명령 할당자와 명령 리스트를 리셋한다.

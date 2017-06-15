@@ -22,8 +22,8 @@ CPlayer::CPlayer(int nMeshes) : CGameObject(nMeshes)
 
 	
 
-	SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(width * 0.5f, height * 0.5f, depth * 0.5f), 
-		XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
+	/*SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(width * 0.5f, height * 0.5f, depth * 0.5f), 
+		XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));*/
 }
 
 CPlayer::~CPlayer()
@@ -73,7 +73,7 @@ void CPlayer::Move(XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 	}
 	else {
 		m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Shift);
-		m_pCamera->Move(xmf3Shift);
+		if (m_pCamera) m_pCamera->Move(xmf3Shift);
 	}
 }
 
@@ -360,17 +360,19 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
 	*pd3dCommandList, void *pContext, int nMeshes) : CPlayer(nMeshes)
 {
-	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 	CHeightMapTerrain *pTerrain = (CHeightMapTerrain *)pContext;
 	/*플레이어의 위치를 지형의 가운데(y-축 좌표는 지형의 높이보다 1500 높게)로 설정한다.
 	플레이어 위치 벡터의 y-좌표가 지형의 높이보다 크고 중력이 작용하도록
 	플레이어를 설정하였으므로 플레이어는 점차적으로 하강하게 된다.*/
 
-	float fHeight = pTerrain->
-		GetHeight(pTerrain->GetWidth()*0.5f, pTerrain->GetLength()*0.5f);
+	float startXpos = 930;
+	float startZpos = 430;
 
-	SetPosition(XMFLOAT3(pTerrain->GetWidth()*0.5f, 
-		fHeight + 1500.0f, pTerrain->GetLength()*0.5f));
+	float fHeight = pTerrain->
+		GetHeight(startXpos, startZpos);
+
+	SetPosition(XMFLOAT3(startXpos,
+		fHeight + 200.0f, startZpos));
 
 	//플레이어의 위치가 변경될 때 지형의 정보에 따라 플레이어의 위치를 변경할 수 있도록 설정한다.
 	SetPlayerUpdatedContext(pTerrain);
@@ -386,6 +388,7 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 	//pShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
 	//SetShader(pShader);
 	//CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 }
 CTerrainPlayer::~CTerrainPlayer()
 {

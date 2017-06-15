@@ -271,7 +271,7 @@ void CPlayerShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 	m_ppObjects = new CGameObject*[m_nObjects];
 	
 	CTerrainPlayer* player = new CTerrainPlayer(pd3dDevice, pd3dCommandList, pContext, 1);
-
+	//CAirplanePlayer* player = new CAirplanePlayer(pd3dDevice, pd3dCommandList, 1);
 	m_ppObjects[0] = player;
 }
 void CPlayerShader::AnimateObjects(float fTimeElapsed)
@@ -562,7 +562,7 @@ void CInstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCom
 
 void CInstancingShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {  
-	m_nObjects = 1;
+	m_nObjects = 100;
 	m_ppObjects = new CGameObject*[m_nObjects];
 
 	std::default_random_engine dre(1000);
@@ -584,7 +584,7 @@ void CInstancingShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 		//pRotatingObject->SetRotationAxis(XMFLOAT3(1.0f, 3.0f, 1.0f));
 		//pRotatingObject->setMovingDir(XMFLOAT3(0.5f, 0.5f, 0.5f));
 		pRotatingObject->SetRotationSpeed(90.0f);
-		pRotatingObject->SetObject(12.0f, 12.0f, 12.0f);
+		//pRotatingObject->SetObject(12.0f, 12.0f, 12.0f);
 		m_ppObjects[i] = pRotatingObject;
 		m_ppObjects[i]->SetMesh(0, pSphereMesh);
 	}

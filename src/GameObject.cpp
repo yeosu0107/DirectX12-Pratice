@@ -39,14 +39,14 @@ void CGameObject::SetShader(CShader *pShader) {
 
 }
 
-void CGameObject::SetObject(float w, float h, float d)
-{
-	width = w * 0.5f;
-	height = h * 0.5f;
-	depth = d * 0.5f;
-
-	SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(width, height, depth), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
-}
+//void CGameObject::SetObject(float w, float h, float d)
+//{
+//	width = w * 0.5f;
+//	height = h * 0.5f;
+//	depth = d * 0.5f;
+//
+//	//SetOOBB(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(width, height, depth), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
+//}
 
 void CGameObject::SetMesh(int nIndex, CMesh *pMesh) { 
 	if (m_ppMeshes)
@@ -77,9 +77,11 @@ void CGameObject::ReleaseUploadBuffers() {
 
 void CGameObject::Animate(float fTimeElapsed) { 
 	//충돌영역
-	m_xmOOBBTransformed = m_xmOOBB;
-	m_xmOOBBTransformed.Transform(m_xmOOBBTransformed, XMLoadFloat4x4(&m_xmf4x4World));
-	XMStoreFloat4(&m_xmOOBBTransformed.Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmOOBBTransformed.Orientation)));
+	if (m_ppMeshes[0]) {
+		m_xmOOBBTransformed = m_ppMeshes[0]->GetBoundingBox();
+		m_xmOOBBTransformed.Transform(m_xmOOBBTransformed, XMLoadFloat4x4(&m_xmf4x4World));
+		XMStoreFloat4(&m_xmOOBBTransformed.Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmOOBBTransformed.Orientation)));
+	}
 }
 
 void CGameObject::OnPrepareRender() { 
@@ -245,7 +247,8 @@ void CGameObject::GenerateRayForPicking(XMFLOAT3& xmf3PickPosition, XMFLOAT4X4&
 	//광선의 방향 벡터를 구한다. 
 	*pxmf3PickRayDirection = Vector3::Normalize(
 		Vector3::Subtract(*pxmf3PickRayDirection, *pxmf3PickRayOrigin));
-}
+}
+
 int CGameObject::PickObjectByRayIntersection(XMFLOAT3& xmf3PickPosition, XMFLOAT4X4&
 	xmf4x4View, float *pfHitDistance)
 {

@@ -25,6 +25,9 @@ protected:
 	CGameObject **m_pBullet = NULL;
 	int m_nBullet = 0;
 
+	CGameObject** m_pWall = NULL;
+	int m_nWall = 0;
+
 	CHeightMapTerrain* m_pTerrain = NULL;
 
 	ID3D12RootSignature *m_pd3dGraphicsRootSignature = NULL;

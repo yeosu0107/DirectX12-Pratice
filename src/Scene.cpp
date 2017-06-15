@@ -21,7 +21,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	
 
 	//셰이더 생성
-	m_nShaders = 2;
+	m_nShaders = 3;
 	m_ppShaders = new CShader*[m_nShaders];
 
 	//맵 셰이더
@@ -44,6 +44,15 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	m_ppShaders[1] = EnemyShader;
 
+	//미로셰이더
+	CMazeShader* MazeShader = new CMazeShader();
+	MazeShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	MazeShader->BuildObjects(pd3dDevice, pd3dCommandList, m_pTerrain);
+
+	m_nWall = MazeShader->getObjectsNum();
+	m_pWall = MazeShader->GetObjects();
+
+	m_ppShaders[2] = MazeShader;
 
 	//총알 객체 셰이더 생성
 	CBulletShader* bulletShader = new CBulletShader();
@@ -115,6 +124,7 @@ void CScene::AnimateObjects(float fTimeElapsed, XMFLOAT3 player)
 
 bool CScene::CrashObjects(BoundingOrientedBox& player, bool playerDeath)
 {
+
 	return false;
 }
 
@@ -243,7 +253,7 @@ CGameObject *CScene::PickObjectPointedByCursor(int xClient, int yClient, CCamera
 	float fHitDistance = FLT_MAX, fNearestHitDistance = FLT_MAX;
 	CGameObject *pIntersectedObject = NULL, *pNearestObject = NULL;
 	//셰이더의 모든 게임 객체들에 대한 마우스 픽킹을 수행하여 카메라와 가장 가까운 게임 객체를 구한다. 
-	for (int i = 0; i < m_nShaders; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		pIntersectedObject = m_ppShaders[i]->PickObjectByRayIntersection(xmf3PickPosition,
 			xmf4x4View, &fHitDistance);

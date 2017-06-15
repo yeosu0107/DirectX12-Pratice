@@ -84,7 +84,9 @@ public:
 	CCamera *m_pCamera = NULL;
 	CPlayer *m_pPlayer = NULL;
 	POINT m_ptOldCursorPos;
-	CGameObject *m_pSelectedObject = NULL;
+	CGameObject *m_pSelectedObject = NULL;
+
+
 
 	//TRACKMOUSEEVENT mouseEvent;
 

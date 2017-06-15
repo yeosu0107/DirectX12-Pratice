@@ -20,7 +20,7 @@ protected:
 	int m_nMeshes = 0;
 	int m_nReferences = 0;
 
-	BoundingOrientedBox m_xmOOBB; //모델좌표계에서의 충돌영역
+	//BoundingOrientedBox m_xmOOBB; //모델좌표계에서의 충돌영역
 	BoundingOrientedBox	m_xmOOBBTransformed; //월드좌표계에서의 충돌 영역
 
 	XMFLOAT3 movingDir;
@@ -36,7 +36,7 @@ public:
 	void ReleaseUploadBuffers();
 	virtual void SetMesh(int nIndex, CMesh *pMesh);
 	virtual void SetShader(CShader *pShader);
-	virtual void SetObject(float w, float h, float d);
+	//virtual void SetObject(float w, float h, float d);
 	virtual void Animate(float fTimeElapsed);
 	virtual void OnPrepareRender(); 
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
@@ -71,7 +71,7 @@ public:
 	void setMovingDir(XMFLOAT3 dir) { movingDir = dir; }
 	XMFLOAT3& getMovingDir() { return movingDir; }
 
-	void SetOOBB(XMFLOAT3& xmCenter, XMFLOAT3& xmExtents, XMFLOAT4& xmOrientation) { m_xmOOBBTransformed = m_xmOOBB = BoundingOrientedBox(xmCenter, xmExtents, xmOrientation); }
+	//void SetOOBB(XMFLOAT3& xmCenter, XMFLOAT3& xmExtents, XMFLOAT4& xmOrientation) { m_xmOOBBTransformed = m_xmOOBB = BoundingOrientedBox(xmCenter, xmExtents, xmOrientation); }
 	BoundingOrientedBox* getOOBB() { return &m_xmOOBBTransformed; } //트랜스폼 oobb주소 반환
 	XMFLOAT4X4& getMatrix() { return m_xmf4x4World; }
 

@@ -245,7 +245,7 @@ void CFirstPersonCamera::Rotate(float x, float y, float z)
 CThirdPersonCamera::CThirdPersonCamera(CCamera *pCamera) : CCamera(pCamera)
 {
 	m_nMode = THIRD_PERSON_CAMERA;
-	m_xmf3Position.y = 10;
+	//m_xmf3Position.y = 10;
 	if (pCamera)
 	{
 		
