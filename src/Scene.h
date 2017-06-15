@@ -3,6 +3,9 @@
 #include "EXShader.h"
 #include "GameObject.h"
 #include "Camera.h"
+
+enum playerStatus { Normal = 0, noMove, Death };
+
 class CScene
 {
 private:
@@ -44,7 +47,7 @@ public:
 
 	bool ProcessInput(UCHAR *pKeysBuffer);
 	void AnimateObjects(float fTimeElapsed, XMFLOAT3 player);
-	bool CrashObjects(BoundingOrientedBox& m_pPlayer, bool playerDeath);
+	bool CrashObjects(BoundingOrientedBox& m_pPlayer, playerStatus& playerDeath);
 	void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 
 	bool OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam); 

@@ -287,7 +287,7 @@ void CGameFramework::BuildObjects()
 	m_pCamera = m_pPlayer->ChangeCamera((DWORD)(0x03),
 		m_GameTimer.GetTimeElapsed());
 	
-
+	playerAct = playerStatus::Normal;
 	//씬 객체를 생성하기 위하여 필요한 그래픽 명령 리스트들을 명령 큐에 추가한다. 
 	m_pd3dCommandList->Close(); 
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
@@ -384,6 +384,9 @@ void CGameFramework::ProcessInput()
 
 			if (dwDirection && !m_pPlayer->getDie()) {
 				m_pPlayer->Move(dwDirection, 200.0f * m_GameTimer.GetTimeElapsed(), false);
+				if (playerAct == playerStatus::noMove) {
+					printf("Crash!\n");
+				}
 				//m_pPlayer->Move(dwDirection, 5.0f, false);
 			}
 		}
@@ -530,7 +533,7 @@ void CGameFramework::AnimateObjects()
 	//printf("%f %f %f\n", m_pPlayer->GetPosition().x, m_pPlayer->GetPosition().y, m_pPlayer->GetPosition().z);
 	if (m_pScene) {
 		m_pScene->AnimateObjects(m_GameTimer.GetTimeElapsed(), m_pPlayer->GetPosition());
-		playerDie = m_pScene->CrashObjects(*m_pPlayer->getOOBB(), m_pPlayer->getDie());
+		playerDie = m_pScene->CrashObjects(*m_pPlayer->getOOBB(), playerAct);
 	}
 	if (playerDie) {
 		m_pPlayer->Die();

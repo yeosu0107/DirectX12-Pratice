@@ -76,6 +76,7 @@ private:
 	CGameTimer					m_GameTimer;
 	_TCHAR						m_pszFrameRate[50];
 
+	playerStatus				playerAct;
 
 public:
 	CPlayerShader* playerShader = NULL;

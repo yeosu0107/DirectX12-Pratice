@@ -122,8 +122,9 @@ void CScene::AnimateObjects(float fTimeElapsed, XMFLOAT3 player)
 	}
 }
 
-bool CScene::CrashObjects(BoundingOrientedBox& player, bool playerDeath)
+bool CScene::CrashObjects(BoundingOrientedBox& player, playerStatus& playerAct)
 {
+	playerAct = playerStatus::Normal;
 	for (int i = 0; i < m_nWall; ++i) {
 		ContainmentType containType = m_pWall[i]->getOOBB()->Contains(player);
 		switch (containType) {
@@ -132,7 +133,7 @@ bool CScene::CrashObjects(BoundingOrientedBox& player, bool playerDeath)
 		case DISJOINT:
 			break;
 		case INTERSECTING:
-			printf("crash\n");
+			playerAct = playerStatus::noMove;
 			//return true;
 		}
 	}
