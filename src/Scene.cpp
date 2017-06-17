@@ -122,22 +122,82 @@ void CScene::AnimateObjects(float fTimeElapsed, XMFLOAT3 player)
 	}
 }
 
+void CScene::SearchingPlayer(BoundingOrientedBox& player, CGameObject* enemy)
+{
+	XMFLOAT3 playerPos = player.Center;
+	XMFLOAT3 enemyPos = enemy->GetPosition();
+
+	XMFLOAT3 distVector = Vector3::Subtract(playerPos, enemyPos);
+	//float dist = Vector3::Length(distVector);
+	if (abs(distVector.x) > abs(distVector.z))
+		distVector.z = 0;
+	else
+		distVector.x = 0;
+	float dist = Vector3::Length(distVector);
+
+	
+
+	enemy->setMovingDir(XMFLOAT3(0,0,0));
+
+	if (dist < 80.0f)
+	{
+		enemy->setStatus(enemyStatus::move);	
+		distVector = Vector3::Normalize(distVector);
+	
+	
+		distVector.y = 0;
+
+		enemy->setMovingDir(distVector);
+	}
+	else {
+		enemy->setStatus(enemyStatus::normal);
+	}
+
+}
+
 void CScene::crushObjects(BoundingOrientedBox& Camera, BoundingOrientedBox& player, playerStatus& playerAct, bool playerDeath, bool& cameraCrush)
 {
 	cameraCrush = false;
 	//총알 - 적
 	for (int i = 0; i < m_nEnemy; ++i) {
+		if (m_pEnemy[i]->getDie())
+			continue;
 		for (int j = 0; j < m_nBullet; ++j) {
 			if (m_pBullet[j]->getDie())
 				continue;
 			if(m_pEnemy[i]->getOOBB()->Intersects(*m_pBullet[j]->getOOBB())) {
 				m_PaticleShaders[nowPaticle]->setPosition(m_pEnemy[i]->GetPosition());
 				m_PaticleShaders[nowPaticle]->setRun(m_pEnemy[i]->getColor());
-				//m_pEnemy[i]->Reset(player.Center);
-
+				m_pEnemy[i]->setDie(true);
+				m_pBullet[j]->setDie(true);
 				nowPaticle += 1;
 				if (nowPaticle > m_nPaticleShaders - 1)
 					nowPaticle = 1;
+			}
+		}
+		if (m_pEnemy[i]->getStatus() != enemyStatus::move)
+			SearchingPlayer(player, m_pEnemy[i]);
+		//적 - 벽
+		for (int j = 0; j < m_nWall; ++j) {
+			if (m_pEnemy[i]->getOOBB()->Contains(*m_pWall[j]->getOOBB())) {
+				//SearchingPlayer(player, m_pEnemy[i]);
+				XMFLOAT3 tmp = m_pEnemy[i]->getMovingDir();
+				/*XMFLOAT3 wallPos = m_pWall[j]->GetPosition();
+				XMFLOAT3 enemyPos = m_pEnemy[i]->GetPosition();
+
+				float distX = wallPos.x - enemyPos.x;
+				float distZ = wallPos.z - enemyPos.z;
+
+				if (abs(distX) > abs(distZ)) {
+					tmp.x *= -1;
+				}
+				else {
+					tmp.z *= -1;
+				}*/
+				
+				tmp = Vector3::ScalarProduct(tmp, -1, false);
+				m_pEnemy[i]->setMovingDir(tmp);
+				//m_pEnemy[i]->Move(2.0f);
 			}
 		}
 	}
@@ -161,13 +221,21 @@ void CScene::crushObjects(BoundingOrientedBox& Camera, BoundingOrientedBox& play
 
 		}
 	}
-	//적 - 플레이어
+	
 	for (int i = 0; i < m_nEnemy; ++i) {
+		//적 - 플레이어
+		if (m_pEnemy[i]->getDie())
+			continue;
+		//if(m_pEnemy[i]->getStatus()!=enemyStatus::move)
+			
+
 		if (m_pEnemy[i]->getOOBB()->Contains(player)) {
-			playerAct = playerStatus::Death;
+			//playerAct = playerStatus::Death;
 			m_PaticleShaders[0]->setPosition(player.Center);
 			m_PaticleShaders[0]->setRun(XMFLOAT4(1.0f, 0.0f, 0.0f, 0.0f));
 		}
+
+		
 	}
 }
 

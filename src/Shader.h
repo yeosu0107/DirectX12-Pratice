@@ -17,6 +17,7 @@ struct VS_VB_INSTANCE
 {
 	XMFLOAT4X4 m_xmf4x4Transform;
 	XMFLOAT4 m_xmcColor;
+	bool	isDraw;
 };
 
 class CShader

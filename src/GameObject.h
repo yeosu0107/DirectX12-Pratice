@@ -3,6 +3,8 @@
 #include "Camera.h"
 class CShader;
 
+enum enemyStatus { normal = 0, move = 1, attack = 2, death = 3 };
+
 class CGameObject
 {
 private: 
@@ -79,6 +81,9 @@ public:
 	bool getDie() const { return die; }
 	void setDie(bool type) { die = type; }
 	virtual void Reset(XMFLOAT3 pos) {}
+	virtual void setStatus(enemyStatus type) {}
+	virtual void StatusWork() {}
+	virtual enemyStatus getStatus() { return enemyStatus::normal; }
 
 	XMFLOAT4& getColor() { return color; }
 	void setColor(XMFLOAT4& t) { color = t; }
@@ -98,7 +103,8 @@ private:
 	XMFLOAT3 m_xmf3RotationAxis; 
 	float m_fRotationSpeed;
 	
-
+	enemyStatus status = enemyStatus::normal;
+	float distance = 0.0f;
 public: 
 	CRotatingObject(int nMeshes=1); 
 	virtual ~CRotatingObject();
@@ -109,6 +115,9 @@ public:
 	
 	virtual void Reset(XMFLOAT3 pos);
 	void setType(int type=0);
+	virtual void setStatus(enemyStatus type) { status = type; }
+	virtual void StatusWork();
+	virtual enemyStatus getStatus() { return status; }
 };
 
 class CHeightMapTerrain : public CGameObject

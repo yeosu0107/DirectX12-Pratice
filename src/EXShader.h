@@ -43,6 +43,8 @@ private:
 	int nowtime = 10;
 	int maxDelay = 10;
 
+	int n_draw = 0;
+
 public:
 	CBulletShader();
 	virtual ~CBulletShader();
@@ -101,12 +103,13 @@ struct pos
 class CEnemyShader : public CInstancingShader{
 private:
 	pos EnemyPos[15] = {
-		{629.0f, 656.0f}, { 627.0f, 875.0f }, { 562.0f, 741.0f },
-		{477.0f, 1025.0f},{ 294.0f, 994.0f }, { 388.0f,	882.0f },
-		{294.0f, 751.0f}, { 443.0f,	570.0f }, { 409.0f,	1051.0f},
-		{123.0f, 565.0f}, { 176.0f,	1079.0f}, { 144.0f, 747.0f },
+		{629.0f, 656.0f}, { 627.0f, 875.0f }, { 537.0f, 743.0f },
+		{457.0f, 1079.0f},{ 294.0f, 994.0f }, { 388.0f,	882.0f },
+		{294.0f, 751.0f}, { 443.0f,	570.0f }, { 386.0f, 982.0f },
+		{123.0f, 565.0f}, { 176.0f,	1079.0f}, { 121.0f, 746.0f },
 		{181.0f, 811.0f}, { 141.0f,	894.0f }, { 110.0f,	967.0f }
 	};
+	int n_draw = 0;
 public:
 	CEnemyShader();
 	virtual ~CEnemyShader();

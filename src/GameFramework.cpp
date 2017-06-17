@@ -356,6 +356,13 @@ void CGameFramework::ProcessInput()
 		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeyBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
 		if (pKeyBuffer[VK_E] & 0xF0) m_pPlayer->SetPosition(XMFLOAT3(629.0f, 300.0f, 495.0f));
+		//if (pKeyBuffer[VK_Q] & 0xF0) m_pPlayer->SetPosition(XMFLOAT3(394.0f, 811.0f, 669.0f));
+		if (pKeyBuffer[VK_RETURN] & 0xF0) {
+			if (!m_pPlayer->getDie()) {
+				ReleaseObjects();
+				BuildObjects();
+			}
+		}
 	}
 	float cxDelta = 0.0f, cyDelta = 0.0f;
 	POINT ptCursorPos;
@@ -375,8 +382,6 @@ void CGameFramework::ProcessInput()
 	}
 	if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
 	{
-		
-		
 			if (cxDelta || cyDelta) {
 				if (pKeyBuffer[VK_RBUTTON] & 0xF0)
 					m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
@@ -398,26 +403,12 @@ void CGameFramework::ProcessInput()
 void CGameFramework::ProcessSelectedObject(DWORD dwDirection, float cxDelta, float
 	cyDelta)
 {
-	//픽킹으로 선택한 게임 객체가 있으면 키보드를 누르거나 마우스를 움직이면 게임 개체를 이동 또는 회전한다. 
-	/*if (dwDirection != 0)
-	{
-		if (dwDirection & DIR_FORWARD) m_pSelectedObject->MoveForward(+1.0f);
-		if (dwDirection & DIR_BACKWARD) m_pSelectedObject->MoveForward(-1.0f);
-		if (dwDirection & DIR_LEFT) m_pSelectedObject->MoveStrafe(+1.0f);
-		if (dwDirection & DIR_RIGHT) m_pSelectedObject->MoveStrafe(-1.0f);
-		if (dwDirection & DIR_UP) m_pSelectedObject->MoveUp(+1.0f);
-		if (dwDirection & DIR_DOWN) m_pSelectedObject->MoveUp(-1.0f);
-	}
-	else if ((cxDelta != 0.0f) || (cyDelta != 0.0f))
-	{
-		m_pSelectedObject->Rotate(cyDelta, cxDelta, 0.0f);
-	}*/
+	if (m_pSelectedObject->getDie())
+		return;
 	XMFLOAT3 target = Vector3::Subtract(m_pSelectedObject->GetPosition(), m_pPlayer->GetPosition());
 	target = Vector3::Normalize(target);
 	float rot = Vector3::Angle(target, m_pPlayer->GetLook());
 	XMFLOAT3 axis = Vector3::CrossProduct(target, m_pPlayer->GetLook());
-
-	
 
 	m_pScene->playerUpdate(m_pPlayer->GetPosition(), target);
 }
@@ -571,7 +562,7 @@ void CGameFramework::FrameAdvance()
 	//AnimateObjects();
 	
 	//플레이어 위치 찍어보기
-	//printf("%f %f %f\n", m_pPlayer->GetPosition().x, m_pPlayer->GetPosition().y, m_pPlayer->GetPosition().z);
+	printf("%f %f %f\n", m_pPlayer->GetPosition().x, m_pPlayer->GetPosition().y, m_pPlayer->GetPosition().z);
 
 	//d3d 표현 부분
 	//명령 할당자와 명령 리스트를 리셋한다.

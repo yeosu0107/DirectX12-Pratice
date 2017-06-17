@@ -254,6 +254,8 @@ void CGameObject::GenerateRayForPicking(XMFLOAT3& xmf3PickPosition, XMFLOAT4X4&
 int CGameObject::PickObjectByRayIntersection(XMFLOAT3& xmf3PickPosition, XMFLOAT4X4&
 	xmf4x4View, float *pfHitDistance)
 {
+	/*if (die)
+		return 0;*/
 	int nIntersected = 0;
 	if (m_ppMeshes)
 	{
@@ -271,18 +273,38 @@ int CGameObject::PickObjectByRayIntersection(XMFLOAT3& xmf3PickPosition, XMFLOAT
 CRotatingObject::CRotatingObject(int nMeshes) {
 	//m_xmf3RotationAxis = XMFLOAT3(1.0f, 5.0f, -5.0f);
 	//m_fRotationSpeed = 90.0f;
+	
 }
 
 CRotatingObject::~CRotatingObject() {
 }
 
-
+void CRotatingObject::StatusWork() {
+	distance = 0.0f;
+	switch (status)
+	{
+	case enemyStatus::normal:
+		
+		break;
+	case enemyStatus::move:
+		distance = 1.0f;
+		break;
+	case enemyStatus::attack:
+		break;
+	case enemyStatus::death:
+		return;
+	}
+}
 
 void CRotatingObject::Animate(float fTimeElapsed) {
+
+	StatusWork();
 	CGameObject::Rotate(&m_xmf3RotationAxis, m_fRotationSpeed * fTimeElapsed);
-	CGameObject::Move(1.0f);
+	CGameObject::Move(distance);
+	
 	CGameObject::Animate(fTimeElapsed);
 }
+
 std::default_random_engine dre(1000);
 std::uniform_int_distribution<int> xPos(-mapWidth / 2 + 13.0f, mapWidth / 2 - 13.0f);
 std::uniform_int_distribution<int> yPos(-mapHeight / 2 + 13.0f, mapHeight / 2 - 13.0f);

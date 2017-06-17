@@ -47,6 +47,7 @@ public:
 
 	bool ProcessInput(UCHAR *pKeysBuffer);
 	void AnimateObjects(float fTimeElapsed, XMFLOAT3 player);
+	void SearchingPlayer(BoundingOrientedBox& player, CGameObject* enemy);
 	void crushObjects(BoundingOrientedBox& m_pCamera, BoundingOrientedBox& m_pPlayer, playerStatus& playerDeath, bool player, bool& cameraCrush);
 	void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 

@@ -108,13 +108,21 @@ void CBulletShader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature
 
 void CBulletShader::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList)
 {
+	n_draw = 0;
+	int index = 0;
 	for (int j = 0; j < m_nObjects; j++)
 	{
 		if (!m_ppObjects[j]->getDie()) {
-			m_pcbMappedGameObjects[j].m_xmcColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
-			XMStoreFloat4x4(&m_pcbMappedGameObjects[j].m_xmf4x4Transform,
+			m_pcbMappedGameObjects[index].m_xmcColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+			XMStoreFloat4x4(&m_pcbMappedGameObjects[index].m_xmf4x4Transform,
 				XMMatrixTranspose(XMLoadFloat4x4(&m_ppObjects[j]->getMatrix())));
+			n_draw += 1;
+			index += 1;
 		}
+	}
+	if (n_draw == 0) {
+		m_pcbMappedGameObjects[index].m_xmcColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+		m_pcbMappedGameObjects[index].m_xmf4x4Transform = XMFLOAT4X4();
 	}
 }
 
@@ -148,7 +156,7 @@ void CBulletShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *
 	UpdateShaderVariables(pd3dCommandList);
 
 	//하나의 정점 데이터를 사용하여 모든 게임 객체(인스턴스)들을 렌더링한다.
-	m_ppObjects[0]->Render(pd3dCommandList, pCamera, m_nObjects,
+	m_ppObjects[0]->Render(pd3dCommandList, pCamera, n_draw,
 		m_d3dInstancingBufferView);
 }
 
@@ -316,12 +324,23 @@ void CEnemyShader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature* p
 }
 void CEnemyShader::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList)
 {
+	n_draw = 0;
+	int index = 0;
 	for (int j = 0; j < m_nObjects; j++)
 	{
-		m_pcbMappedGameObjects[j].m_xmcColor = m_ppObjects[j]->getColor();
-		XMStoreFloat4x4(&m_pcbMappedGameObjects[j].m_xmf4x4Transform,
-			XMMatrixTranspose(XMLoadFloat4x4(&m_ppObjects[j]->getMatrix())));
+		if (!m_ppObjects[j]->getDie()) {
+			m_pcbMappedGameObjects[index].m_xmcColor = m_ppObjects[j]->getColor();
+			XMStoreFloat4x4(&m_pcbMappedGameObjects[index].m_xmf4x4Transform,
+				XMMatrixTranspose(XMLoadFloat4x4(&m_ppObjects[j]->getMatrix())));
+			n_draw += 1;
+			index += 1;
+		}
 	}
+	if (n_draw == 0) {
+		m_pcbMappedGameObjects[index].m_xmcColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+		m_pcbMappedGameObjects[index].m_xmf4x4Transform = XMFLOAT4X4();
+	}
+
 }
 
 void CEnemyShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, void* pContext)
@@ -360,7 +379,7 @@ void CEnemyShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *p
 	UpdateShaderVariables(pd3dCommandList);
 
 	//하나의 정점 데이터를 사용하여 모든 게임 객체(인스턴스)들을 렌더링한다.
-	m_ppObjects[1]->Render(pd3dCommandList, pCamera, m_nObjects,
+	m_ppObjects[1]->Render(pd3dCommandList, pCamera, n_draw,
 		m_d3dInstancingBufferView);
 }
 void CEnemyShader::AnimateObjects(float fTime)

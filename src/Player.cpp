@@ -494,7 +494,7 @@ void CTerrainPlayer::OnCameraUpdateCallback(float fTimeElapsed)
 
 	if (m_pCamera->getCrush())
 	{
-		printf("Crush\n");
+		//printf("Crush\n");
 		xmf3CameraPosition.y += 3.0f;
 		m_pCamera->SetPosition(xmf3CameraPosition);
 		if (m_pCamera->GetMode() == THIRD_PERSON_CAMERA)

@@ -368,6 +368,8 @@ CGameObject *ObjectShader::PickObjectByRayIntersection(XMFLOAT3& xmf3PickPositio
 	CGameObject *pSelectedObject = NULL;
 	for (int j = 0; j < m_nObjects; j++)
 	{
+		if (m_ppObjects[j]->getDie())
+			continue;
 		nIntersected = m_ppObjects[j]->PickObjectByRayIntersection(xmf3PickPosition,
 			xmf4x4View, &fHitDistance);
 		if ((nIntersected > 0) && (fHitDistance < *pfNearHitDistance))
