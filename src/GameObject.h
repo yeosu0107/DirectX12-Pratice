@@ -57,8 +57,8 @@ public:
 
 	void SetPosition(float x, float y, float z);
 	void SetPosition(XMFLOAT3 xmf3Position);
-	void Rotate(XMFLOAT3 *pxmf3Axis, float fAngle);
-	void Rotate(float fPitch = 10.0f, float fYaw = 10.0f, float fRoll = 10.0f);
+	virtual void Rotate(XMFLOAT3 *pxmf3Axis, float fAngle);
+	virtual void Rotate(float fPitch = 10.0f, float fYaw = 10.0f, float fRoll = 10.0f);
 	void Scale(float num);
 	void setScale(float num);
 
@@ -87,7 +87,9 @@ public:
 	void GenerateRayForPicking(XMFLOAT3& xmf3PickPosition, 
 		XMFLOAT4X4& xmf4x4View, XMFLOAT3 *pxmf3PickRayOrigin, XMFLOAT3 *pxmf3PickRayDirection);
 	//카메라 좌표계의 한 점에 대한 모델 좌표계의 픽킹 광선을 생성하고 객체와의 교차를 검사한다. 
-	int PickObjectByRayIntersection(XMFLOAT3& xmf3PickPosition, 		XMFLOAT4X4& xmf4x4View, float *pfHitDistance);
+	int PickObjectByRayIntersection(XMFLOAT3& xmf3PickPosition, 
+		XMFLOAT4X4& xmf4x4View, float *pfHitDistance);
+
 };
 
 class CRotatingObject : public CGameObject 

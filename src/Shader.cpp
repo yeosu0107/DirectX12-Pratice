@@ -562,7 +562,7 @@ void CInstancingShader::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCom
 
 void CInstancingShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {  
-	m_nObjects = 100;
+	m_nObjects = 1;
 	m_ppObjects = new CGameObject*[m_nObjects];
 
 	std::default_random_engine dre(1000);
@@ -578,7 +578,7 @@ void CInstancingShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 	for (int i = 0; i < m_nObjects; ++i) {
 		pRotatingObject = new CRotatingObject();
 		//각 정육면체 객체의 위치를 설정한다. 
-		pRotatingObject->SetPosition(2149 + xPos(dre), 246 + yPos(dre), 3527 + zPos(dre));
+		pRotatingObject->SetPosition(500 + xPos(dre), 246 + yPos(dre), 500 + zPos(dre));
 		pRotatingObject->setType(type(dre));
 		pRotatingObject->setMovingDir(XMFLOAT3(0, 0, 0));
 		//pRotatingObject->SetRotationAxis(XMFLOAT3(1.0f, 3.0f, 1.0f));

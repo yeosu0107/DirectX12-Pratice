@@ -4,7 +4,7 @@
 #include "GameObject.h"
 #include "Camera.h"
 
-enum playerStatus { Normal = 0, noMove, Death };
+enum playerStatus { Normal = 0, noMove=1, Death = 2 };
 
 class CScene
 {
@@ -47,7 +47,7 @@ public:
 
 	bool ProcessInput(UCHAR *pKeysBuffer);
 	void AnimateObjects(float fTimeElapsed, XMFLOAT3 player);
-	bool CrashObjects(BoundingOrientedBox& m_pPlayer, playerStatus& playerDeath);
+	void crushObjects(BoundingOrientedBox& m_pCamera, BoundingOrientedBox& m_pPlayer, playerStatus& playerDeath, bool player, bool& cameraCrush);
 	void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 
 	bool OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam); 

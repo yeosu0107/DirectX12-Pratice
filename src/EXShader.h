@@ -61,7 +61,6 @@ public:
 class CMazeShader : public CInstancingShader
 {
 private:
-private:
 	SCENE3_MIRO miro[10][10] =
 	{
 		{ { 1, 2 },{ 1, 0 },{ 2, 0 },{ 2, 0 },{ 2, 0 },{ 2, 0 },{ 2, 0 },{ 2, 0 },{ 2, 0 },{ 2, 3 } },
@@ -79,6 +78,38 @@ public:
 	CMazeShader();
 	virtual ~CMazeShader();
 
+	virtual void CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature
+		*pd3dGraphicsRootSignature);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);
+
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, void* pContext);
+	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
+	virtual void AnimateObjects(float fTime);
+
+	virtual CGameObject *PickObjectByRayIntersection(XMFLOAT3& xmf3PickPosition,
+		XMFLOAT4X4& xmf4x4View, float *pfNearHitDistance) {
+		return nullptr;
+	}
+};
+
+struct pos
+{
+	float xPos;
+	float zPos;
+};
+
+class CEnemyShader : public CInstancingShader{
+private:
+	pos EnemyPos[15] = {
+		{629.0f, 656.0f}, { 627.0f, 875.0f }, { 562.0f, 741.0f },
+		{477.0f, 1025.0f},{ 294.0f, 994.0f }, { 388.0f,	882.0f },
+		{294.0f, 751.0f}, { 443.0f,	570.0f }, { 409.0f,	1051.0f},
+		{123.0f, 565.0f}, { 176.0f,	1079.0f}, { 144.0f, 747.0f },
+		{181.0f, 811.0f}, { 141.0f,	894.0f }, { 110.0f,	967.0f }
+	};
+public:
+	CEnemyShader();
+	virtual ~CEnemyShader();
 	virtual void CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature
 		*pd3dGraphicsRootSignature);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);

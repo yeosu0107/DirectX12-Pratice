@@ -150,6 +150,7 @@ class CInstancingShader : public ObjectShader
 {
 private:
 	XMFLOAT3 playerPos;
+
 public:
 	CInstancingShader();
 	virtual ~CInstancingShader();

@@ -1,11 +1,6 @@
 #pragma once
 
-#define DIR_FORWARD 0x01
-#define DIR_BACKWARD 0x02
-#define DIR_LEFT 0x04
-#define DIR_RIGHT 0x08
-#define DIR_UP 0x10
-#define DIR_DOWN 0x20
+
 
 
 
@@ -88,6 +83,7 @@ public:
 	
 	//카메라 위치 갱신
 	virtual void OnCameraUpdateCallback(float fTimeElapsed) { }
+	virtual void OnCameraWallcrush(float fTimeElapsed) {}
 
 	void SetCameraUpdatedContext(LPVOID pContext) { m_pCameraUpdatedContext = pContext; }
 	virtual void CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList

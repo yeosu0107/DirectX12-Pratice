@@ -184,7 +184,8 @@ CCube::CCube(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandLis
 	m_d3dIndexBufferView.SizeInBytes = sizeof(UINT)*m_nIndices;
 	
 	m_xmBoundingBox = BoundingOrientedBox(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(fx, fy,
-		fz), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
+		fz), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
+
 	
 }
 

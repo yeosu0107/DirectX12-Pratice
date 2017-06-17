@@ -54,8 +54,10 @@ protected:
 	//카메라 소유 플레이어 포인터
 	CPlayer *m_pPlayer = NULL;
 
-
-
+	//카메라 oobb
+	BoundingOrientedBox m_xmOOBB;			 //모델좌표계에서의 충돌영역
+	BoundingOrientedBox	m_xmOOBBTransformed; //월드좌표계에서의 충돌 영역
+	bool				CameraCrush;
 public:
 	CCamera();
 	CCamera(CCamera* pCamera);
@@ -108,9 +110,9 @@ public:
 
 	void SetOffset(XMFLOAT3 xmf3Offset) {
 		m_xmf3Offset = xmf3Offset; 
-		/*m_xmf3Position.x += xmf3Offset.x;
+		m_xmf3Position.x += xmf3Offset.x;
 		m_xmf3Position.y += xmf3Offset.y;
-		m_xmf3Position.z += xmf3Offset.z;*/
+		m_xmf3Position.z += xmf3Offset.z;
 	}
 	XMFLOAT3& GetOffset() { return(m_xmf3Offset); }
 
@@ -136,6 +138,12 @@ public:
 	//3인칭 카메라에서 카메라가 바라보는 지점을 설정한다. 
 	//일반적으로 플레이어를 바라보도록 설정한다. 
 	virtual void SetLookAt(XMFLOAT3& xmf3LookAt) { }
+
+	void SetOOBB(XMFLOAT3& xmCenter, XMFLOAT3& xmExtents, XMFLOAT4& xmOrientation) { m_xmOOBBTransformed = m_xmOOBB = BoundingOrientedBox(xmCenter, xmExtents, xmOrientation); }
+	BoundingOrientedBox* getOOBB() { return &m_xmOOBBTransformed; } //트랜스폼 oobb주소 반환
+	void UpdateOOBB(XMFLOAT4X4& matrix);
+	void setCrush(bool t) { CameraCrush = t; }
+	bool getCrush() const { return CameraCrush; }
 };
 
 //조정석 위치

@@ -35,14 +35,14 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 
 	//적 셰이더
-	CInstancingShader* EnemyShader = new CInstancingShader();
+	CEnemyShader* EnemyShader = new CEnemyShader();
 	EnemyShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-	EnemyShader->BuildObjects(pd3dDevice, pd3dCommandList);
+	EnemyShader->BuildObjects(pd3dDevice, pd3dCommandList, m_pTerrain);
 	
 	m_nEnemy = EnemyShader->getObjectsNum();
 	m_pEnemy = EnemyShader->GetObjects();
 
-	m_ppShaders[1] = EnemyShader;
+	m_ppShaders[2] = EnemyShader;
 
 	//미로셰이더
 	CMazeShader* MazeShader = new CMazeShader();
@@ -52,7 +52,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_nWall = MazeShader->getObjectsNum();
 	m_pWall = MazeShader->GetObjects();
 
-	m_ppShaders[2] = MazeShader;
+	m_ppShaders[1] = MazeShader;
 
 	//총알 객체 셰이더 생성
 	CBulletShader* bulletShader = new CBulletShader();
@@ -122,22 +122,53 @@ void CScene::AnimateObjects(float fTimeElapsed, XMFLOAT3 player)
 	}
 }
 
-bool CScene::CrashObjects(BoundingOrientedBox& player, playerStatus& playerAct)
+void CScene::crushObjects(BoundingOrientedBox& Camera, BoundingOrientedBox& player, playerStatus& playerAct, bool playerDeath, bool& cameraCrush)
 {
+	cameraCrush = false;
+	//총알 - 적
+	for (int i = 0; i < m_nEnemy; ++i) {
+		for (int j = 0; j < m_nBullet; ++j) {
+			if (m_pBullet[j]->getDie())
+				continue;
+			if(m_pEnemy[i]->getOOBB()->Intersects(*m_pBullet[j]->getOOBB())) {
+				m_PaticleShaders[nowPaticle]->setPosition(m_pEnemy[i]->GetPosition());
+				m_PaticleShaders[nowPaticle]->setRun(m_pEnemy[i]->getColor());
+				//m_pEnemy[i]->Reset(player.Center);
+
+				nowPaticle += 1;
+				if (nowPaticle > m_nPaticleShaders - 1)
+					nowPaticle = 1;
+			}
+		}
+	}
+
+	if (playerDeath)
+		return;
 	playerAct = playerStatus::Normal;
+	//벽 - 플레이어
 	for (int i = 0; i < m_nWall; ++i) {
-		ContainmentType containType = m_pWall[i]->getOOBB()->Contains(player);
-		switch (containType) {
+		if (m_pWall[i]->getOOBB()->Intersects(player)) {
+			playerAct = playerStatus::noMove;
+		}
+		ContainmentType type = m_pWall[i]->getOOBB()->Contains(Camera);
+		switch (type) {
+		case INTERSECTS:
 		case CONTAINS:
+			cameraCrush = true;
 			break;
 		case DISJOINT:
 			break;
-		case INTERSECTING:
-			playerAct = playerStatus::noMove;
-			//return true;
+
 		}
 	}
-	return false;
+	//적 - 플레이어
+	for (int i = 0; i < m_nEnemy; ++i) {
+		if (m_pEnemy[i]->getOOBB()->Contains(player)) {
+			playerAct = playerStatus::Death;
+			m_PaticleShaders[0]->setPosition(player.Center);
+			m_PaticleShaders[0]->setRun(XMFLOAT4(1.0f, 0.0f, 0.0f, 0.0f));
+		}
+	}
 }
 
 void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera) 
@@ -265,7 +296,7 @@ CGameObject *CScene::PickObjectPointedByCursor(int xClient, int yClient, CCamera
 	float fHitDistance = FLT_MAX, fNearestHitDistance = FLT_MAX;
 	CGameObject *pIntersectedObject = NULL, *pNearestObject = NULL;
 	//셰이더의 모든 게임 객체들에 대한 마우스 픽킹을 수행하여 카메라와 가장 가까운 게임 객체를 구한다. 
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < m_nShaders; i++)
 	{
 		pIntersectedObject = m_ppShaders[i]->PickObjectByRayIntersection(xmf3PickPosition,
 			xmf4x4View, &fHitDistance);

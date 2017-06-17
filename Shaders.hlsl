@@ -57,6 +57,7 @@ float4 PSDiffused(VS_OUTPUT input) : SV_TARGET {
 VS_INSTANCING_OUTPUT VSInstancing(VS_INSTANCING_INPUT input)
 {
 	VS_INSTANCING_OUTPUT output;
+
 	output.position = mul(mul(mul(float4(input.position, 1.0f), input.mtxTransform),
 		gmtxView), gmtxProjection);
 	output.color = input.color + input.instanceColor;

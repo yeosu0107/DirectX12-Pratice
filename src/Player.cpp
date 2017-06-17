@@ -63,6 +63,8 @@ void CPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
 
 		Move(xmf3Shift, bUpdateVelocity);
 	}
+	
+
 }
 
 void CPlayer::Move(XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
@@ -352,7 +354,7 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 	default:
 		break;
 	}
-
+	
 	Update(fTimeElapsed);
 	return(m_pCamera);
 }
@@ -365,8 +367,8 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 	플레이어 위치 벡터의 y-좌표가 지형의 높이보다 크고 중력이 작용하도록
 	플레이어를 설정하였으므로 플레이어는 점차적으로 하강하게 된다.*/
 
-	float startXpos = 930;
-	float startZpos = 430;
+	float startXpos = 629;
+	float startZpos = 495;
 
 	float fHeight = pTerrain->
 		GetHeight(startXpos, startZpos);
@@ -390,6 +392,7 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 	//SetShader(pShader);
 	//CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
+	
 }
 CTerrainPlayer::~CTerrainPlayer()
 {
@@ -437,6 +440,7 @@ CCamera *CTerrainPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 	default:
 		break;
 	}
+	m_pCamera->SetOOBB(m_pCamera->GetPosition(), XMFLOAT3(4, 7, 7), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 	Update(fTimeElapsed);
 	return(m_pCamera);
 }
@@ -466,9 +470,14 @@ void CTerrainPlayer::OnPlayerUpdateCallback(float fTimeElapsed)
 
 void CTerrainPlayer::OnCameraUpdateCallback(float fTimeElapsed)
 {
+	if (!m_pCamera)
+		return;
 	XMFLOAT3 xmf3CameraPosition = m_pCamera->GetPosition();
 	CHeightMapTerrain *pTerrain = (CHeightMapTerrain *)m_pCameraUpdatedContext;
-	//printf("%f %f %f\n", xmf3CameraPosition.x, xmf3CameraPosition.y, xmf3CameraPosition.z);
+	
+	m_pCamera->UpdateOOBB(getMatrix());
+	//printf("%f %f %f\n", GetPosition().x, GetPosition().y, GetPosition().z);
+	//printf("%f %f %f\n", m_pCamera->getOOBB()->Center.x, m_pCamera->getOOBB()->Center.y, m_pCamera->getOOBB()->Center.z);
 	float fHeight = pTerrain->
 		GetHeight(xmf3CameraPosition.x, xmf3CameraPosition.z) + 5.0f;
 	
@@ -482,4 +491,18 @@ void CTerrainPlayer::OnCameraUpdateCallback(float fTimeElapsed)
 			p3rdPersonCamera->SetLookAt(GetPosition());
 		}
 	}
+
+	if (m_pCamera->getCrush())
+	{
+		printf("Crush\n");
+		xmf3CameraPosition.y += 3.0f;
+		m_pCamera->SetPosition(xmf3CameraPosition);
+		if (m_pCamera->GetMode() == THIRD_PERSON_CAMERA)
+		{
+			CThirdPersonCamera *p3rdPersonCamera = (CThirdPersonCamera *)m_pCamera;
+			p3rdPersonCamera->SetLookAt(GetPosition());
+		}
+	}
+	
+	
 }

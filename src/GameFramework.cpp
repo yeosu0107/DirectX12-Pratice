@@ -345,7 +345,7 @@ void CGameFramework::OnDestroy()
 void CGameFramework::ProcessInput()
 {
 	static UCHAR pKeyBuffer[256];
-	DWORD dwDirection = 0;
+	dwDirection = 0;
 
 	if (::GetKeyboardState(pKeyBuffer))
 	{
@@ -355,6 +355,7 @@ void CGameFramework::ProcessInput()
 		if (pKeyBuffer[VK_D] & 0xF0) dwDirection |= DIR_RIGHT;
 		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeyBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
+		if (pKeyBuffer[VK_E] & 0xF0) m_pPlayer->SetPosition(XMFLOAT3(629.0f, 300.0f, 495.0f));
 	}
 	float cxDelta = 0.0f, cyDelta = 0.0f;
 	POINT ptCursorPos;
@@ -366,30 +367,29 @@ void CGameFramework::ProcessInput()
 		cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 3.0f;
 		cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 3.0f;
 		::SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
-
-	}
-	if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
-	{
 		if (m_pSelectedObject)
 		{
 			ProcessSelectedObject(dwDirection, cxDelta, cyDelta);
 		}
-		else {
+
+	}
+	if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
+	{
+		
+		
 			if (cxDelta || cyDelta) {
 				if (pKeyBuffer[VK_RBUTTON] & 0xF0)
 					m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
 				else
 					m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
 			}
-
-			if (dwDirection && !m_pPlayer->getDie()) {
-				m_pPlayer->Move(dwDirection, 200.0f * m_GameTimer.GetTimeElapsed(), false);
-				if (playerAct == playerStatus::noMove) {
-					printf("Crash!\n");
-				}
+		
+		if (dwDirection && !m_pPlayer->getDie()) {
+			m_pPlayer->Move(dwDirection, 100.0f * m_GameTimer.GetTimeElapsed(), false);
+				
 				//m_pPlayer->Move(dwDirection, 5.0f, false);
-			}
 		}
+		
 	}
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
 
@@ -399,7 +399,7 @@ void CGameFramework::ProcessSelectedObject(DWORD dwDirection, float cxDelta, flo
 	cyDelta)
 {
 	//픽킹으로 선택한 게임 객체가 있으면 키보드를 누르거나 마우스를 움직이면 게임 개체를 이동 또는 회전한다. 
-	if (dwDirection != 0)
+	/*if (dwDirection != 0)
 	{
 		if (dwDirection & DIR_FORWARD) m_pSelectedObject->MoveForward(+1.0f);
 		if (dwDirection & DIR_BACKWARD) m_pSelectedObject->MoveForward(-1.0f);
@@ -411,7 +411,15 @@ void CGameFramework::ProcessSelectedObject(DWORD dwDirection, float cxDelta, flo
 	else if ((cxDelta != 0.0f) || (cyDelta != 0.0f))
 	{
 		m_pSelectedObject->Rotate(cyDelta, cxDelta, 0.0f);
-	}
+	}*/
+	XMFLOAT3 target = Vector3::Subtract(m_pSelectedObject->GetPosition(), m_pPlayer->GetPosition());
+	target = Vector3::Normalize(target);
+	float rot = Vector3::Angle(target, m_pPlayer->GetLook());
+	XMFLOAT3 axis = Vector3::CrossProduct(target, m_pPlayer->GetLook());
+
+	
+
+	m_pScene->playerUpdate(m_pPlayer->GetPosition(), target);
 }
 
 void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
@@ -526,17 +534,29 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 
 void CGameFramework::AnimateObjects()
 {
-	bool playerDie = false;
+	CameraCorrection = false;
 	if (playerShader) {
 		playerShader->AnimateObjects(m_GameTimer.GetTimeElapsed());
 	}
-	//printf("%f %f %f\n", m_pPlayer->GetPosition().x, m_pPlayer->GetPosition().y, m_pPlayer->GetPosition().z);
+	
 	if (m_pScene) {
 		m_pScene->AnimateObjects(m_GameTimer.GetTimeElapsed(), m_pPlayer->GetPosition());
-		playerDie = m_pScene->CrashObjects(*m_pPlayer->getOOBB(), playerAct);
-	}
-	if (playerDie) {
-		m_pPlayer->Die();
+		m_pScene->crushObjects(*m_pCamera->getOOBB(),*m_pPlayer->getOOBB(), playerAct, m_pPlayer->getDie(), CameraCorrection);
+
+		m_pCamera->setCrush(CameraCorrection);
+
+		switch (playerAct) {
+		case playerStatus::Normal:
+			break;
+		case playerStatus::noMove:
+			m_pPlayer->Move(dwDirection, -100.0f * m_GameTimer.GetTimeElapsed(), false);
+			break;
+		case playerStatus::Death:
+			m_pPlayer->Die();
+			break;
+		default:
+			break;
+		}
 	}
 }
 
@@ -544,9 +564,12 @@ void CGameFramework::FrameAdvance()
 {    
 	m_GameTimer.Tick(60); //60프레임 고정
 	
+	AnimateObjects();
+
 	ProcessInput();
 
-	AnimateObjects();
+	//AnimateObjects();
+	
 	//플레이어 위치 찍어보기
 	//printf("%f %f %f\n", m_pPlayer->GetPosition().x, m_pPlayer->GetPosition().y, m_pPlayer->GetPosition().z);
 

@@ -135,6 +135,13 @@ void CCamera::SetViewportsAndScissorRects(ID3D12GraphicsCommandList *pd3dCommand
 	pd3dCommandList->RSSetScissorRects(1, &m_d3dScissorRect); 
 }
 
+void CCamera::UpdateOOBB(XMFLOAT4X4& matrix)
+{
+	m_xmOOBBTransformed = m_xmOOBB;
+	m_xmOOBBTransformed.Transform(m_xmOOBBTransformed, XMLoadFloat4x4(&matrix));
+	XMStoreFloat4(&m_xmOOBBTransformed.Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmOOBBTransformed.Orientation)));
+}
+
 CSpaceShipCamera::CSpaceShipCamera(CCamera *pCamera) : CCamera(pCamera)
 {
 	m_nMode = SPACESHIP_CAMERA;
@@ -245,7 +252,6 @@ void CFirstPersonCamera::Rotate(float x, float y, float z)
 CThirdPersonCamera::CThirdPersonCamera(CCamera *pCamera) : CCamera(pCamera)
 {
 	m_nMode = THIRD_PERSON_CAMERA;
-	//m_xmf3Position.y = 10;
 	if (pCamera)
 	{
 		

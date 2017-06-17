@@ -225,6 +225,7 @@ void CGameObject::Scale(float num)
 	m_xmf4x4World._11 *= num;
 	m_xmf4x4World._22 *= num;
 	m_xmf4x4World._33 *= num;
+
 }
 
 void CGameObject::setScale(float num)
@@ -233,6 +234,7 @@ void CGameObject::setScale(float num)
 	m_xmf4x4World._22 = num;
 	m_xmf4x4World._33 = num;
 }
+
 
 void CGameObject::GenerateRayForPicking(XMFLOAT3& xmf3PickPosition, XMFLOAT4X4&
 	xmf4x4View, XMFLOAT3 *pxmf3PickRayOrigin, XMFLOAT3 *pxmf3PickRayDirection)
@@ -400,7 +402,7 @@ CBullet::~CBullet()
 
 void CBullet::Animate(float fTimeElapsed)
 {
-	Move(10.0f);
+	Move(5.0f);
 	CGameObject::Animate(fTimeElapsed);
 	/*runtime += 1.0f;
 	if (runtime >= maxtime) {

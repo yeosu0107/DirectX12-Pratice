@@ -77,6 +77,7 @@ private:
 	_TCHAR						m_pszFrameRate[50];
 
 	playerStatus				playerAct;
+	bool						CameraCorrection;
 
 public:
 	CPlayerShader* playerShader = NULL;
@@ -86,8 +87,7 @@ public:
 	CPlayer *m_pPlayer = NULL;
 	POINT m_ptOldCursorPos;
 	CGameObject *m_pSelectedObject = NULL;
-
-
+	DWORD dwDirection = 0;
 
 	//TRACKMOUSEEVENT mouseEvent;
 
