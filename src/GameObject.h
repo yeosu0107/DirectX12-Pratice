@@ -95,6 +95,8 @@ public:
 	int PickObjectByRayIntersection(XMFLOAT3& xmf3PickPosition, 
 		XMFLOAT4X4& xmf4x4View, float *pfHitDistance);
 
+	bool IsVisible(CCamera *pCamera = NULL);
+
 };
 
 class CRotatingObject : public CGameObject 

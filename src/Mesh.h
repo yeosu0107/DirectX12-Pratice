@@ -167,3 +167,11 @@ public:
 		*pd3dCommandList, float fRadius = 2.0f, int nSlices = 20, int nStacks = 20);
 	virtual ~CSphereMeshDiffused();
 };
+
+class CHouseMesh : public CMesh
+{
+public:
+	CHouseMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList,
+		float width, float height, float depth);
+	virtual ~CHouseMesh() { }
+};

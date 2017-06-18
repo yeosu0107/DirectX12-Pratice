@@ -115,9 +115,45 @@ public:
 	virtual ~CEnemyShader();
 	virtual void CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature
 		*pd3dGraphicsRootSignature);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
+
+	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, void* pContext);
+	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
+	virtual void AnimateObjects(float fTime);
+};
+
+class CHouseShader : public CInstancingShader
+{
+private:
+	SCENE3_MIRO miro[11][11] =
+	{
+		{ { 1, 2 },{ 2, 0 },{ 0, 0 },{ 2, 0 },{ 2, 0 },{ 2, 0 },{ 2, 0 },{ 2, 0 },{ 2, 0 },{ 2, 0 },{ 2, 3 } },
+		{ { 1, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 3, 0 } },
+		{ { 1, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 3, 0 } },
+		{ { 1, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 3, 0 } },
+		{ { 1, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 3, 0 } },
+		{ { 1, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 3, 0 } },
+		{ { 1, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 3, 0 } },
+		{ { 1, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 3, 0 } },
+		{ { 1, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 3, 0 } },
+		{ { 1, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 0, 0 },{ 3, 0 } },
+		{ { 1, 4 },{ 4, 0 },{ 4, 0 },{ 4, 0 },{ 4, 0 },{ 4, 0 },{ 4, 0 },{ 4, 0 },{ 4, 0 },{ 0, 0 },{ 3, 0 } }
+	};
+
+public:
+	CHouseShader() {}
+	virtual ~CHouseShader() {}
+
+	virtual void CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature
+		*pd3dGraphicsRootSignature);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);
 
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, void* pContext);
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 	virtual void AnimateObjects(float fTime);
+
+	virtual CGameObject *PickObjectByRayIntersection(XMFLOAT3& xmf3PickPosition,
+		XMFLOAT4X4& xmf4x4View, float *pfNearHitDistance) {
+		return nullptr;
+	}
 };

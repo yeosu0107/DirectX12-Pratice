@@ -31,6 +31,9 @@ protected:
 	CGameObject** m_pWall = NULL;
 	int m_nWall = 0;
 
+	CGameObject** m_pHouse = NULL;
+	int m_nHouse = 0;
+
 	CHeightMapTerrain* m_pTerrain = NULL;
 
 	ID3D12RootSignature *m_pd3dGraphicsRootSignature = NULL;

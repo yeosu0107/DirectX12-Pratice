@@ -21,8 +21,11 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	
 
 	//¼ÎÀÌ´õ »ý¼º
-	m_nShaders = 3;
+	m_nShaders = 4;
 	m_ppShaders = new CShader*[m_nShaders];
+
+	
+
 
 	//¸Ê ¼ÎÀÌ´õ
 	CTerrainShader* mapShader = new CTerrainShader();
@@ -31,8 +34,16 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	
 	m_pTerrain = (CHeightMapTerrain*)mapShader->GetObjects()[0];
 
-	m_ppShaders[0] = mapShader;
+	m_ppShaders[1] = mapShader;
 
+	CHouseShader* houseShader = new CHouseShader();
+	houseShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	houseShader->BuildObjects(pd3dDevice, pd3dCommandList, m_pTerrain);
+
+	m_pHouse = houseShader->GetObjects();
+	m_nHouse = houseShader->getObjectsNum();
+
+	m_ppShaders[0] = houseShader;
 
 	//Àû ¼ÎÀÌ´õ
 	CEnemyShader* EnemyShader = new CEnemyShader();
@@ -42,7 +53,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_nEnemy = EnemyShader->getObjectsNum();
 	m_pEnemy = EnemyShader->GetObjects();
 
-	m_ppShaders[2] = EnemyShader;
+	m_ppShaders[3] = EnemyShader;
 
 	//¹Ì·Î¼ÎÀÌ´õ
 	CMazeShader* MazeShader = new CMazeShader();
@@ -52,7 +63,8 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_nWall = MazeShader->getObjectsNum();
 	m_pWall = MazeShader->GetObjects();
 
-	m_ppShaders[1] = MazeShader;
+	m_ppShaders[2] = MazeShader;
+
 
 	//ÃÑ¾Ë °´Ã¼ ¼ÎÀÌ´õ »ý¼º
 	CBulletShader* bulletShader = new CBulletShader();
@@ -221,6 +233,11 @@ void CScene::crushObjects(BoundingOrientedBox& Camera, BoundingOrientedBox& play
 
 		}
 	}
+	for (int i = 0; i < m_nHouse; ++i) {
+		if (m_pHouse[i]->getOOBB()->Intersects(player)) {
+			playerAct = playerStatus::noMove;
+		}
+	}
 	
 	for (int i = 0; i < m_nEnemy; ++i) {
 		//Àû - ÇÃ·¹ÀÌ¾î
@@ -230,12 +247,11 @@ void CScene::crushObjects(BoundingOrientedBox& Camera, BoundingOrientedBox& play
 			
 
 		if (m_pEnemy[i]->getOOBB()->Contains(player)) {
-			//playerAct = playerStatus::Death;
+			playerAct = playerStatus::Death;
 			m_PaticleShaders[0]->setPosition(player.Center);
 			m_PaticleShaders[0]->setRun(XMFLOAT4(1.0f, 0.0f, 0.0f, 0.0f));
 		}
 
-		
 	}
 }
 

@@ -18,7 +18,7 @@ struct VS_CB_CAMERA_INFO
 
 class CCamera
 {
-protected: 
+protected:
 	//카메라의 위치
 	XMFLOAT3 m_xmf3Position;
 
@@ -58,17 +58,19 @@ protected:
 	BoundingOrientedBox m_xmOOBB;			 //모델좌표계에서의 충돌영역
 	BoundingOrientedBox	m_xmOOBBTransformed; //월드좌표계에서의 충돌 영역
 	bool				CameraCrush;
+	BoundingFrustum     m_xmFrustum;			 //절두체 컬링
+
 public:
 	CCamera();
 	CCamera(CCamera* pCamera);
 	virtual ~CCamera();
 
 	//카메라정보 -> 셰이더 프로그램
-	virtual void CreateShaderVariables(ID3D12Device *pd3dDevice, 
-		ID3D12GraphicsCommandList *pd3dCommandList); 
-	virtual void ReleaseShaderVariables(); 
+	virtual void CreateShaderVariables(ID3D12Device *pd3dDevice,
+		ID3D12GraphicsCommandList *pd3dCommandList);
+	virtual void ReleaseShaderVariables();
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);
-	
+
 	//카메라 변환행렬 생성
 	void GenerateViewMatrix();
 	void GenerateViewMatrix(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3LookAt, XMFLOAT3 xmf3Up);
@@ -78,10 +80,10 @@ public:
 
 	//투영변환행렬 생성
 	void GenerateProjectionMatrix(float fNearPlaneDistance, float fFarPlaneDistance, float fAspectRatio, float fFOVAngle);
-	
+
 	//뷰포트, 시저렉트 셋
-	void SetViewport(int xTopLeft, int yTopLeft, int nWidth, int nHeight, 
-		float fMinZ = 0.0f, float fMaxZ = 1.0f); 
+	void SetViewport(int xTopLeft, int yTopLeft, int nWidth, int nHeight,
+		float fMinZ = 0.0f, float fMaxZ = 1.0f);
 	void SetScissorRect(LONG xLeft, LONG yTop, LONG xRight, LONG yBottom);
 	virtual void SetViewportsAndScissorRects(ID3D12GraphicsCommandList *pd3dCommandList);
 
@@ -109,7 +111,7 @@ public:
 	float& GetYaw() { return(m_fYaw); }
 
 	void SetOffset(XMFLOAT3 xmf3Offset) {
-		m_xmf3Offset = xmf3Offset; 
+		m_xmf3Offset = xmf3Offset;
 		m_xmf3Position.x += xmf3Offset.x;
 		m_xmf3Position.y += xmf3Offset.y;
 		m_xmf3Position.z += xmf3Offset.z;
@@ -124,14 +126,14 @@ public:
 	D3D12_VIEWPORT GetViewport() { return(m_d3dViewport); }
 	D3D12_RECT GetScissorRect() { return(m_d3dScissorRect); }
 
-	virtual void Move(XMFLOAT3& xmf3Shift) { 
+	virtual void Move(XMFLOAT3& xmf3Shift) {
 		m_xmf3Position.x += xmf3Shift.x;
-		m_xmf3Position.y += xmf3Shift.y; 
-		m_xmf3Position.z += xmf3Shift.z; 
+		m_xmf3Position.y += xmf3Shift.y;
+		m_xmf3Position.z += xmf3Shift.z;
 	}
 
 	virtual void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f) { }
-	
+
 	//카메라의 이동, 회전에 따라 카메라의 정보를 갱신하는 가상함수이다. 
 	virtual void Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed) { }
 
@@ -144,6 +146,10 @@ public:
 	void UpdateOOBB(XMFLOAT4X4& matrix);
 	void setCrush(bool t) { CameraCrush = t; }
 	bool getCrush() const { return CameraCrush; }
+	bool IsInFrustum(BoundingOrientedBox& xmBoundingBox);
+	//절두체(월드 좌표계)를 생성한다. 
+	void GenerateFrustum();
+	//바운딩 박스(OOBB, 월드 좌표계)가 절두체에 포함되는 가를 검사한다. 	
 };
 
 //조정석 위치

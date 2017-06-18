@@ -356,9 +356,9 @@ void CGameFramework::ProcessInput()
 		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeyBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
 		if (pKeyBuffer[VK_E] & 0xF0) m_pPlayer->SetPosition(XMFLOAT3(629.0f, 300.0f, 495.0f));
-		//if (pKeyBuffer[VK_Q] & 0xF0) m_pPlayer->SetPosition(XMFLOAT3(394.0f, 811.0f, 669.0f));
+		if (pKeyBuffer[VK_Q] & 0xF0) m_pPlayer->SetPosition(XMFLOAT3(394.0f, 811.0f, 669.0f));
 		if (pKeyBuffer[VK_RETURN] & 0xF0) {
-			if (!m_pPlayer->getDie()) {
+			if (m_pPlayer->getDie()) {
 				ReleaseObjects();
 				BuildObjects();
 			}
@@ -562,7 +562,7 @@ void CGameFramework::FrameAdvance()
 	//AnimateObjects();
 	
 	//플레이어 위치 찍어보기
-	printf("%f %f %f\n", m_pPlayer->GetPosition().x, m_pPlayer->GetPosition().y, m_pPlayer->GetPosition().z);
+	//printf("%f %f %f\n", m_pPlayer->GetPosition().x, m_pPlayer->GetPosition().y, m_pPlayer->GetPosition().z);
 
 	//d3d 표현 부분
 	//명령 할당자와 명령 리스트를 리셋한다.

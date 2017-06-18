@@ -425,7 +425,7 @@ void CTerrainShader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature
 void CTerrainShader::BuildObjects(ID3D12Device *pd3dDevice, 
 	ID3D12GraphicsCommandList *pd3dCommandList) {
 
-	m_nObjects = 1;
+	m_nObjects = 3;
 	m_ppObjects = new CGameObject*[m_nObjects];
 
 	CHeightMapTerrain *m_pTerrain = NULL;
@@ -448,6 +448,20 @@ void CTerrainShader::BuildObjects(ID3D12Device *pd3dDevice,
 #endif
 
 	m_ppObjects[0] = m_pTerrain;
+
+	CGameObject* roof = new CGameObject();
+	roof->SetPosition(380, 345, 820);
+	CCube* proof = new CCube(pd3dDevice, pd3dCommandList, 650, 30, 650);
+	roof->SetMesh(0, proof);
+	m_ppObjects[1] = roof;
+
+	roof = new CGameObject();
+	roof->SetPosition(380, 390, 820);
+	CCube* proof2 = new CCube(pd3dDevice, pd3dCommandList, 450, 60, 450);
+	roof->SetMesh(0, proof2);
+
+	
+	m_ppObjects[2] = roof;
 }
 
 void CTerrainShader::ReleaseUploadBuffers()

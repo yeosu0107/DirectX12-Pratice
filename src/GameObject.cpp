@@ -270,6 +270,18 @@ int CGameObject::PickObjectByRayIntersection(XMFLOAT3& xmf3PickPosition, XMFLOAT
 	return(nIntersected);
 }
 
+bool CGameObject::IsVisible(CCamera *pCamera)
+{
+	OnPrepareRender();
+	bool bIsVisible = false;
+	BoundingOrientedBox xmBoundingBox = m_ppMeshes[0]->GetBoundingBox();
+	//모델 좌표계의 바운딩 박스를 월드 좌표계로 변환한다. 
+	xmBoundingBox.Transform(xmBoundingBox, XMLoadFloat4x4(&m_xmf4x4World));
+	if (pCamera) 
+		bIsVisible = pCamera->IsInFrustum(xmBoundingBox);
+	return(bIsVisible);
+}
+
 CRotatingObject::CRotatingObject(int nMeshes) {
 	//m_xmf3RotationAxis = XMFLOAT3(1.0f, 5.0f, -5.0f);
 	//m_fRotationSpeed = 90.0f;
@@ -287,7 +299,7 @@ void CRotatingObject::StatusWork() {
 		
 		break;
 	case enemyStatus::move:
-		distance = 1.0f;
+		distance = 1.5f;
 		break;
 	case enemyStatus::attack:
 		break;

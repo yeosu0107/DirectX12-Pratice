@@ -367,8 +367,8 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 	플레이어 위치 벡터의 y-좌표가 지형의 높이보다 크고 중력이 작용하도록
 	플레이어를 설정하였으므로 플레이어는 점차적으로 하강하게 된다.*/
 
-	float startXpos = 629;
-	float startZpos = 495;
+	float startXpos = 2138;
+	float startZpos = 860;
 
 	float fHeight = pTerrain->
 		GetHeight(startXpos, startZpos);

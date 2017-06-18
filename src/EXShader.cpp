@@ -286,9 +286,9 @@ void CMazeShader::BuildObjects(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandL
 			}
 		}
 	}
-				
-	
 	m_ppObjects[0]->SetMesh(0, pCube);
+
+
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
@@ -303,6 +303,7 @@ void CMazeShader::Render(ID3D12GraphicsCommandList * pd3dCommandList, CCamera * 
 	//하나의 정점 데이터를 사용하여 모든 게임 객체(인스턴스)들을 렌더링한다.
 	m_ppObjects[0]->Render(pd3dCommandList, pCamera, m_nObjects,
 		m_d3dInstancingBufferView);
+
 }
 
 void CMazeShader::AnimateObjects(float fTimeElapsed)
@@ -322,13 +323,13 @@ void CEnemyShader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature* p
 	m_ppd3dPipelineStates = new ID3D12PipelineState*[m_nPipelineStates];
 	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
 }
-void CEnemyShader::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList)
+void CEnemyShader::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)
 {
 	n_draw = 0;
 	int index = 0;
 	for (int j = 0; j < m_nObjects; j++)
 	{
-		if (!m_ppObjects[j]->getDie()) {
+		if (!m_ppObjects[j]->getDie() && m_ppObjects[j]->IsVisible(pCamera)) {
 			m_pcbMappedGameObjects[index].m_xmcColor = m_ppObjects[j]->getColor();
 			XMStoreFloat4x4(&m_pcbMappedGameObjects[index].m_xmf4x4Transform,
 				XMMatrixTranspose(XMLoadFloat4x4(&m_ppObjects[j]->getMatrix())));
@@ -376,7 +377,7 @@ void CEnemyShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *p
 	ObjectShader::Render(pd3dCommandList, pCamera);
 
 	//모든 게임 객체의 인스턴싱 데이터를 버퍼에 저장한다.
-	UpdateShaderVariables(pd3dCommandList);
+	UpdateShaderVariables(pd3dCommandList, pCamera);
 
 	//하나의 정점 데이터를 사용하여 모든 게임 객체(인스턴스)들을 렌더링한다.
 	m_ppObjects[1]->Render(pd3dCommandList, pCamera, n_draw,
@@ -386,4 +387,122 @@ void CEnemyShader::AnimateObjects(float fTime)
 {
 	for (int i = 0; i < m_nObjects; ++i)
 		m_ppObjects[i]->Animate(fTime);
+}
+
+void CHouseShader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature
+	*pd3dGraphicsRootSignature)
+{
+	m_nPipelineStates = 1;
+	m_ppd3dPipelineStates = new ID3D12PipelineState*[m_nPipelineStates];
+	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+}
+
+void CHouseShader::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList)
+{
+	for (int j = 0; j < m_nObjects; j++)
+	{
+
+		m_pcbMappedGameObjects[j].m_xmcColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+		XMStoreFloat4x4(&m_pcbMappedGameObjects[j].m_xmf4x4Transform,
+			XMMatrixTranspose(XMLoadFloat4x4(&m_ppObjects[j]->getMatrix())));
+	}
+}
+
+void CHouseShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, void* pContext)
+{
+	int count = 0;
+	for(int i=0; i<11; ++i)
+		for(int j=0; j<11; ++j)
+			for(int z=0; z<2; ++z)
+				if (miro[i][j].layout[z] != 0)
+					++count;
+
+	CHeightMapTerrain *pTerrain = (CHeightMapTerrain *)pContext;
+
+	float fHeight = 230.0f;
+
+	float startXpos = 73.0f - 30.0f;
+	float startZPos = 145.0f + 30.0f;
+
+	float xPos = 0.0f;
+	float zPos = 0.0f;
+
+	float setX = 60.0f;
+	float setY = 200.0f;
+	float setZ = 30.0f;
+
+	m_nObjects = count; 
+	m_ppObjects = new CGameObject*[m_nObjects];
+	int now = 0;
+	CGameObject* wall = nullptr;
+
+	//float th = setY / 2 - 10;
+
+	CCube* pCube = new CCube(pd3dDevice, pd3dCommandList, setX, setY, setZ);
+	for (int i = 0; i < 11; ++i) {
+		for (int j = 0; j < 11; ++j) {
+			for (int z = 0; z < 2; ++z) {
+				if (miro[i][j].layout[z] == 0)
+					continue;
+
+				wall = new CGameObject();
+				if (miro[i][j].layout[z] == 1) {
+					xPos = startXpos + setX * j + setZ - setZ / 2;
+					zPos = startZPos + 950 - setX * i;
+					//fHeight = pTerrain->GetHeight(xPos, zPos) + th;
+					wall->SetPosition(xPos, fHeight, zPos);
+
+					wall->Rotate(0, 90, 0);
+				}
+				else if (miro[i][j].layout[z] == 2) {
+					xPos = startXpos + setX * j + setZ;
+					zPos = startZPos + 950 - setX * i + setZ / 2;
+					//fHeight = pTerrain->GetHeight(xPos, zPos) + th;
+					wall->SetPosition(xPos, fHeight, zPos);
+
+				}
+				else if (miro[i][j].layout[z] == 3) {
+					xPos = startXpos + setX * j + setZ + setZ / 2;
+					zPos = startZPos + 950 - setX * i;
+					//fHeight = pTerrain->GetHeight(xPos, zPos) + th;
+					wall->SetPosition(xPos, fHeight, zPos);
+
+					wall->Rotate(0, 90, 0);
+				}
+				else if (miro[i][j].layout[z] == 4) {
+					xPos = startXpos + setX * j + setZ;
+					zPos = startZPos + 950 - setX * i - setZ / 2;
+					//fHeight = pTerrain->GetHeight(xPos, zPos) + th;
+					wall->SetPosition(xPos, fHeight, zPos);
+
+				}
+				wall->SetOOBB(pCube->GetBoundingBox());
+				m_ppObjects[now++] = wall;
+			}
+		}
+	}
+	m_ppObjects[0]->SetMesh(0, pCube);
+
+
+
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+}
+
+void CHouseShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)
+{
+	CShader::Render(pd3dCommandList, pCamera);
+
+	UpdateShaderVariables(pd3dCommandList);
+
+	m_ppObjects[0]->Render(pd3dCommandList, pCamera, m_nObjects,
+		m_d3dInstancingBufferView);
+}
+
+void CHouseShader::AnimateObjects(float fTime)
+{
+	for (int j = 0; j < m_nObjects; j++) {
+		if (!m_ppObjects[j]->getDie()) {
+			m_ppObjects[j]->Animate(fTime);
+		}
+	}
 }
