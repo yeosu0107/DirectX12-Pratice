@@ -1,6 +1,7 @@
 Debug/
 x64/
 ReadMe/
+.vs/
 *.aps/
 *.ico
 *.rc
